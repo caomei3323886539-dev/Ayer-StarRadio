@@ -2,7 +2,7 @@
   "id": "./",
   "name": "艾耶尔大陆 · 星音电台",
   "short_name": "星音电台",
-  "description": "星音电台 v0.5.4 · 日文原文与灰色中文翻译同步滚动歌词",
+  "description": "星音电台 v0.5.5 · 歌词引擎稳定版",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
