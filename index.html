@@ -24,7 +24,7 @@
 
 .toast{top:79px}@media(max-width:850px){.toast{top:auto;bottom:calc(175px + env(safe-area-inset-bottom));right:11px;left:11px;max-width:none;text-align:center}}
 
-/* v0.5.3 immersive synchronized LRC lyrics */
+/* v0.5.4 immersive synchronized LRC lyrics */
 .lyric-card{min-width:0}
 .lyric-card .side-head{gap:10px}
 .lyric-card .side-buttons{display:flex;align-items:center;gap:7px}
@@ -88,6 +88,18 @@ button:active{filter:brightness(.97);transition:filter .12s ease}
 @media(max-width:460px){.lyric-card .side-head{flex-wrap:wrap}.lyric-card .side-buttons{width:100%;justify-content:space-between}.lyric-card .side-buttons .small-pill{min-height:40px}.calibration-hint{font-size:10px}}
 @media(max-height:740px){.calibration-hint{padding:5px 8px}}
 
+
+/* v0.5.4 synchronized Japanese and Chinese subtitle lines */
+.lyric-view-option{display:flex;align-items:center;justify-content:flex-end;gap:9px;padding:8px 7px 1px;font-size:12px;color:#496d8b;flex-shrink:0}
+.lyric-view-option select{border:1px solid #bad6ec;border-radius:999px;min-height:38px;max-width:235px;background:#f5fbff;color:#215b89;padding:7px 12px;font-size:12px}
+.lyrics-box .lyrics-line{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:var(--lyric-font-size,16px)!important;line-height:1.5}
+.lyrics-box .lyric-primary{display:block;width:100%;font-size:1em;line-height:1.65;overflow-wrap:anywhere}
+.lyrics-box .lyric-translation{display:block;width:100%;font-size:.72em;line-height:1.65;color:#718397;font-weight:500;letter-spacing:.02em;opacity:.93;overflow-wrap:anywhere}
+.lyrics-box .lyrics-line.active .lyric-translation{color:#68788d;font-weight:600;opacity:1}
+.lyrics-box .lyrics-line.active .lyric-primary{color:#126fbd}
+.lyrics-box .lyrics-line.bilingual{min-height:75px;padding-top:12px;padding-bottom:19px}
+.lyrics-box .lyrics-line.active.bilingual{padding-bottom:22px}
+@media(max-width:850px){.lyric-view-option{padding:5px 4px 1px}.lyric-view-option select{font-size:11px;min-height:38px;max-width:215px}.lyrics-box .lyrics-line.bilingual{min-height:68px;margin:5px 0}.lyrics-box .lyric-translation{font-size:.78em}}
 </style>
 </head>
 <body>
@@ -157,12 +169,12 @@ button:active{filter:brightness(.97);transition:filter .12s ease}
         <div class="now-actions"><button class="chip selected" id="lyricsTab"><span data-icon="file-text"></span>歌词</button><button class="chip" id="queueTab"><span data-icon="list"></span>播放队列</button><button class="chip" id="motionBtn"><span data-icon="sparkles"></span>动画：开</button><button class="chip" id="lyricFocus" type="button" aria-pressed="false"><span data-icon="chevron-up"></span>歌词全屏</button></div>
       </section>
       <section class="lyric-card glass" id="nowSide"><div class="side-head"><h3><span class="little-star">✦</span><span id="sideHeading">歌词</span></h3><div class="side-buttons"><button id="lyricCalibrate" class="small-pill" type="button" aria-pressed="false" title="播放时点击歌词记录这一句的真实起唱时间">◷ 逐句校准</button><button id="lyricSize" class="small-pill" title="调整歌词字号" aria-label="调整歌词字号">A±</button><button id="lyricFollow" class="small-pill lyric-follow selected" type="button" aria-pressed="true" title="自动跟随正在演唱的歌词">◎ 跟随中</button></div></div>
-        <div class="lyric-tools" id="lyricTools" aria-label="歌词同步设置"><span class="lyric-live">● <span id="lyricSyncStatus">等待播放</span></span><div class="lyric-offset-group"><button id="lyricEarlier" type="button" class="small-pill" title="歌词提前 0.5 秒" aria-label="歌词提前0.5秒">−0.5s</button><button id="lyricOffsetReset" type="button" class="small-pill lyric-offset-value" title="重置歌词同步偏移" aria-label="重置歌词时间偏移">0.0s</button><button id="lyricLater" type="button" class="small-pill" title="歌词延后 0.5 秒" aria-label="歌词延后0.5秒">+0.5s</button></div></div>
+        <div class="lyric-view-option"><label for="lyricDisplay">歌词显示</label><select id="lyricDisplay" aria-label="歌词显示方式"><option value="bilingual">日文原文 + 中文翻译</option><option value="original">仅原文</option><option value="translation">仅翻译</option></select></div><div class="lyric-tools" id="lyricTools" aria-label="歌词同步设置"><span class="lyric-live">● <span id="lyricSyncStatus">等待播放</span></span><div class="lyric-offset-group"><button id="lyricEarlier" type="button" class="small-pill" title="歌词提前 0.5 秒" aria-label="歌词提前0.5秒">−0.5s</button><button id="lyricOffsetReset" type="button" class="small-pill lyric-offset-value" title="重置歌词同步偏移" aria-label="重置歌词时间偏移">0.0s</button><button id="lyricLater" type="button" class="small-pill" title="歌词延后 0.5 秒" aria-label="歌词延后0.5秒">+0.5s</button></div></div>
         <div class="calibration-hint" id="calibrationHint">歌词不同步？点击「逐句校准」，播放时听到哪一句开始唱就点击哪一句；时间按歌曲单独保存。<button id="lyricClearCalibration" type="button" class="calibration-reset">恢复原时间</button></div><div id="lyricsBox" class="lyrics-box"></div><div id="queueBox" class="queue-box hidden"></div></section>
     </div>
   </div>
 </dialog>
-<dialog id="editDialog" class="app-dialog"><form id="editForm"><div class="dialog-heading"><h2>编辑歌曲资料</h2><button type="button" data-close="editDialog" class="round-icon" aria-label="关闭"><span data-icon="x"></span></button></div><input id="editId" type="hidden"><label>曲名<input id="editTitle" required maxlength="120"></label><label>艺术家<input id="editArtist" required maxlength="120"></label><label>所属专辑<input id="editAlbum" required maxlength="120" list="albumOptions"></label><datalist id="albumOptions"></datalist><label>音乐标签<input id="editTags" maxlength="200" placeholder="例如：神之谷, 交响, 纯音乐"></label><label>封面图片（JPG / PNG / WebP，最大 3 MB）<input id="editCover" type="file" accept="image/jpeg,image/png,image/webp"></label><label>歌词 / LRC<textarea id="editLyrics" rows="6" placeholder="[00:10.00] 晨曦穿过云海的边缘&#10;[00:15.20] 照亮神之谷的峰巅"></textarea></label><label>导入 LRC 歌词文件（选填）<input type="file" id="editLyricsFile" accept=".lrc,.txt,text/plain"></label><p class="notice" style="margin:0">带有 [00:12.30] 时间标签的 LRC 歌词会随音乐同步居中滚动。纯文本只能静态显示。</p><div class="dialog-footer"><button type="button" class="btn btn-ice" id="editAddToList"><span data-icon="list"></span>加入歌单</button><button class="btn btn-primary" type="submit">保存资料</button></div></form></dialog>
+<dialog id="editDialog" class="app-dialog"><form id="editForm"><div class="dialog-heading"><h2>编辑歌曲资料</h2><button type="button" data-close="editDialog" class="round-icon" aria-label="关闭"><span data-icon="x"></span></button></div><input id="editId" type="hidden"><label>曲名<input id="editTitle" required maxlength="120"></label><label>艺术家<input id="editArtist" required maxlength="120"></label><label>所属专辑<input id="editAlbum" required maxlength="120" list="albumOptions"></label><datalist id="albumOptions"></datalist><label>音乐标签<input id="editTags" maxlength="200" placeholder="例如：神之谷, 交响, 纯音乐"></label><label>封面图片（JPG / PNG / WebP，最大 3 MB）<input id="editCover" type="file" accept="image/jpeg,image/png,image/webp"></label><label>歌词 / 双语 LRC<textarea id="editLyrics" rows="6" placeholder="[00:10.00] 晨曦穿过云海的边缘&#10;[00:15.20] 照亮神之谷的峰巅"></textarea></label><label>导入 LRC 歌词文件（选填）<input type="file" id="editLyricsFile" accept=".lrc,.txt,text/plain"></label><p class="notice" style="margin:0">双语 LRC：同一时间标签第一行写日文，第二行写中文（建议添加 [tr] 标记）。两行绑定同步滚动，中文显示在下方。</p><div class="dialog-footer"><button type="button" class="btn btn-ice" id="editAddToList"><span data-icon="list"></span>加入歌单</button><button class="btn btn-primary" type="submit">保存资料</button></div></form></dialog>
 <dialog id="playlistDialog" class="app-dialog"><form id="playlistForm"><div class="dialog-heading"><h2 id="playlistDialogTitle">创建歌单</h2><button type="button" data-close="playlistDialog" class="round-icon" aria-label="关闭"><span data-icon="x"></span></button></div><label>歌单名称<input id="playlistName" maxlength="80" required placeholder="例如：神之谷的晨光"></label><label>歌单简介（选填）<textarea id="playlistDescription" rows="3" maxlength="280" placeholder="记录歌单的故事与心情"></textarea></label><div class="dialog-footer"><button class="btn btn-primary" type="submit" id="playlistSubmit">创建歌单</button></div></form></dialog>
 <dialog id="addDialog" class="app-dialog"><div class="dialog-heading"><h2>加入播放列表</h2><button type="button" data-close="addDialog" class="round-icon" aria-label="关闭"><span data-icon="x"></span></button></div><div id="addOptions" class="add-options"></div><div class="dialog-footer"><button class="btn btn-primary" data-close="addDialog">完成</button></div></dialog>
 <dialog id="trackMenuDialog" class="app-dialog action-dialog"><div class="dialog-heading"><h2 id="trackMenuTitle">歌曲操作</h2><button type="button" data-close="trackMenuDialog" class="round-icon" aria-label="关闭"><span data-icon="x"></span></button></div><div class="menu-actions"><button id="menuEdit" class="menu-choice"><span data-icon="edit"></span>编辑歌曲资料</button><button id="menuPlaylist" class="menu-choice"><span data-icon="list"></span>加入或移出歌单</button><button id="menuDelete" class="menu-choice danger"><span data-icon="trash"></span>从音乐库删除歌曲</button></div></dialog>
@@ -177,7 +189,7 @@ const $=id=>document.getElementById(id);
 const audio=$('audioPlayer');
 const readPreference=(key,fallback)=>{try{return localStorage.getItem(key)??fallback}catch(e){return fallback}};
 const writePreference=(key,value)=>{try{localStorage.setItem(key,value)}catch(e){}};
-const state={db:null,tracks:[],playlists:[],temporary:[],view:'all',album:null,playlist:null,query:'',sort:'added',current:null,queue:[],shuffle:false,repeat:'all',objectUrl:null,nowMode:'lyrics',motion:readPreference('ayer-star-radio-motion','on')!=='off',lyricSize:Number(readPreference('ayer-star-radio-lyric-size','15')),lyricShift:Math.max(-10,Math.min(10,Number(readPreference('ayer-star-radio-lyric-shift','0'))||0)),lyricFollow:true,lyricCalibration:false,editPlaylist:null,addingTrack:null,menuTrack:null};
+const state={db:null,tracks:[],playlists:[],temporary:[],view:'all',album:null,playlist:null,query:'',sort:'added',current:null,queue:[],shuffle:false,repeat:'all',objectUrl:null,nowMode:'lyrics',motion:readPreference('ayer-star-radio-motion','on')!=='off',lyricSize:Number(readPreference('ayer-star-radio-lyric-size','15')),lyricShift:Math.max(-10,Math.min(10,Number(readPreference('ayer-star-radio-lyric-shift','0'))||0)),lyricFollow:true,lyricDisplay:readPreference('ayer-star-radio-lyric-display','bilingual'),lyricCalibration:false,editPlaylist:null,addingTrack:null,menuTrack:null};
 const iconPaths={
  'music':'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
  'heart':'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>',
@@ -263,7 +275,7 @@ function updateTime(){const pos=Number.isFinite(audio.currentTime)?audio.current
 function seek(p){if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=audio.duration*Number(p)/100}
 /* v0.5.2 timestamp-synchronised LRC player: line follow, enhanced LRC and manual timing. */
 function lrcTimestamp(min,sec,fraction){return Number(min)*60+Number(sec)+(fraction?Number('0.'+fraction.replace(':','.')):0)}
-function parseLyrics(raw){
+function parseSingleLyrics(raw){
  const rows=[],source=String(raw||'').replace(/^\uFEFF/,'').split(/\r?\n/);let fileOffset=0;
  for(const rawLine of source){
   const line=rawLine.trim();if(!line)continue;
@@ -289,9 +301,26 @@ function parseLyrics(raw){
  }
  return rows.sort((a,b)=>(a.sec??Infinity)-(b.sec??Infinity));
 }
+
+function parseLyrics(raw){
+ const singles=parseSingleLyrics(raw),groups=[];
+ for(const row of singles){
+   const tag=/^(?:\[tr\]|\[译\]|\{tr\}|译[:：])\s*/;
+   const marked=tag.test(row.text);
+   const item={...row,text:row.text.replace(tag,''),isTranslation:marked};
+   const match=groups.find(g=>g.sec!==null&&item.sec!==null&&Math.abs(g.sec-item.sec)<.06);
+   if(match)match.parts.push(item); else groups.push({sec:item.sec,parts:[item]});
+ }
+ return groups.map(g=>{
+   const main=g.parts.find(x=>!x.isTranslation)||g.parts[0];
+   const sub=g.parts.find(x=>x!==main&&x.isTranslation)||g.parts.find(x=>x!==main);
+   return {sec:g.sec,text:main.text,words:main.words,translation:sub?.text||''};
+ }).sort((a,b)=>(a.sec??Infinity)-(b.sec??Infinity));
+}
+
 let lyricLines=[],activeLyric=-1,lyricTimedIndices=[],lyricFrame=0,lastLyricFrame=0,lyricActiveScroll=0;
 function hasTimedLyrics(){return lyricTimedIndices.length>0}
-function updateLyricStatus(){
+function updateLyricStatus(){if($('lyricDisplay'))$('lyricDisplay').value=state.lyricDisplay;
  const e=$('lyricSyncStatus');if(!e)return;
  e.textContent=!lyricLines.length?'暂无歌词':!hasTimedLyrics()?'普通文本·无法自动同步':state.lyricCalibration?'校准模式 · 点击正在唱的句子':!state.lyricFollow?'手动浏览':audio.paused?'已暂停':'歌词同步中';
  $('lyricFollow').classList.toggle('selected',state.lyricFollow);
@@ -321,10 +350,14 @@ function renderLyrics(){
  el.innerHTML=`<div class="lyric-spacer" aria-hidden="true"></div>`+lyricLines.map((l,i)=>{
   let inner=esc(l.text||'♪');
   if(l.words.length){inner=l.words.map((w,j)=>`<span class="karaoke-word" data-word="${j}">${esc(w.text)}</span>`).join('')}
-  return `<button type="button" class="lyrics-line${l.sec!==null?' is-timed':''}" data-lyric="${i}" aria-label="${esc(l.text||'间奏')}" style="font-size:${state.lyricSize}px">${inner}</button>`;
+  const original=state.lyricDisplay!=='translation'?'<span class="lyric-primary">'+inner+'</span>':'';
+  const translation=state.lyricDisplay!=='original'&&l.translation?'<span class="lyric-translation" lang="zh-CN">'+esc(l.translation)+'</span>':'';
+  const visible=(original+translation)||'<span class="lyric-primary">'+esc(l.text||'♪')+'</span>';
+  return '<button type="button" class="lyrics-line'+(l.sec!==null?' is-timed':'')+(l.translation?' bilingual':'')+'" data-lyric="'+i+'" aria-label="'+esc([l.text,l.translation].filter(Boolean).join('；')||'间奏')+'" style="--lyric-font-size:'+state.lyricSize+'px">'+visible+'</button>';
  }).join('')+`<div class="lyric-spacer" aria-hidden="true"></div>`;
  updateActiveLyric(audio.currentTime||0,true);updateLyricStatus();
 }
+function setLyricDisplay(mode){if(!['bilingual','original','translation'].includes(mode))return;state.lyricDisplay=mode;writePreference('ayer-star-radio-lyric-display',mode);renderLyrics();requestAnimationFrame(()=>scrollLyricToCenter(true))}
 function findActiveLyric(pos){
  let low=0,hi=lyricTimedIndices.length-1,result=-1;
  while(low<=hi){const mid=(low+hi)>>1,idx=lyricTimedIndices[mid];
@@ -392,7 +425,7 @@ async function storageDetail(){const a=state.tracks.filter(t=>!isTemporary(t.id)
 function rowMore(id){const t=findTrack(id);if(!t)return;state.menuTrack=id;$('trackMenuTitle').textContent='《'+t.title+'》';showDialog('trackMenuDialog')}
 async function handleViewAction(button){const a=button.dataset.act,id=button.dataset.id;if(a==='import')$('filesInput').click();else if(a==='play')await playTrack(id);else if(a==='fav')await toggleFavourite(id);else if(a==='edit')openEdit(id);else if(a==='more')rowMore(id);else if(a==='album'){state.album=button.dataset.album;state.query='';renderView();window.scrollTo(0,0)}else if(a==='album-back'){state.album=null;state.query='';renderAlbums()}else if(a==='playlist'){state.playlist=button.dataset.pl;state.query='';renderView();window.scrollTo(0,0)}else if(a==='playlist-back'){state.playlist=null;state.query='';renderPlaylists()}else if(a==='new-playlist')openPlaylistDialog();else if(a==='rename-playlist')openPlaylistDialog(state.playlist);else if(a==='delete-playlist')deletePlaylist();else if(a==='play-list'){const a=filterTracks();if(a.length)playTrack(a[0].id);else notify('此列表还没有音乐')}else if(a==='storage-dialog')storageDetail();else if(a==='backup')exportMetadata();else if(a==='toggle-motion')toggleMotion();else if(a==='navigate-recent')nav('recent')}
 function bindEvents(){document.querySelectorAll('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeDialog(b.dataset.close)));$('headerImport').onclick=$('importBtn').onclick=()=>$('filesInput').click();$('headerSettings').onclick=()=>nav('storage');$('playAllBtn').onclick=()=>{const a=filterTracks();a.length?playTrack(a[0].id):$('filesInput').click()};$('newListBtn').onclick=()=>openPlaylistDialog();$('viewRoot').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b)handleViewAction(b)});$('viewRoot').addEventListener('input',e=>{if(e.target.id==='librarySearch'){state.query=e.target.value.trim().toLocaleLowerCase();if(state.view==='album'&&!state.album){renderAlbums();const inp=$('librarySearch');inp?.focus();inp?.setSelectionRange(inp.value.length,inp.value.length)}else updateListOnly()}});$('viewRoot').addEventListener('change',e=>{if(e.target.id==='librarySort'){state.sort=e.target.value;updateListOnly()}});$('filesInput').addEventListener('change',async e=>{const files=Array.from(e.target.files||[]);e.target.value='';if(files.length)await chooseFiles(files)});
-$('dockToggle').onclick=$('nowToggle').onclick=togglePlaying;$('dockPrev').onclick=$('nowPrev').onclick=()=>step(-1);$('dockNext').onclick=$('nowNext').onclick=()=>step(1);$('dockShuffle').onclick=$('nowShuffle').onclick=()=>{state.shuffle=!state.shuffle;updatePlaybackState()};$('dockRepeat').onclick=$('nowRepeat').onclick=()=>{state.repeat=state.repeat==='all'?'one':state.repeat==='one'?'off':'all';updatePlaybackState()};$('dockSeek').oninput=$('nowSeek').oninput=e=>seek(e.target.value);$('dockCover').onclick=$('dockInfo').onclick=()=>showNow();$('dockQueue').onclick=()=>showNow('queue');$('dockFav').onclick=()=>state.current&&toggleFavourite(state.current);$('closeNow').onclick=()=>closeDialog('nowDialog');$('nowMore').onclick=()=>state.current?openEdit(state.current):notify('尚未选择歌曲');$('lyricsTab').onclick=()=>switchNowSide('lyrics');$('queueTab').onclick=()=>switchNowSide('queue');$('lyricFocus').onclick=()=>setLyricFocus();$('lyricFollow').onclick=()=>setLyricFollow(!state.lyricFollow);$('lyricEarlier').onclick=()=>adjustLyricOffset(-.5);$('lyricLater').onclick=()=>adjustLyricOffset(.5);$('lyricOffsetReset').onclick=()=>adjustLyricOffset(-getLyricShift());$('lyricCalibrate').onclick=()=>setLyricCalibration(!state.lyricCalibration);$('lyricClearCalibration').onclick=clearLyricCalibration;$('motionBtn').onclick=toggleMotion;$('lyricSize').onclick=()=>{state.lyricSize=state.lyricSize>=20?14:state.lyricSize+2;writePreference('ayer-star-radio-lyric-size',String(state.lyricSize));renderLyrics()};$('lyricsBox').addEventListener('click',e=>{const el=e.target.closest('[data-lyric]');if(!el)return;const s=lyricLines[Number(el.dataset.lyric)]?.sec;if(Number.isFinite(s)){if(state.lyricCalibration){calibrateLyric(Number(el.dataset.lyric));return}audio.currentTime=Math.max(0,s+getLyricShift());setLyricFollow(true);updateActiveLyric(audio.currentTime,true)}});
+$('dockToggle').onclick=$('nowToggle').onclick=togglePlaying;$('dockPrev').onclick=$('nowPrev').onclick=()=>step(-1);$('dockNext').onclick=$('nowNext').onclick=()=>step(1);$('dockShuffle').onclick=$('nowShuffle').onclick=()=>{state.shuffle=!state.shuffle;updatePlaybackState()};$('dockRepeat').onclick=$('nowRepeat').onclick=()=>{state.repeat=state.repeat==='all'?'one':state.repeat==='one'?'off':'all';updatePlaybackState()};$('dockSeek').oninput=$('nowSeek').oninput=e=>seek(e.target.value);$('dockCover').onclick=$('dockInfo').onclick=()=>showNow();$('dockQueue').onclick=()=>showNow('queue');$('dockFav').onclick=()=>state.current&&toggleFavourite(state.current);$('closeNow').onclick=()=>closeDialog('nowDialog');$('nowMore').onclick=()=>state.current?openEdit(state.current):notify('尚未选择歌曲');$('lyricsTab').onclick=()=>switchNowSide('lyrics');$('queueTab').onclick=()=>switchNowSide('queue');$('lyricFocus').onclick=()=>setLyricFocus();$('lyricFollow').onclick=()=>setLyricFollow(!state.lyricFollow);$('lyricEarlier').onclick=()=>adjustLyricOffset(-.5);$('lyricLater').onclick=()=>adjustLyricOffset(.5);$('lyricOffsetReset').onclick=()=>adjustLyricOffset(-getLyricShift());$('lyricCalibrate').onclick=()=>setLyricCalibration(!state.lyricCalibration);$('lyricClearCalibration').onclick=clearLyricCalibration;$('motionBtn').onclick=toggleMotion;$('lyricDisplay').onchange=e=>setLyricDisplay(e.target.value);$('lyricSize').onclick=()=>{state.lyricSize=state.lyricSize>=20?14:state.lyricSize+2;writePreference('ayer-star-radio-lyric-size',String(state.lyricSize));renderLyrics()};$('lyricsBox').addEventListener('click',e=>{const el=e.target.closest('[data-lyric]');if(!el)return;const s=lyricLines[Number(el.dataset.lyric)]?.sec;if(Number.isFinite(s)){if(state.lyricCalibration){calibrateLyric(Number(el.dataset.lyric));return}audio.currentTime=Math.max(0,s+getLyricShift());setLyricFollow(true);updateActiveLyric(audio.currentTime,true)}});
 for(const type of ['wheel','touchmove'])$('lyricsBox').addEventListener(type,()=>{if(state.lyricFollow)setLyricFollow(false)},{passive:true});
 $('nowDialog').addEventListener('close',stopLyricAnimation);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')startLyricAnimation();else stopLyricAnimation()});$('queueBox').addEventListener('click',e=>{const stepBtn=e.target.closest('[data-queue-step]');if(stepBtn){const i=Number(stepBtn.dataset.queueIndex),j=i+Number(stepBtn.dataset.queueStep);if(j>=0&&j<state.queue.length){[state.queue[i],state.queue[j]]=[state.queue[j],state.queue[i]];renderQueue()}return}const b=e.target.closest('[data-queue-play]');if(b)playTrack(b.dataset.queuePlay,true)});
