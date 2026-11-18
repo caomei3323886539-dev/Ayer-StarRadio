@@ -1,10 +1,14 @@
 {
+  "id": "./",
   "name": "艾耶尔大陆 · 星音电台",
   "short_name": "星音电台",
+  "description": "星音电台 v0.5.1 · 星光新界面及 Android 兼容修复",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#edf6ff",
-  "theme_color": "#dfefff",
+  "background_color": "#d5eafb",
+  "theme_color": "#2d6fae",
+  "lang": "zh-CN",
   "icons": [
     {
       "src": "icon.svg",
@@ -12,6 +16,5 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ],
-  "description": "艾耶尔大陆原创音乐电台 v0.5.2 · 星光音乐空间"
+  ]
 }
