@@ -2,7 +2,7 @@
   "id": "./",
   "name": "艾耶尔大陆 · 星音电台",
   "short_name": "星音电台",
-  "description": "星音电台 v0.5.1 · 星光新界面及 Android 兼容修复",
+  "description": "星音电台 v0.5.2 · LRC 同步滚动歌词与竖屏歌词全屏",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

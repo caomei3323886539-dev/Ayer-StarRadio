@@ -1,8 +1,17 @@
-/* Ayer Star Radio v0.5.1 single-file PWA - offline shell */
-const CACHE='ayer-star-radio-inline-v051-20261118';
+/* Ayer Star Radio v0.5.2 — offline single-file music PWA */
+const CACHE='ayer-star-radio-inline-v052-20261118';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon.svg'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>(k.startsWith('ayer-star-radio-')||k.startsWith('ayer-radio-'))&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{const r=e.request;if(r.method!=='GET'||new URL(r.url).origin!==self.location.origin)return;
-if(r.mode==='navigate'){e.respondWith(fetch(r).then(resp=>{if(resp.ok){const clone=resp.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put('./index.html',clone)))}return resp}).catch(async()=>await caches.match('./index.html')||new Response('暂时无法离线加载',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})));return;}
-e.respondWith(caches.match(r).then(cached=>cached||fetch(r).catch(()=>new Response('Offline',{status:503}))));});
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('ayer-star-radio-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{
+ const req=event.request;
+ if(req.method!=='GET'||new URL(req.url).origin!==self.location.origin)return;
+ if(req.mode==='navigate'){
+  event.respondWith(fetch(req).then(response=>{
+   if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put('./index.html',copy)))}
+   return response;
+  }).catch(async()=>await caches.match('./index.html')||new Response('当前离线页面尚未缓存',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}})));
+  return;
+ }
+ event.respondWith(caches.match(req).then(cached=>cached||fetch(req).catch(()=>new Response('Offline',{status:503}))));
+});
