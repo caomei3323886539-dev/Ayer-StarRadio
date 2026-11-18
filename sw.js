@@ -1,5 +1,5 @@
-/* Ayer Star Radio v0.5.5 — offline single-file music PWA */
-const CACHE='ayer-star-radio-inline-v055-20261118';
+/* Ayer Star Radio v0.6.0 — offline single-file music PWA */
+const CACHE='ayer-star-radio-inline-v060-20261118';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('ayer-star-radio-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
