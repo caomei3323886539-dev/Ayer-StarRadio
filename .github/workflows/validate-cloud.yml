@@ -1,0 +1,29 @@
+name: Validate Cloud Library
+on:
+  push:
+    paths:
+      - "cloud.html"
+      - ".github/workflows/validate-cloud.yml"
+  workflow_dispatch:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify cloud HTML and extract module
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('cloud.html').read_text(encoding='utf-8')
+          assert '<script type="module">' in s and '</script>' in s
+          assert 'radio_playback_state' in s and 'radio_playlists' in s
+          assert 'ayer-covers' in s and '[tr]' in s
+          a=s.split('<script type="module">',1)[1].split('</script>',1)[0]
+          Path('cloud-module.mjs').write_text(a,encoding='utf-8')
+          print('Module length:',len(a))
+          PY
+      - name: JavaScript syntax check
+        run: node --check cloud-module.mjs
