@@ -1,0 +1,78 @@
+name: Validate Unified Music Hall
+on:
+  push:
+    paths:
+      - 'index.html'
+      - '.github/workflows/validate-unified.yml'
+  workflow_dispatch:
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate player JavaScript syntax and source boundaries
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          matches=re.findall(r'<script>(.*?)</script>',s,re.S)
+          assert len(matches)==1
+          Path('/tmp/ayer-player.js').write_text(matches[0],encoding='utf-8')
+          for required in [
+              'unifiedMusicHall','initUnifiedCloud()', 'refreshUnifiedCloud()',
+              "sb.from('radio_publications')", ".eq('published',true)",
+              "sb.from('radio_tracks')", "if(t?.cloudType||isTemporary(t.id)||!state.db)return;",
+              "if(t.cloudType){await playUnifiedCloud(t,preserveQueue);return}",
+              'audioPlayer','syncRecordRotation','renderLyrics()'
+          ]: assert required in s, required
+          assert 'SERVICE_ROLE_KEY' not in s
+          print('Unified cloud isolation and player structure verified')
+          PY
+          node --check /tmp/ayer-player.js
+      - name: Browser test dependencies
+        run: |
+          npm install --no-save playwright@1.57.0
+          if ! command -v google-chrome >/dev/null && ! command -v google-chrome-stable >/dev/null; then
+            npx playwright install --with-deps chromium
+          fi
+      - name: Serve unified homepage
+        run: python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/ayer-preview.log 2>&1 &
+      - name: Test anonymous cloud catalog, player and mobile layout
+        run: |
+          node <<'JS'
+          const {chromium}=require('playwright');
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const hasChrome=require('node:child_process').spawnSync('bash',['-lc','command -v google-chrome || command -v google-chrome-stable'],{encoding:'utf8'}).status===0;
+            const browser=await chromium.launch(hasChrome?{channel:'chrome',headless:true,args:['--no-sandbox']}:{headless:true,args:['--no-sandbox']});
+            for(const [width,height] of [[390,844],[1366,768]]){
+              const page=await browser.newPage({viewport:{width,height}});
+              const errors=[];page.on('pageerror',e=>errors.push(e.message));
+              await page.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
+              await page.waitForFunction(()=>document.querySelector('#hubCount')?.textContent.startsWith('全馆'),null,{timeout:40000});
+              const hub=page.locator('#unifiedMusicHall');
+              assert.equal(await hub.isVisible(),true,'The cloud collection must appear on the main page');
+              const num=await page.locator('[data-hub-play]').count();
+              assert.ok(num>=4,'Expected 4 public cloud songs without login, got '+num);
+              assert.ok((await page.locator('#hubOverview').innerText()).includes('已公开 4 首'));
+              if(width===390){
+                const dimensions=await hub.evaluate(el=>({right:el.getBoundingClientRect().right,width:innerWidth}));
+                assert.ok(dimensions.right<=dimensions.width+3,'Cloud panel overflowed phone screen');
+              }
+              const audio=page.locator('#audioPlayer');
+              await page.locator('[data-hub-play]').first().click();
+              await page.waitForFunction(()=>document.querySelector('#audioPlayer')?.src?.includes('/storage/v1/object/sign/'),null,{timeout:30000});
+              assert.ok((await page.locator('#dockTitle').innerText()).trim().length>0);
+              const dangerous=errors.filter(x=>!x.includes('NotSupportedError'));
+              assert.equal(dangerous.length,0,'Unexpected JS page errors: '+dangerous.join('; '));
+              console.log(width+'px: catalog visible with '+num+' songs, unified player linked to published audio');
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
