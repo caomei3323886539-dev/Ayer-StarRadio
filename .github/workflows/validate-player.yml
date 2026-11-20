@@ -1,0 +1,62 @@
+name: Validate Main Player
+on:
+  push:
+    paths:
+      - "index.html"
+      - ".github/workflows/validate-player.yml"
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Extract embedded main player and verify visual structure
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,re.S)
+          assert len(scripts)==1, f'Expected one player script, found {len(scripts)}'
+          assert 'class="record-disc"' in html
+          assert 'class="record-tonearm"' in html
+          assert 'record-stage.is-spinning' in html
+          assert "audio.onpause=()=>{updatePlaybackState()" in html
+          assert "addEventListener('playing',syncRecordRotation)" in html
+          assert "addEventListener('waiting'" in html
+          assert 'href="./cloud.html"' in html
+          assert "DB_NAME='ayer-star-radio'" in html
+          Path('player-inline.js').write_text(scripts[0],encoding='utf-8')
+          print('HTML preserved; JS chars:', len(scripts[0]))
+          PY
+      - name: JavaScript syntax check
+        run: node --check player-inline.js
+      - name: Test vinyl play, pause, end, and motion state
+        shell: bash
+        run: |
+          node <<'JS'
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          const code=fs.readFileSync('player-inline.js','utf8');
+          const src=code.match(/function syncRecordRotation\(\)\{[^}]*\}/)?.[0];
+          assert.ok(src,'Missing rotation control function');
+          const audio={paused:true,ended:false,error:null,seeking:false,readyState:4};
+          const state={current:'demo',motion:true};
+          let rotating=false;
+          const stage={classList:{toggle:(name,v)=>{assert.equal(name,'is-spinning');rotating=v}}};
+          const $=()=>stage;
+          eval(src);
+          syncRecordRotation();assert.equal(rotating,false,'Idle must not spin');
+          audio.paused=false;syncRecordRotation();assert.equal(rotating,true,'Play should spin');
+          audio.paused=true;syncRecordRotation();assert.equal(rotating,false,'Pause should stop');
+          audio.paused=false;audio.ended=true;syncRecordRotation();assert.equal(rotating,false,'End should stop');
+          audio.ended=false;audio.seeking=true;syncRecordRotation();assert.equal(rotating,false,'Seek should stop');
+          audio.seeking=false;state.motion=false;syncRecordRotation();assert.equal(rotating,false,'Motion off should stop');
+          state.motion=true;audio.readyState=1;syncRecordRotation();assert.equal(rotating,false,'Unloaded should not spin');
+          audio.readyState=4;syncRecordRotation();assert.equal(rotating,true,'Playback resumes rotation');
+          console.log('Vinyl rotation state tests passed');
+          JS
