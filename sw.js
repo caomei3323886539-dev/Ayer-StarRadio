@@ -1,5 +1,5 @@
 /* Ayer Star Radio v0.7 cloud sync staging — separate offline routes */
-const CACHE='ayer-star-radio-unified-hall-v073-20261120';
+const CACHE='ayer-star-radio-cover-sync-v074-20261120';
 const SHELL=['./','./index.html','./cloud.html','./public.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('ayer-star-radio-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
