@@ -98,7 +98,7 @@ async function loadCatalog(){
  for(const t of arr){
   const row=elem("div","track"),art=elem("div","track-art","✦"),meta=elem("div","track-meta"),act=elem("div","track-controls");
   meta.append(elem("strong","",t.title),elem("small","",(t.artist||"艾耶尔大陆")+" · "+(t.album||"原创音乐")));
-  const play=elem("button","primary","▶ 播放"),fav=elem("button"+(favorites.has(t.track_id)?" favored":"") ,"",favorites.has(t.track_id)?"★ 已收藏":"☆ 收藏");
+  const play=elem("button","primary","▶ 播放"),fav=elem("button",favorites.has(t.track_id)?"favored":"",favorites.has(t.track_id)?"★ 已收藏":"☆ 收藏");
   play.onclick=()=>startTrack(t,play);fav.onclick=()=>toggleFavorite(t.track_id);
   act.append(play,fav);row.append(art,meta,act);list.append(row);
   loadCover(t.track_id,art);
