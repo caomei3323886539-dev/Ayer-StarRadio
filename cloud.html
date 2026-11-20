@@ -6,18 +6,30 @@
 .song-art{width:54px;height:54px;border-radius:13px;object-fit:cover;background:#d8eaff;flex-shrink:0}
 .song-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
 .song-actions button{min-height:40px;padding:7px 10px;font-size:12px}.song-actions button.published{color:#965c2f;background:#fff3de;border-color:#e5cda8}
+.cover-panel{margin:14px 0 22px;padding:15px;background:linear-gradient(130deg,#e8f4ff,#fffdf7);border:1px solid #c6deef;border-radius:17px}
+.cover-panel h3{margin:0 0 8px;font-size:17px;color:#306b9b}.cover-panel .cover-hint{font-size:12px;color:#5d7d9e;line-height:1.7}
+.cover-preview{width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;background:#dce9f7}
+.cover-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #d6e4f0}
+.cover-row .cover-title{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cover-panel button{min-height:44px}
+.song-cover-missing{font-size:11px;color:#a06d3a;background:#fff6e5;border:1px solid #f2dfba;border-radius:6px;padding:3px 6px}
+
 #playlistItems .song{padding:7px 0}
 .cloud-edit{width:min(650px,calc(100vw - 26px));max-height:85dvh;overflow:auto;border:1px solid #b9d9f4;border-radius:19px;padding:22px;background:#f7fbff;color:#244d78}
 .cloud-edit::backdrop{background:#143a64a8;backdrop-filter:blur(4px)}
 .cloud-edit textarea{font:inherit;min-height:180px;resize:vertical;width:100%;border:1px solid #bdd8ef;border-radius:12px;padding:12px}
 @media(max-width:560px){.song{align-items:flex-start}.song-actions{width:100%;justify-content:flex-start}.song{flex-wrap:wrap}.song-info{max-width:calc(100% - 70px)}}
-</style></head><body><main><a class="back" href="./index.html">← 返回星音电台</a>　<a class="back" href="./public.html">试听公开音乐馆</a><header class="hero"><div class="row spread"><div><div class="eyebrow">AYER STAR RADIO / CLOUD LIBRARY</div><h1>✦ 云端音乐馆</h1></div><span class="badge">公开发布管理 v0.7.2</span></div><p class="notice">使用相同邮箱在手机与电脑登录；上传成功后另一设备会收到实时更新。未上传的本地歌曲仍留在原浏览器，不会被删除。</p></header>
+</style></head><body><main><a class="back" href="./index.html">← 返回星音电台</a>　<a class="back" href="./public.html">试听公开音乐馆</a><header class="hero"><div class="row spread"><div><div class="eyebrow">AYER STAR RADIO / CLOUD LIBRARY</div><h1>✦ 云端音乐馆</h1></div><span class="badge">封面同步增强 v0.7.4</span></div><p class="notice">使用相同邮箱在手机与电脑登录；上传成功后另一设备会收到实时更新。未上传的本地歌曲仍留在原浏览器，不会被删除。</p></header>
 <section class="glass" id="loginPanel"><h2>☁ 登录云音乐馆</h2><label for="email">邮箱地址</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"><div class="row"><button class="primary" id="send" type="button">发送邮箱登录链接</button></div><p class="notice">请在同一设备打开邮件中的登录链接。如果登录后仍未显示，可以返回此页面刷新。</p></section>
 <section class="glass hidden" id="userPanel"><div class="row spread"><div><h2>我的云音乐库</h2><div class="notice" id="account"></div></div><button id="logout" type="button">退出登录</button></div>
 <label for="upload">选择手机或电脑上的歌曲上传至云端</label><input id="upload" type="file" accept="audio/*,.mp3,.wav,.flac,.m4a,.ogg" multiple><div class="row"><button class="primary" id="uploadBtn" type="button">上传所选音乐</button><button id="refresh" type="button">刷新云曲库</button></div>
 <div class="help">仅拥有相关音乐的上传权利时才上传。音频保存在私有存储桶，歌曲资料仅登录本人可读。单个文件超过 40 MB 时建议先压缩或使用分片上传。</div>
 
 <p id="publisherHint" class="help hidden">官方发布管理：私人歌曲默认不公开。只有明确点击“公开发布”并确认后，游客才能听到；点击“撤回公开”后从公开目录移除，已签发的临时播放链接可能在到期前仍有效。</p>
+<section class="cover-panel" id="coverSyncPanel"><h3>✦ 云端封面同步</h3>
+<p class="cover-hint">以前上传的音乐没有附带封面。请在保存有原始音乐封面的手机或电脑浏览器中，点击“扫描本机封面”。扫描只在本机进行，确认后才会上传；仅补齐缺失封面，不覆盖已有封面或音频。</p>
+<div class="row"><button id="scanLocalCovers" type="button">检测本机封面</button><button id="syncMatchedCovers" class="primary hidden" type="button">确认同步匹配封面</button></div>
+<div id="coverSyncMatches" aria-live="polite" class="cover-hint"></div></section>
 <section id="playlistPanel"><h2 style="margin-top:20px">云端歌单</h2>
 <div class="row"><input id="playlistName" style="flex:1;min-width:150px" maxlength="120" aria-label="新歌单名称" placeholder="输入歌单名称"><button id="playlistCreate" type="button">新建歌单</button></div>
 <div id="playlists" class="notice"></div><div id="playlistItems"></div></section>
@@ -37,7 +49,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 const SB_URL='https://nnoffobuktejgtmwfvbn.supabase.co', SB_KEY='sb_publishable_ypAoa0UggQNWR9Rt9HWelQ_ao_Ih5Yw';
 const sb=createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-const $=id=>document.getElementById(id);let currentUser=null, channel=null, cloudTracks=[], cloudPlaylists=[], cloudPlaylistItems=[], lastPlayback=null, activeTrackId=null, activeCoverUrls=[], lastProgressWrite=0, pendingProgress=null, isPublisher=false, publicationMap=new Map();const text=(id,msg)=>$(id).textContent=msg;const status=msg=>text('status',msg);
+const $=id=>document.getElementById(id);let currentUser=null, channel=null, cloudTracks=[], cloudPlaylists=[], cloudPlaylistItems=[], lastPlayback=null, activeTrackId=null, activeCoverUrls=[], lastProgressWrite=0, pendingProgress=null, isPublisher=false, publicationMap=new Map(), plannedCoverMatches=[];const text=(id,msg)=>$(id).textContent=msg;const status=msg=>text('status',msg);
 function el(tag,cls,content){const n=document.createElement(tag);if(cls)n.className=cls;if(content!==undefined)n.textContent=content;return n}
 async function start(){const {data,error}=await sb.auth.getUser();if(error||!data.user){currentUser=null;showLoggedOut();return}currentUser=data.user;showLoggedIn();await loadPublisherRole();await Promise.all([loadSongs(),loadPlaylists(),loadPlayback()]);subscribe()}
 function showLoggedOut(){$('loginPanel').classList.remove('hidden');$('userPanel').classList.add('hidden');text('status','请先登录账号。')}
@@ -80,6 +92,7 @@ $('saveTrack').onclick=async()=>{
   if(newCover)update.cover_path=newCover;
   must(await sb.from('radio_tracks').update(update).eq('id',id).eq('user_id',currentUser.id));
   $('trackDialog').close();
+  if(newCover)await notifyPublishedCoverUpdated(id);
   await loadSongs();
   status('歌曲信息、封面与歌词已同步至云端。');
  }catch(err){
@@ -131,9 +144,10 @@ async function loadSongs(){
  if(!cloudTracks.length){box.append(el('p','notice','云端还没有歌曲。'));return}
  for(const t of cloudTracks){
   const row=el('div','song'),art=el('img','song-art'),info=el('div','song-info'),actions=el('div','song-actions');
-  art.alt='封面';art.style.visibility='hidden';
+  art.alt='封面';art.style.visibility='visible';art.src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><rect width="72" height="72" fill="#dceeff"/><text x="36" y="47" text-anchor="middle" font-size="32" fill="#5686b5">♫</text></svg>');
   if(t.cover_path){sb.storage.from('ayer-covers').download(t.cover_path).then(({data,error})=>{if(!error&&data){const url=URL.createObjectURL(data);activeCoverUrls.push(url);art.src=url;art.style.visibility='visible'}})}
   info.append(el('strong','',t.title),el('small','',(t.artist||'未知歌手')+' · '+(t.album||'未分类')));
+  if(!t.cover_path){const missing=el('span','song-cover-missing','封面未同步');info.append(missing)}
   const play=el('button','','▶ 播放'),edit=el('button','','✎ 编辑'),add=el('button','','＋ 歌单');
   play.onclick=()=>playTrack(t,play);edit.onclick=()=>openEditor(t);add.onclick=()=>choosePlaylist(t);
   actions.append(play,edit,add);
@@ -234,17 +248,150 @@ function subscribe(){
  .on('postgres_changes',{event:'*',schema:'public',table:'radio_publications'},()=>{if(isPublisher)loadSongs()})
  .subscribe(v=>{if(v==='SUBSCRIBED')status('云曲库、歌单与进度实时同步已连接。');if(v==='CHANNEL_ERROR'||v==='TIMED_OUT')status('实时同步连接中断，可使用“刷新云曲库”重试。')});
 }
-async function uploadOne(file,meta={}){if(!currentUser)throw Error('请先登录');if(file.size>40*1024*1024)throw Error('文件超过 40 MB，当前页面暂不支持大文件上传');if(!(/\.(mp3|wav|m4a|flac|ogg)$/i.test(file.name)||file.type.startsWith('audio/')))throw Error('不支持的音频格式');
-const id=crypto.randomUUID(),ext=(file.name.split('.').pop()||'mp3').replace(/[^a-z0-9]/gi,'').toLowerCase(),path=currentUser.id+'/'+id+'.'+ext;
-const {error:storageError}=await sb.storage.from('ayer-audio').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});if(storageError)throw Error('音频存储失败：'+storageError.message+'。请确认 Supabase Storage 已创建私有存储桶 ayer-audio。');
-const record={id,title:(meta.title||file.name.replace(/\.[^.]+$/,'')).slice(0,200),artist:meta.artist||'',album:meta.album||'',lyrics:meta.lyrics||'',audio_path:path,file_size_bytes:file.size,mime_type:file.type||null,sync_state:'ready'};
-const {error}=await sb.from('radio_tracks').insert(record);if(error){await sb.storage.from('ayer-audio').remove([path]);throw Error('歌曲资料写入失败：'+error.message)}return record}
+
+/* v0.7.4: repair covers uploaded originally into local IndexedDB only. */
+const cloudCoverKey=v=>String(v||'').normalize('NFKC').trim().replace(/\.(mp3|wav|flac|ogg|aac|m4a)$/i,'').toLocaleLowerCase();
+function isCloudCoverMissing(t){return !t?.cover_path}
+async function getLocalStoredSongs(){
+ const db=await new Promise((resolve,reject)=>{const req=indexedDB.open('ayer-star-radio');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+ try{
+  if(!db.objectStoreNames.contains('songs'))return [];
+  return await new Promise((resolve,reject)=>{const req=db.transaction('songs','readonly').objectStore('songs').getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error)});
+ }finally{db.close()}
+}
+function embeddedCover(source){return source instanceof Blob||(typeof source==='string'&&/^data:image\/(?:jpeg|png|webp);base64,/i.test(source))}
+async function localCoverFile(source,name='cover'){
+ let blob;
+ if(source instanceof Blob)blob=source;
+ else if(typeof source==='string'&&/^data:image\/(?:jpeg|png|webp);base64,/i.test(source))blob=await(await fetch(source)).blob();
+ else throw Error('没有可用的本地封面图片');
+ if(!['image/jpeg','image/png','image/webp'].includes(blob.type))throw Error('仅支持 JPG、PNG、WebP 封面');
+ if(blob.size>3*1024*1024){
+  const bitmap=await createImageBitmap(blob);
+  try{
+   const ratio=Math.min(1,1200/Math.max(bitmap.width,bitmap.height));
+   const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*ratio));canvas.height=Math.max(1,Math.round(bitmap.height*ratio));
+   const ctx=canvas.getContext('2d');if(!ctx)throw Error('浏览器无法压缩封面');
+   ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+   blob=await new Promise((resolve,reject)=>canvas.toBlob(out=>out?resolve(out):reject(Error('封面压缩失败')),'image/jpeg',0.78));
+  }finally{bitmap.close()}
+ }
+ if(blob.size>3*1024*1024)throw Error('封面仍大于 3MB，请先压缩图片');
+ const ext=blob.type==='image/png'?'png':blob.type==='image/webp'?'webp':'jpg';
+ return new File([blob],String(name).slice(0,70)+'.'+ext,{type:blob.type});
+}
+async function uploadCoverObject(source,name){
+ if(!currentUser)throw Error('请先登录');
+ const file=await localCoverFile(source,name);
+ const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+ const path=currentUser.id+'/'+crypto.randomUUID()+'.'+ext;
+ const result=await sb.storage.from('ayer-covers').upload(path,file,{upsert:false,contentType:file.type});
+ if(result.error)throw Error('封面上传失败：'+result.error.message);
+ return path;
+}
+async function notifyPublishedCoverUpdated(trackId){
+ if(!isPublisher)return;
+ const pub=publicationMap.get(trackId);
+ if(pub?.published){
+  const result=await sb.from('radio_publications').update({updated_at:new Date().toISOString()}).eq('track_id',trackId);
+  if(result.error)console.warn('公开封面刷新通知未发送',result.error.message);
+ }
+}
+async function fillCoverForCloudTrack(track,source){
+ if(!track||!isCloudCoverMissing(track))return false;
+ const path=await uploadCoverObject(source,track.title||'cover');
+ try{
+  const result=await sb.from('radio_tracks').update({cover_path:path}).eq('id',track.id).eq('user_id',currentUser.id).is('cover_path',null).select('id');
+  if(result.error)throw result.error;
+  if(!result.data?.length){await sb.storage.from('ayer-covers').remove([path]);return false}
+  track.cover_path=path;
+  await notifyPublishedCoverUpdated(track.id);
+  return true;
+ }catch(e){
+  await sb.storage.from('ayer-covers').remove([path]);
+  throw e;
+ }
+}
+$('scanLocalCovers').onclick=async()=>{
+ if(!currentUser){status('请先登录后同步封面');return}
+ const output=$('coverSyncMatches');output.replaceChildren();plannedCoverMatches=[];
+ $('syncMatchedCovers').classList.add('hidden');
+ $('scanLocalCovers').disabled=true;
+ try{
+  const locals=await getLocalStoredSongs();
+  const missing=cloudTracks.filter(isCloudCoverMissing);
+  const remoteGroups=new Map();
+  for(const remote of missing){const key=cloudCoverKey(remote.title);remoteGroups.set(key,[...(remoteGroups.get(key)||[]),remote])}
+  for(const local of locals){
+   if(!embeddedCover(local.cover))continue;
+   const matches=remoteGroups.get(cloudCoverKey(local.title))||[];
+   if(matches.length!==1)continue;
+   if(plannedCoverMatches.some(x=>x.remote.id===matches[0].id))continue;
+   plannedCoverMatches.push({local,remote:matches[0]});
+  }
+  if(!plannedCoverMatches.length){output.textContent=missing.length?'没有找到与云端缺失封面歌曲同名的本地封面。请在歌曲“编辑”中手动上传封面。':'所有云端歌曲均已有封面。';return}
+  const description=el('p','cover-hint','检测到 '+plannedCoverMatches.length+' 张可匹配封面，等待确认上传；不会上传或修改音频。');
+  output.append(description);
+  for(const {local,remote} of plannedCoverMatches){
+   const row=el('div','cover-row'),art=el('img','cover-preview');
+   if(typeof local.cover==='string')art.src=local.cover;else art.src=URL.createObjectURL(local.cover);
+   art.alt='本机封面';const info=el('span','cover-title',remote.title);row.append(art,info);output.append(row);
+   if(local.cover instanceof Blob)art.onload=()=>URL.revokeObjectURL(art.src);
+  }
+  $('syncMatchedCovers').classList.remove('hidden');
+ }catch(e){status('本机封面扫描失败：'+e.message);output.textContent='请检查此浏览器是否保存过星音电台本地音乐。'}
+ finally{$('scanLocalCovers').disabled=false}
+};
+$('syncMatchedCovers').onclick=async()=>{
+ if(!currentUser||!plannedCoverMatches.length)return;
+ if(!confirm('确认将 '+plannedCoverMatches.length+' 张本机图片上传至私有云封面库，并关联到同名歌曲？已有封面不会覆盖。'))return;
+ const entries=[...plannedCoverMatches];$('syncMatchedCovers').disabled=true;$('scanLocalCovers').disabled=true;
+ let completed=0,failed=0;
+ try{
+  for(const {local,remote} of entries){
+   try{status('封面同步中：'+remote.title);if(await fillCoverForCloudTrack(remote,local.cover))completed++}
+   catch(e){failed++;console.warn('封面同步失败',remote.title,e);status(remote.title+'：'+e.message)}
+  }
+  plannedCoverMatches=[];$('syncMatchedCovers').classList.add('hidden');
+  $('coverSyncMatches').textContent='已同步 '+completed+' 张封面'+(failed?'；失败 '+failed+' 张。请重试或在“编辑”中手动上传。':'。PC 端重新打开或点击同步即可显示。');
+  await loadSongs();
+  status('封面补同步完成：'+completed+' 张成功，'+failed+' 张失败。');
+ }finally{$('syncMatchedCovers').disabled=false;$('scanLocalCovers').disabled=false}
+};
+
+async function uploadOne(file,meta={}){
+ if(!currentUser)throw Error('请先登录');
+ if(file.size>40*1024*1024)throw Error('文件超过 40 MB，当前页面暂不支持大文件上传');
+ if(!(/\.(mp3|wav|m4a|flac|ogg)$/i.test(file.name)||file.type.startsWith('audio/')))throw Error('不支持的音频格式');
+ const id=crypto.randomUUID(),ext=(file.name.split('.').pop()||'mp3').replace(/[^a-z0-9]/gi,'').toLowerCase(),path=currentUser.id+'/'+id+'.'+ext;
+ const uploaded=await sb.storage.from('ayer-audio').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
+ if(uploaded.error)throw Error('音频存储失败：'+uploaded.error.message);
+ let coverPath=null,coverWarning='';
+ if(embeddedCover(meta.cover)){try{coverPath=await uploadCoverObject(meta.cover,meta.title||'cover')}catch(e){coverWarning=e.message;console.warn('Local cover upload skipped',e)}}
+ const record={id,title:(meta.title||file.name.replace(/\.[^.]+$/,'')).slice(0,200),artist:meta.artist||'',album:meta.album||'',lyrics:meta.lyrics||'',audio_path:path,cover_path:coverPath,file_size_bytes:file.size,mime_type:file.type||null,sync_state:'ready'};
+ const {error}=await sb.from('radio_tracks').insert(record);
+ if(error){
+  await sb.storage.from('ayer-audio').remove([path]);
+  if(coverPath)await sb.storage.from('ayer-covers').remove([coverPath]);
+  throw Error('歌曲资料写入失败：'+error.message);
+ }
+ return {...record,coverWarning};
+}
 $('uploadBtn').onclick=async()=>{const files=Array.from($('upload').files||[]);if(!files.length){status('请先选择音乐文件');return}$('uploadBtn').disabled=true;let ok=0;for(const file of files){try{status('正在上传：'+file.name);await uploadOne(file);ok++}catch(e){status('已上传 '+ok+' 首，失败：'+e.message);break}}$('uploadBtn').disabled=false;$('upload').value='';await loadSongs();if(ok===files.length)status('全部上传成功，共 '+ok+' 首；电脑端登录相同账号后自动显示。')};
 $('refresh').onclick=async()=>{await Promise.all([loadSongs(),loadPlaylists(),loadPlayback()]);subscribe()};
 $('localRefresh').onclick=readLocals;
 async function readLocals(){const out=$('locals');out.replaceChildren();try{const db=await new Promise((res,rej)=>{const req=indexedDB.open('ayer-star-radio');req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)});if(!db.objectStoreNames.contains('songs')){out.append(el('p','notice','尚无本地歌曲'));db.close();return}
 const songs=await new Promise((res,rej)=>{const req=db.transaction('songs','readonly').objectStore('songs').getAll();req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)});db.close();if(!songs.length){out.append(el('p','notice','当前浏览器的本地音乐库为空'));return}
-for(const song of songs){const row=el('div','song'),inf=el('div','song-info');inf.append(el('strong','',song.title||'未命名'),el('small','',song.artist||''));const b=el('button','','↑ 上传');b.onclick=async()=>{if(!currentUser){status('请先登录');return}if(!(song.blob instanceof Blob)){status('找不到此歌曲的本地音频数据');return}b.disabled=true;try{status('正在上传：'+song.title);const file=new File([song.blob],(song.title||'track')+'.'+((song.blob.type||'audio/mpeg').includes('wav')?'wav':'mp3'),{type:song.blob.type||'audio/mpeg'});await uploadOne(file,song);b.textContent='✓ 已上传';await loadSongs()}catch(e){status(e.message);b.disabled=false}};row.append(inf,b);out.append(row)}
+for(const song of songs){const row=el('div','song'),inf=el('div','song-info');inf.append(el('strong','',song.title||'未命名'),el('small','',song.artist||''));const b=el('button','','↑ 上传');const possible=cloudTracks.filter(t=>cloudCoverKey(t.title)===cloudCoverKey(song.title));const existing=possible.length===1?possible[0]:null;
+if(existing){b.textContent=embeddedCover(song.cover)&&!existing.cover_path?'补同步封面':'云端已存在';b.disabled=!(embeddedCover(song.cover)&&!existing.cover_path)}
+b.onclick=async()=>{if(!currentUser){status('请先登录');return}b.disabled=true;try{
+ if(existing){const done=await fillCoverForCloudTrack(existing,song.cover);b.textContent=done?'✓ 封面已同步':'已跳过';await loadSongs();status(done?'封面已同步到手机和 PC 云音乐馆':'云端已有封面，未重复上传');return}
+ if(!(song.blob instanceof Blob))throw Error('找不到此歌曲的本地音频数据');
+ status('正在上传：'+song.title);
+ const file=new File([song.blob],(song.title||'track')+'.'+((song.blob.type||'audio/mpeg').includes('wav')?'wav':'mp3'),{type:song.blob.type||'audio/mpeg'});
+ const uploaded=await uploadOne(file,song);b.textContent='✓ 已上传';await loadSongs();
+ status(uploaded.coverWarning?'音频上传成功，封面待补传：'+uploaded.coverWarning:'音频及本地封面已处理完毕');
+ }catch(e){status(e.message);b.disabled=false}};row.append(inf,b);out.append(row)}
 }catch(e){status('读取本地音乐失败：'+e.message)}}
 start().catch(e=>status('启动失败：'+e.message));
 </script></body></html>
