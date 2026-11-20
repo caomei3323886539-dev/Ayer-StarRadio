@@ -1,0 +1,59 @@
+name: Validate Public Music
+on:
+  push:
+    paths:
+      - "public.html"
+      - "cloud.html"
+      - "sw.js"
+      - ".github/workflows/validate-public.yml"
+  workflow_dispatch:
+jobs:
+  public-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check public player and publisher scripts
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          public=Path('public.html').read_text()
+          private=Path('cloud.html').read_text()
+          worker=Path('sw.js').read_text()
+          for name,src in [('public',public),('cloud',private)]:
+              scripts=re.findall(r'<script type="module">(.*?)</script>',src,re.S)
+              assert len(scripts)==1, name
+              Path(name+'.mjs').write_text(scripts[0])
+          assert 'radio_publications' in public
+          assert 'ayer-public-media' in public
+          assert '.eq("published",true)' in public
+          assert "storage.from('ayer-audio')" not in public
+          assert 'publishTrack(track)' in private
+          assert "loadPublisherRole()" in private
+          assert "confirm('确认公开发布" in private
+          assert "'./public.html'" in worker
+          assert "SUPABASE_SERVICE_ROLE_KEY" not in public
+          print('Public privacy invariants passed')
+          PY
+          node --check public.mjs
+          node --check cloud.mjs
+          node --check sw.js
+      - name: Public API smoke checks (no private content)
+        run: |
+          node <<'JS'
+          const base='https://nnoffobuktejgtmwfvbn.supabase.co';
+          const key='sb_publishable_ypAoa0UggQNWR9Rt9HWelQ_ao_Ih5Yw';
+          (async()=>{
+            const r=await fetch(base+'/rest/v1/radio_publications?select=track_id,title,published&published=eq.true',{headers:{apikey:key}});
+            const body=await r.text();
+            if(!r.ok)throw Error('Public catalog HTTP '+r.status+': '+body.slice(0,250));
+            const tracks=JSON.parse(body);if(!Array.isArray(tracks)||tracks.some(x=>x.published!==true))throw Error('Non-public data in catalog');
+            const media=await fetch(base+'/functions/v1/ayer-public-media',{method:'POST',headers:{'content-type':'application/json',apikey:key},body:JSON.stringify({track_id:'00000000-0000-4000-8000-000000000000',kind:'audio'})});
+            const m=await media.text();
+            if(media.status!==404)throw Error('Private media guard failed: '+media.status+': '+m.slice(0,250));
+            console.log('Public catalog reachable, '+tracks.length+' published records; private media access denied');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
