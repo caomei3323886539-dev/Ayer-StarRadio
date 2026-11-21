@@ -158,3 +158,26 @@ body.detail-open{overflow:hidden}
 body.detail-open{overflow:hidden}
 @media(max-width:900px){.player-detail .lyric-layout{height:auto!important;flex:1;min-height:0}.player-detail .lyric-lines{overflow-y:auto;overscroll-behavior:contain}}
 @media(prefers-reduced-motion:reduce){.player-detail{transition:none!important;transform:none!important}}
+
+/* v0.8.5 immersive detail only; mini player unchanged */
+.player-detail{isolation:isolate;background:linear-gradient(150deg,#dceeff,#f9fcff 58%,#d8eafa)!important}
+.detail-backdrop-art{position:absolute;inset:-10%;z-index:-2;background-position:center;background-size:cover;filter:blur(65px) saturate(1.15);opacity:.24;transform:scale(1.1);pointer-events:none;transition:background-image .35s ease}
+.player-detail:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(155deg,#e9f5f9d9,#ffffffbb 55%,#d8eaf6df);pointer-events:none}
+.detail-view-toggle{position:relative;z-index:1;display:flex;justify-content:center;gap:5px;margin:0 auto 10px;padding:4px;border-radius:30px;background:#ffffff9c;border:1px solid #d6e8f4}
+.detail-view-toggle button{border:0;background:transparent;border-radius:22px;padding:9px 18px;color:#6185a5;min-height:40px;cursor:pointer}
+.detail-view-toggle button.active{background:#d8eafa;color:#2476b2;font-weight:750}
+.player-detail .lyric-disc{filter:drop-shadow(0 18px 22px #396e983b);transition:filter .4s ease}
+.player-detail .lyric-art,.player-detail .lyric-lines{transition:opacity .28s ease,transform .36s cubic-bezier(.22,1,.36,1)}
+@media(max-width:900px){
+ .player-detail:not(.mode-lyrics) .lyric-lines{display:none!important}
+ .player-detail:not(.mode-lyrics) .lyric-art{flex:1!important;justify-content:center!important}
+ .player-detail:not(.mode-lyrics) .lyric-disc{width:min(66vw,280px)!important;height:min(66vw,280px)!important}
+ .player-detail.mode-lyrics .lyric-art{display:none!important}
+ .player-detail.mode-lyrics .lyric-lines{display:block!important;flex:1!important;padding-top:18%!important}
+ .player-detail .detail-controls{z-index:2}
+}
+@media(min-width:901px){
+ .player-detail:not(.mode-lyrics) .lyric-lines{opacity:.55}
+ .player-detail.mode-lyrics .lyric-art{opacity:.28;transform:scale(.9)}
+}
+@media(prefers-reduced-motion:reduce){.player-detail .lyric-art,.player-detail .lyric-lines,.detail-backdrop-art{transition:none!important}}
