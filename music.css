@@ -234,3 +234,7 @@ body.detail-open{overflow:hidden}
 .music-sort{flex-shrink:0;max-width:145px;border:1px solid #d5e6f4;border-radius:12px;padding:10px;background:#fff;color:#315c7f}
 .music-filter-summary{color:#6a8ca9;font-size:13px;margin:4px 0 15px}
 @media(max-width:600px){.music-filter-tools{align-items:stretch;flex-direction:column;gap:7px}.music-sort{align-self:flex-end}.music-filter-tabs{width:100%}}
+
+/* v0.9.1 search results grouped by published albums, creators and tracks */
+#viewRoot .section:has(.tiles)+.section{margin-top:22px}
+@media(max-width:900px){#viewRoot .section .tiles{scroll-margin-top:16px}}
