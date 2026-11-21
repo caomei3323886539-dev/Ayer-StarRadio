@@ -374,18 +374,26 @@ function updatePlayer(){
  $('nowTitle').textContent=t?t.title:'等待播放';
  $('nowArtist').textContent=t?displayName(t):'在音乐馆选择一首歌曲';
  $('playBtn').textContent=audio.paused?'▶':'Ⅱ';
+ $('detailPlay').textContent=audio.paused?'▶':'Ⅱ';
+ $('detailPlay').setAttribute('aria-label',audio.paused?'播放':'暂停');
  $('playBtn').setAttribute('aria-label',audio.paused?'播放':'暂停');
  $('likeNow').textContent=t&&isLiked(t)?'♥':'♡';
  $('likeNow').classList.toggle('active',!!(t&&isLiked(t)));
  $('shuffleBtn').classList.toggle('active',state.shuffle);
  $('repeatBtn').classList.toggle('active',state.repeat);
  $('repeatBtn').textContent=state.repeat?'↻¹':'↻';
+ $('detailShuffle').classList.toggle('active',state.shuffle);
+ $('detailRepeat').classList.toggle('active',state.repeat);
+ $('detailRepeat').textContent=state.repeat?'↻¹':'↻';
  $('vinyl').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('lyricDisc').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('lyricHeading').textContent=t?t.title:'实时歌词';
  $('lyricArtist').textContent=t?displayName(t):'星音音乐';
  $('timeNow').textContent=formatTime(audio.currentTime);
  $('timeTotal').textContent=formatTime(audio.duration);
+ $('detailTimeNow').textContent=formatTime(audio.currentTime);
+ $('detailTimeTotal').textContent=formatTime(audio.duration);
+ if(Number.isFinite(audio.duration)&&audio.duration>0)$('detailSeek').value=String(100*audio.currentTime/audio.duration);
  if(t){
   const signature=key(t);
   if($('playerArt').dataset.song!==signature){
@@ -506,6 +514,25 @@ function syncVisualViewport(){
  const bottom=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop));
  document.documentElement.style.setProperty('--visual-bottom',bottom+'px');
 }
+function openPlayerDetail(){
+ const d=$('lyricsDialog');
+ if(d.open)return;
+ renderLyric();
+ d.showModal();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.add('detail-visible')));
+ document.body.classList.add('detail-open');
+ updatePlayer();
+}
+function closePlayerDetail(){
+ const d=$('lyricsDialog');
+ if(!d.open)return;
+ d.classList.remove('detail-visible');
+ document.body.classList.remove('detail-open');
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){d.close();return}
+ const done=()=>{if(d.open&&!d.classList.contains('detail-visible'))d.close()};
+ d.addEventListener('transitionend',e=>{if(e.target===d)done()},{once:true});
+ setTimeout(done,440);
+}
 function attach(){
  syncVisualViewport();
  if(window.visualViewport){
@@ -519,7 +546,17 @@ function attach(){
  $('closeAuth').onclick=()=>$('authDialog').close();
  $('closePlaylist').onclick=()=>$('playlistDialog').close();
  $('closeAdd').onclick=()=>{$('addDialog').close();state.pendingAdd=null};
- $('closeLyrics').onclick=()=>$('lyricsDialog').close();
+ $('closeLyrics').onclick=closePlayerDetail;
+ $('openPlayer').onclick=openPlayerDetail;
+ $('lyricsDialog').addEventListener('cancel',e=>{e.preventDefault();closePlayerDetail()});
+ $('lyricsDialog').addEventListener('click',e=>{if(e.target===$('lyricsDialog'))closePlayerDetail()});
+ $('detailPlay').onclick=togglePlay;
+ $('detailPrev').onclick=()=>advance(true);
+ $('detailNext').onclick=()=>advance(false);
+ $('detailShuffle').onclick=()=>{state.shuffle=!state.shuffle;updatePlayer()};
+ $('detailRepeat').onclick=()=>{state.repeat=!state.repeat;updatePlayer()};
+ $('detailQueueBtn').onclick=()=>{closePlayerDetail();$('queueDrawer').hidden=false;renderQueue()};
+ $('detailSeek').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
  $('authForm').onsubmit=async e=>{
   e.preventDefault();$('signIn').disabled=true;
   try{safeError(await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value}),'登录失败');$('authDialog').close();$('password').value='';await loadAll()}
@@ -555,13 +592,16 @@ function attach(){
  $('likeNow').onclick=()=>{if(state.current)toggleFavorite(state.current)};
  $('queueBtn').onclick=()=>{$('queueDrawer').hidden=!$('queueDrawer').hidden;renderQueue()};
  $('closeQueue').onclick=()=>{$('queueDrawer').hidden=true};
- $('lyricsBtn').onclick=()=>{$('lyricsDialog').showModal();renderLyric()};
+ $('lyricsBtn').onclick=openPlayerDetail;
  $('seekBar').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
  $('volume').oninput=e=>{audio.volume=Number(e.target.value)};
  audio.volume=Number($('volume').value);
  audio.addEventListener('timeupdate',()=>{
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('seekBar').value=String(100*audio.currentTime/audio.duration);
-  $('timeNow').textContent=formatTime(audio.currentTime);updateLyric();
+  $('timeNow').textContent=formatTime(audio.currentTime);
+  $('detailTimeNow').textContent=formatTime(audio.currentTime);
+  if(Number.isFinite(audio.duration)&&audio.duration>0)$('detailSeek').value=String(100*audio.currentTime/audio.duration);
+  updateLyric();
  });
  audio.addEventListener('durationchange',updatePlayer);
  for(const ev of ['playing','play','pause','waiting','canplay','ended','seeking'])audio.addEventListener(ev,()=>{updatePlayer();if(ev==='playing')recordPlay()});
