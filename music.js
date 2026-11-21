@@ -7,7 +7,7 @@ const $=id=>document.getElementById(id);
 const audio=$('audio');
 const state={
  user:null,public:[],private:[],favorites:new Set(),history:[],playlists:[],items:[],
- view:'home',search:'',album:null,artist:null,selectedPlaylist:null,
+ view:'home',search:'',album:null,artist:null,selectedPlaylist:null,discoverFilter:'all',discoverSort:'newest',
  queue:[],current:null,index:-1,shuffle:false,repeat:false,
  covers:new Map(),coverObjects:[],lyrics:[],lyricIndex:-1,channel:null,
  pendingAdd:null,playToken:0,recordedKey:null,loadToken:0,cloudUser:null,cloudStamp:null,cloudRestoring:false,pendingResume:0,lastSyncAt:0
@@ -47,6 +47,7 @@ function setActiveNav(){
 function goto(view){
  state.view=view;state.search='';$('searchInput').value='';
  state.album=null;state.artist=null;state.selectedPlaylist=null;
+ if(view==='discover')state.discoverFilter='all';
  document.querySelector('.sidebar').classList.remove('open');$('backdrop').hidden=true;
  render();$('mainContent').scrollIntoView({block:'start',behavior:'instant'});
 }
@@ -173,6 +174,15 @@ function renderHome(root){
   albums.append(grid);
  }else albums.append(empty('尚无公开专辑','管理员发布音乐后，专辑分类会自动出现。'));
  root.append(albums);
+ const creators=groupBy(songs,displayName);
+ if(creators.size){
+  const section=el('section','section');
+  section.append(heading('遇见音乐创作者','探索艾耶尔大陆音乐的创作者','全部创作者',()=>goto('artists')));
+  const grid=el('div','tiles');
+  for(const [name,tracks] of Array.from(creators).slice(0,5))
+   grid.append(collectionTile(name,tracks.length+' 首已发布作品',tracks[0],()=>{state.view='artists';state.artist=name;render()},'创作者'));
+  section.append(grid);root.append(section);
+ }
  if(state.user&&state.private.length){const mine=el('section','section');
   mine.append(heading('继续欣赏我的音乐','只有当前账号可以读取的私人音频','进入私人曲库',()=>goto('private')));
   mine.append(tiles(availablePrivate().slice(0,4)));root.append(mine);
@@ -183,9 +193,36 @@ function pageHead(root,title,description,right,fn){
  const bar=el('div','summary-top'),left=el('div');left.append(el('h1','',title),el('p','',description));bar.append(left);
  if(right)bar.append(button(right,'primary-btn',fn));root.append(bar);
 }
+function sortPublicTracks(songs,sort){
+ const arr=[...songs];
+ if(sort==='title')return arr.sort((a,b)=>a.title.localeCompare(b.title,'zh-CN'));
+ if(sort==='artist')return arr.sort((a,b)=>displayName(a).localeCompare(displayName(b),'zh-CN'));
+ return arr.sort((a,b)=>new Date(b.published_at||0)-new Date(a.published_at||0));
+}
 function renderDiscover(root){
- const songs=availablePublic();pageHead(root,'发现音乐','公开音乐馆 · '+songs.length+' 首已发布曲目');
- if(songs.length)root.append(rowList(songs));else root.append(empty('尚无已发布歌曲','只有管理员在云端管理中明确发布的音乐，才会向所有用户开放。'));
+ const songs=availablePublic(),albums=groupBy(songs,albumName),artists=groupBy(songs,displayName);
+ pageHead(root,'发现音乐','公开音乐馆 · '+songs.length+' 首已发布曲目');
+ if(!songs.length){root.append(empty('尚无已发布歌曲','只有管理员在云端管理中明确发布的音乐，才会向所有用户开放。'));return}
+ const tools=el('div','music-filter-tools');
+ const tabs=el('div','music-filter-tabs');
+ const filters=[['all','全部音乐'],...Array.from(albums.keys()).map(name=>['album:'+name,name])];
+ for(const [value,label] of filters){
+  const b=button(label,(state.discoverFilter===value?'active ':''),'');
+  b.setAttribute('aria-pressed',String(state.discoverFilter===value));
+  b.onclick=()=>{state.discoverFilter=value;render()};
+  tabs.append(b);
+ }
+ const sorter=el('select','music-sort');
+ sorter.setAttribute('aria-label','歌曲排序');
+ for(const [value,label] of [['newest','最新发布'],['title','歌曲名称'],['artist','创作者名称']]){
+  const option=el('option','',label);option.value=value;sorter.append(option);
+ }
+ sorter.value=state.discoverSort;sorter.onchange=()=>{state.discoverSort=sorter.value;render()};
+ tools.append(tabs,sorter);root.append(tools);
+ const filtered=state.discoverFilter.startsWith('album:')?songs.filter(t=>albumName(t)===state.discoverFilter.slice(6)):songs;
+ if(!filtered.length){state.discoverFilter='all';renderDiscover(root);return}
+ const summary=el('p','music-filter-summary','当前展示 '+filtered.length+' 首歌曲 · '+albums.size+' 张专辑 · '+artists.size+' 位创作者');
+ root.append(summary,rowList(sortPublicTracks(filtered,state.discoverSort)));
 }
 function renderAlbums(root){
  const songs=availablePublic(),albums=groupBy(songs,albumName);
