@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0841"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0841"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=085"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=085"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0841'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0841'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=085'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=085'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -47,3 +47,5 @@ test('vinyl animation pauses when audio is paused', () => {
 test('v0.8.4 player detail uses full-screen layer',()=>{assert.match(html,/<section id="lyricsDialog"[^>]*role="dialog"/);assert.doesNotMatch(html,/<dialog id="lyricsDialog"/);assert.match(script,/function openPlayerDetail\(\)/);assert.match(script,/d.hidden=false/);assert.match(css,/\.player-detail\[hidden\]\{display:none!important\}/)});
 
 test('cross-browser sync uses account-scoped cloud checkpoints',()=>{assert.match(script,/radio_listener_sync/);assert.match(script,/function restoreCloudCheckpoint/);assert.match(script,/function saveCloudCheckpoint/);assert.match(script,/current_track_id/);assert.match(script,/onConflict:'user_id'/)});
+
+test('v0.8.5 immersive player mode and gestures',()=>{assert.match(html,/id="showDisc"/);assert.match(html,/id="showLyrics"/);assert.match(html,/id="detailBackdrop"/);assert.match(script,/function setDetailMode/);assert.match(script,/touchstart/);assert.match(script,/touchend/);assert.match(css,/\.player-detail\.mode-lyrics/)});
