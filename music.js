@@ -423,19 +423,29 @@ async function loadAll(){
   if(!current||current.kind!=='public'||state.public.some(t=>t.track_id===current.id))silent();
  }catch(e){if(token!==state.loadToken)return;say('在线音乐馆连接失败：'+e.message);render()}
 }
+const favoriteBusy=new Set();
 async function toggleFavorite(t){
  if(!requireUser())return;
+ const songKey=key(t),userId=state.user.id;
+ if(favoriteBusy.has(songKey))return;
+ favoriteBusy.add(songKey);
  try{
   if(t.kind==='public'){
-   if(state.favorites.has(t.id)){safeError(await sb.from('radio_public_favorites').delete().eq('track_id',t.id).eq('user_id',state.user.id),'取消收藏');state.favorites.delete(t.id)}
-   else{safeError(await sb.from('radio_public_favorites').insert({track_id:t.id}),'收藏歌曲');state.favorites.add(t.id)}
+   if(state.favorites.has(t.id)){
+    safeError(await sb.from('radio_public_favorites').delete().eq('track_id',t.id).eq('user_id',userId),'取消收藏');
+    if(state.user?.id===userId)state.favorites.delete(t.id);
+   }else{
+    safeError(await sb.from('radio_public_favorites').insert({track_id:t.id,user_id:userId}),'收藏歌曲');
+    if(state.user?.id===userId)state.favorites.add(t.id);
+   }
   }else{
    const next=!isLiked(t);
-   safeError(await sb.from('radio_tracks').update({is_favorite:next}).eq('id',t.id).eq('user_id',state.user.id),'私人曲库收藏');
-   const saved=state.private.find(x=>x.id===t.id);if(saved)saved.is_favorite=next;
+   safeError(await sb.from('radio_tracks').update({is_favorite:next}).eq('id',t.id).eq('user_id',userId),'私人曲库收藏');
+   if(state.user?.id===userId){const saved=state.private.find(x=>x.id===t.id);if(saved)saved.is_favorite=next}
   }
-  render();updatePlayer();
+  if(state.user?.id===userId){render();updatePlayer()}
  }catch(e){say(e.message)}
+ finally{favoriteBusy.delete(songKey)}
 }
 async function addPrompt(t){
  if(!requireUser())return;
@@ -453,7 +463,7 @@ async function addPrompt(t){
 async function addPlaylistTrack(playlistId,trackId){
  if(state.items.some(i=>i.playlist_id===playlistId&&i.track_id===trackId)){say('歌曲已经在这张歌单中。');return}
  try{
-  const next=state.items.filter(i=>i.playlist_id===playlistId).length;
+  const next=Math.max(-1,...state.items.filter(i=>i.playlist_id===playlistId).map(i=>Number(i.sort_order)||0))+1;
   safeError(await sb.from('radio_listener_playlist_tracks').insert({playlist_id:playlistId,track_id:trackId,sort_order:next}),'添加歌单');
   state.items.push({playlist_id:playlistId,track_id:trackId,sort_order:next});
   $('addDialog').close();say('歌曲已添加到个人在线歌单。');render();
