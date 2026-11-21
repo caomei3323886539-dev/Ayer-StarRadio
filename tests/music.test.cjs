@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=090"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=090"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=091"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=091"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=090'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=090'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=091'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=091'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -61,3 +61,5 @@ test('v0.8.6.2 turntable tonearm and elevated disc',()=>{assert.match(html,/id="
 test('v0.8.6.3 extended stylus reaches vinyl grooves',()=>{assert.match(html,/viewBox="0 0 220 300"/);assert.match(html,/L58 267/);assert.match(css,/\.player-detail \.tonearm\{height:75%/)});
 
 test('v0.9.0 public music discovery filters and sort',()=>{assert.match(script,/function sortPublicTracks/);assert.match(script,/discoverFilter:'all'/);assert.match(script,/音乐创作者/);assert.match(script,/state\.discoverFilter\.startsWith\('album:'\)/);assert.match(css,/\.music-filter-tabs/)});
+
+test('v0.9.1 grouped music search respects public/private navigation',()=>{assert.match(script,/function normalizedSearch/);assert.match(script,/function searchCatalog/);assert.match(script,/匹配专辑/);assert.match(script,/匹配创作者/);assert.match(script,/tracks\.filter\(t=>t\.kind==='public'\)/)});
