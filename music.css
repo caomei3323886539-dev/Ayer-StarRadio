@@ -204,3 +204,20 @@ body.detail-open{overflow:hidden}
 .player-detail .lyric-disc.vinyl{animation-name:vinyl-spin;animation-duration:7s;animation-timing-function:linear;animation-iteration-count:infinite;animation-play-state:paused}
 .player-detail .lyric-disc.vinyl.is-playing{animation-play-state:running}
 @media(prefers-reduced-motion:reduce){.player-detail .lyric-disc.vinyl{animation:none!important}}
+
+/* v0.8.6.2: elevated vinyl and articulated tonearm (detail view only) */
+.player-detail .lyric-art{position:relative}
+.player-detail .turntable-stage{position:relative;width:fit-content;max-width:100%;margin-inline:auto;transform:translateY(clamp(-135px,-10dvh,-48px));isolation:isolate}
+.player-detail .turntable-stage .lyric-disc{position:relative;z-index:1}
+.player-detail .tonearm{position:absolute;z-index:3;width:54%;height:54%;top:-31%;right:-27%;overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 4px #466a8640)}
+.player-detail .tonearm-moving{transform-box:view-box;transform-origin:184px 29px;transform:rotate(-29deg);transition:transform .72s cubic-bezier(.2,.7,.2,1)}
+.player-detail .tonearm.is-playing .tonearm-moving{transform:rotate(0deg)}
+.player-detail .lyric-art h3{position:relative;transform:translateY(clamp(-135px,-10dvh,-48px))}
+@media(max-width:900px){
+ .player-detail:not(.mode-lyrics) .lyric-art{justify-content:center!important}
+ .player-detail .turntable-stage{transform:translateY(clamp(-145px,-10dvh,-54px))}
+ .player-detail .lyric-art h3{transform:translateY(clamp(-145px,-10dvh,-54px))}
+ .player-detail .tonearm{right:-22%;top:-29%;width:50%;height:50%}
+}
+@media(max-height:680px){.player-detail .turntable-stage,.player-detail .lyric-art h3{transform:translateY(-24px)}}
+@media(prefers-reduced-motion:reduce){.player-detail .tonearm-moving{transition:none!important}}
