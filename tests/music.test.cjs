@@ -43,3 +43,5 @@ test('vinyl animation pauses when audio is paused', () => {
   assert.match(css,/\.vinyl\.is-playing\{animation-play-state:running\}/);
   assert.match(css,/animation-play-state:paused/);
 });
+
+test('v0.8.4 player detail uses full-screen layer',()=>{assert.match(html,/<section id="lyricsDialog"[^>]*role="dialog"/);assert.doesNotMatch(html,/<dialog id="lyricsDialog"/);assert.match(script,/function openPlayerDetail\(\)/);assert.match(script,/d.hidden=false/);assert.match(css,/\.player-detail\[hidden\]\{display:none!important\}/)});
