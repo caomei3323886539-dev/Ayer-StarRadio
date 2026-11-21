@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0861"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0861"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0862"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0862"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0861'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0861'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0862'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0862'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -55,3 +55,5 @@ test('v0.8.5.1 smooth vinyl transition and safe lyric scroll',()=>{assert.match(
 test('v0.8.6 playback engine has local queue, next source preparation and reconnect recovery',()=>{assert.match(script,/ENGINE_QUEUE_KEY/);assert.match(script,/prepareNextSource/);assert.match(script,/retryCurrentSource/);assert.match(script,/addEventListener\('online'/);assert.match(css,/\.player-detail \.lyric-disc \.vinyl-label\{width:62%/)});
 
 test('full-screen vinyl spin is not overwritten by entry transition',()=>{assert.doesNotMatch(css,/\.player-detail\.detail-visible \.lyric-disc\{animation:detail-disc-enter/);assert.match(css,/\.player-detail\.detail-visible \.lyric-art\{animation:detail-disc-enter/);assert.match(css,/\.player-detail \.lyric-disc\.vinyl\.is-playing\{animation-play-state:running\}/)});
+
+test('v0.8.6.2 turntable tonearm and elevated disc',()=>{assert.match(html,/id="tonearm"/);assert.match(html,/class="turntable-stage"/);assert.match(script,/\$\('tonearm'\)\.classList\.toggle\('is-playing'/);assert.match(css,/\.tonearm\.is-playing \.tonearm-moving/);assert.match(css,/translateY\(clamp\(-145px/)});
