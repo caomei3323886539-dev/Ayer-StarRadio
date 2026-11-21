@@ -517,11 +517,14 @@ function syncVisualViewport(){
 function openPlayerDetail(){
  const d=$('lyricsDialog');
  if(d.open)return;
- renderLyric();
- d.showModal();
- requestAnimationFrame(()=>requestAnimationFrame(()=>d.classList.add('detail-visible')));
- document.body.classList.add('detail-open');
- updatePlayer();
+ try{
+  d.showModal();
+  document.body.classList.add('detail-open');
+  d.classList.remove('detail-visible');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(d.open)d.classList.add('detail-visible')}));
+  renderLyric();
+  updatePlayer();
+ }catch(e){console.error('无法打开播放器详情',e);say('播放器详情打开失败，请刷新页面后重试。')}
 }
 function closePlayerDetail(){
  const d=$('lyricsDialog');
@@ -547,7 +550,9 @@ function attach(){
  $('closePlaylist').onclick=()=>$('playlistDialog').close();
  $('closeAdd').onclick=()=>{$('addDialog').close();state.pendingAdd=null};
  $('closeLyrics').onclick=closePlayerDetail;
- $('openPlayer').onclick=openPlayerDetail;
+ $('openPlayer').addEventListener('click',e=>{if(e.target.closest('#likeNow'))return;openPlayerDetail()});
+ $('openPlayer').addEventListener('keydown',e=>{if(e.target!==$('openPlayer'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();openPlayerDetail()}});
+ $('likeNow').addEventListener('click',e=>e.stopPropagation());
  $('lyricsDialog').addEventListener('cancel',e=>{e.preventDefault();closePlayerDetail()});
  $('lyricsDialog').addEventListener('click',e=>{if(e.target===$('lyricsDialog'))closePlayerDetail()});
  $('detailPlay').onclick=togglePlay;
