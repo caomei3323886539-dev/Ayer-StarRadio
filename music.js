@@ -448,10 +448,11 @@ function updatePlayer(){
   if($('playerArt').dataset.song!==signature){
    $('playerArt').dataset.song=signature;$('lyricArt').dataset.song=signature;
    setArt(t,$('playerArt'));setArt(t,$('lyricArt'));
+   artwork(t).then(url=>{if(state.current&&key(state.current)===signature)$('detailBackdrop').style.backgroundImage=url?'url("'+url.replace(/"/g,'%22')+'")':'none'});
   }
  }else{
   $('playerArt').dataset.song='';$('lyricArt').dataset.song='';
-  $('playerArt').textContent='✦';$('lyricArt').textContent='✦';
+  $('playerArt').textContent='✦';$('lyricArt').textContent='✦';$('detailBackdrop').style.backgroundImage='none';
  }
  if('mediaSession' in navigator&&t){
   navigator.mediaSession.metadata=new MediaMetadata({title:t.title,artist:displayName(t),album:albumName(t)});
@@ -568,10 +569,20 @@ function syncVisualViewport(){
 let detailCloseTimer=0;
 let detailLastFocus=null;
 function detailIsOpen(){return !$('lyricsDialog').hidden}
+function setDetailMode(mode){
+ const lyrics=mode==='lyrics';
+ $('lyricsDialog').classList.toggle('mode-lyrics',lyrics);
+ $('showDisc').classList.toggle('active',!lyrics);
+ $('showLyrics').classList.toggle('active',lyrics);
+ $('showDisc').setAttribute('aria-pressed',String(!lyrics));
+ $('showLyrics').setAttribute('aria-pressed',String(lyrics));
+ if(lyrics)updateLyric();
+}
 function openPlayerDetail(){
  const d=$('lyricsDialog');if(detailIsOpen())return;
  clearTimeout(detailCloseTimer);detailLastFocus=document.activeElement;
  d.hidden=false;d.setAttribute('aria-hidden','false');
+ setDetailMode('disc');
  document.body.classList.add('detail-open');renderLyric();updatePlayer();
  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(!d.hidden)d.classList.add('detail-visible')}));
  $('closeLyrics').focus({preventScroll:true});
@@ -598,6 +609,11 @@ function attach(){
  $('closePlaylist').onclick=()=>$('playlistDialog').close();
  $('closeAdd').onclick=()=>{$('addDialog').close();state.pendingAdd=null};
  $('closeLyrics').onclick=closePlayerDetail;
+ $('showDisc').onclick=()=>setDetailMode('disc');
+ $('showLyrics').onclick=()=>setDetailMode('lyrics');
+ let detailTouchStart=null;
+ $('lyricsDialog').addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,.lyric-lines'))return;detailTouchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+ $('lyricsDialog').addEventListener('touchend',e=>{if(!detailTouchStart||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-detailTouchStart.x,dy=e.changedTouches[0].clientY-detailTouchStart.y;detailTouchStart=null;if(dy>100&&Math.abs(dy)>Math.abs(dx)*1.3)closePlayerDetail();else if(Math.abs(dx)>95&&Math.abs(dx)>Math.abs(dy)*1.3)advance(dx>0)},{passive:true});
  $('openPlayer').addEventListener('click',e=>{if(e.target.closest('#likeNow'))return;openPlayerDetail()});
  $('openPlayer').addEventListener('keydown',e=>{if(e.target!==$('openPlayer'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();openPlayerDetail()}});
  $('likeNow').addEventListener('click',e=>e.stopPropagation());
