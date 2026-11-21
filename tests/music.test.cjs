@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0863"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0863"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=090"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=090"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0863'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0863'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=090'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=090'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -59,3 +59,5 @@ test('full-screen vinyl spin is not overwritten by entry transition',()=>{assert
 test('v0.8.6.2 turntable tonearm and elevated disc',()=>{assert.match(html,/id="tonearm"/);assert.match(html,/class="turntable-stage"/);assert.match(script,/\$\('tonearm'\)\.classList\.toggle\('is-playing'/);assert.match(css,/\.tonearm\.is-playing \.tonearm-moving/);assert.match(css,/translateY\(clamp\(-145px/)});
 
 test('v0.8.6.3 extended stylus reaches vinyl grooves',()=>{assert.match(html,/viewBox="0 0 220 300"/);assert.match(html,/L58 267/);assert.match(css,/\.player-detail \.tonearm\{height:75%/)});
+
+test('v0.9.0 public music discovery filters and sort',()=>{assert.match(script,/function sortPublicTracks/);assert.match(script,/discoverFilter:'all'/);assert.match(script,/音乐创作者/);assert.match(script,/state\.discoverFilter\.startsWith\('album:'\)/);assert.match(css,/\.music-filter-tabs/)});
