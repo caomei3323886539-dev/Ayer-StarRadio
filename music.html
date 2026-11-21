@@ -8,7 +8,7 @@
 <title>星音音乐 · 艾耶尔大陆在线音乐平台</title>
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./music.css?v=083">
+<link rel="stylesheet" href="./music.css?v=084">
 </head>
 <body>
 <div class="app-shell">
@@ -92,11 +92,11 @@
   <div id="queueItems"></div>
 </aside>
 
-<dialog id="lyricsDialog" class="lyric-dialog player-detail" aria-label="完整播放器详情">
+<section id="lyricsDialog" class="lyric-dialog player-detail" role="dialog" aria-modal="true" aria-label="完整播放器详情" aria-hidden="true" hidden>
   <div class="dialog-head"><button type="button" id="closeLyrics" class="icon-btn" aria-label="收起播放器">⌄</button><div class="detail-heading"><small>AYER STAR MUSIC · NOW PLAYING</small><h2 id="lyricHeading">正在播放</h2></div><button type="button" id="detailQueueBtn" class="icon-btn" aria-label="打开播放队列">☷</button></div>
   <div class="lyric-layout"><div class="lyric-art"><div class="lyric-disc vinyl" id="lyricDisc"><div class="vinyl-label" id="lyricArt">✦</div></div><h3 id="lyricArtist">星音音乐</h3></div><div id="lyricLines" class="lyric-lines"></div></div>
   <div class="detail-controls"><div class="detail-timeline"><span id="detailTimeNow">0:00</span><input id="detailSeek" aria-label="播放器详情进度" type="range" min="0" max="100" step="0.1" value="0"><span id="detailTimeTotal">0:00</span></div><div class="detail-buttons"><button type="button" id="detailShuffle" class="icon-btn" aria-label="随机播放">⤨</button><button type="button" id="detailPrev" class="icon-btn" aria-label="上一首">⏮</button><button type="button" id="detailPlay" class="play-main" aria-label="播放或暂停">▶</button><button type="button" id="detailNext" class="icon-btn" aria-label="下一首">⏭</button><button type="button" id="detailRepeat" class="icon-btn" aria-label="切换循环">↻</button></div></div>
-</dialog>
+</section>
 
 <dialog id="authDialog" class="simple-dialog">
   <div class="dialog-head"><div><small>AYER STAR MUSIC</small><h2>星音账号</h2></div><button type="button" class="icon-btn" id="closeAuth" aria-label="关闭登录">✕</button></div>
@@ -120,6 +120,6 @@
 </dialog>
 
 <div class="backdrop" id="backdrop" hidden></div>
-<script type="module" src="./music.js?v=083"></script>
+<script type="module" src="./music.js?v=084"></script>
 </body>
 </html>
