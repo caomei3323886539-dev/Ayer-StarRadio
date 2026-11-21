@@ -148,3 +148,13 @@ body.detail-open{overflow:hidden}
  .player{grid-template-columns:minmax(105px,1fr) 83px 77px!important}
  .player .player-song{min-width:0}
 }
+
+/* v0.8.4: full-screen player layer, original v0.8.1 mini-player untouched */
+.player-detail[hidden]{display:none!important}
+.player-detail{position:fixed!important;z-index:120!important;inset:0!important;display:flex!important;flex-direction:column!important;width:100%!important;height:100dvh!important;max-height:none!important;margin:0!important;box-sizing:border-box;overflow:hidden!important;overscroll-behavior:contain;opacity:0;pointer-events:none;transform:translate3d(0,32px,0) scale(.99);transition:opacity .27s ease,transform .38s cubic-bezier(.2,.8,.2,1)}
+.player-detail.detail-visible{opacity:1;pointer-events:auto;transform:translate3d(0,0,0) scale(1)}
+.player-detail .lyric-layout{flex:1;min-height:0;height:auto!important}
+.player-detail .detail-controls{flex-shrink:0}
+body.detail-open{overflow:hidden}
+@media(max-width:900px){.player-detail .lyric-layout{height:auto!important;flex:1;min-height:0}.player-detail .lyric-lines{overflow-y:auto;overscroll-behavior:contain}}
+@media(prefers-reduced-motion:reduce){.player-detail{transition:none!important;transform:none!important}}
