@@ -225,3 +225,12 @@ body.detail-open{overflow:hidden}
 /* v0.8.6.3: extend tonearm stylus into the outer groove while preserving the upper-right pivot */
 .player-detail .tonearm{height:75%;width:54%;top:-31%;right:-27%}
 @media(max-width:900px){.player-detail .tonearm{height:72%;width:50%;top:-29%;right:-22%}}
+
+/* v0.9.0: publicly grounded album filters, creator discovery and sorting */
+.music-filter-tools{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:18px 0 8px;min-width:0}
+.music-filter-tabs{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:thin;flex:1;min-width:0;padding:5px 2px}
+.music-filter-tabs button{border:1px solid #d6e7f5;background:#fffdfd;color:#5d7e9e;border-radius:24px;padding:9px 16px;white-space:nowrap;min-height:42px}
+.music-filter-tabs button.active{background:#d7ebfc;border-color:#a5d3f5;color:#1e6fa9;font-weight:750}
+.music-sort{flex-shrink:0;max-width:145px;border:1px solid #d5e6f4;border-radius:12px;padding:10px;background:#fff;color:#315c7f}
+.music-filter-summary{color:#6a8ca9;font-size:13px;margin:4px 0 15px}
+@media(max-width:600px){.music-filter-tools{align-items:stretch;flex-direction:column;gap:7px}.music-sort{align-self:flex-end}.music-filter-tabs{width:100%}}
