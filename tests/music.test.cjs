@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=092"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=092"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0921"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0921"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=092'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=092'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0921'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0921'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -65,3 +65,5 @@ test('v0.9.0 public music discovery filters and sort',()=>{assert.match(script,/
 test('v0.9.1 grouped music search respects public/private navigation',()=>{assert.match(script,/function normalizedSearch/);assert.match(script,/function searchCatalog/);assert.match(script,/匹配专辑/);assert.match(script,/匹配创作者/);assert.match(script,/tracks\.filter\(t=>t\.kind==='public'\)/)});
 
 test('v0.9.2 personal center and cloud playlist rename',()=>{assert.match(html,/data-view="profile"/);assert.match(script,/function renderProfile/);assert.match(script,/async function renamePlaylist/);assert.match(script,/radio_listener_playlists'\)\.update\(\{name\}\)/);assert.match(css,/\.profile-stats/)});
+
+test('v0.9.2.1 playlist ordering and mobile profile entry',()=>{assert.match(html,/data-view="profile"><span>◉<\/span>我的/);assert.match(script,/async function movePlaylistTrack/);assert.match(script,/sort_order:temp/);assert.match(script,/removePlaylistTrack\(track.id\)/);assert.match(css,/\.playlist-edit-row/)});
