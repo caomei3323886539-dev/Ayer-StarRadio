@@ -500,7 +500,19 @@ function openAuth(){
  $('authDialog').showModal();$('signedIn').hidden=!state.user;$('authForm').hidden=!!state.user;
  $('signedInEmail').textContent=state.user?'已登录：'+(state.user.email||''):''; 
 }
+function syncVisualViewport(){
+ const vv=window.visualViewport;
+ if(!vv)return;
+ const bottom=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop));
+ document.documentElement.style.setProperty('--visual-bottom',bottom+'px');
+}
 function attach(){
+ syncVisualViewport();
+ if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',syncVisualViewport,{passive:true});
+  window.visualViewport.addEventListener('scroll',syncVisualViewport,{passive:true});
+ }
+ window.addEventListener('resize',syncVisualViewport,{passive:true});
  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goto(b.dataset.view)));
  $('searchInput').addEventListener('input',e=>{state.search=e.target.value;render()});
  $('accountBtn').onclick=openAuth;
