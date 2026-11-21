@@ -45,3 +45,5 @@ test('vinyl animation pauses when audio is paused', () => {
 });
 
 test('v0.8.4 player detail uses full-screen layer',()=>{assert.match(html,/<section id="lyricsDialog"[^>]*role="dialog"/);assert.doesNotMatch(html,/<dialog id="lyricsDialog"/);assert.match(script,/function openPlayerDetail\(\)/);assert.match(script,/d.hidden=false/);assert.match(css,/\.player-detail\[hidden\]\{display:none!important\}/)});
+
+test('cross-browser sync uses account-scoped cloud checkpoints',()=>{assert.match(script,/radio_listener_sync/);assert.match(script,/function restoreCloudCheckpoint/);assert.match(script,/function saveCloudCheckpoint/);assert.match(script,/current_track_id/);assert.match(script,/onConflict:'user_id'/)});
