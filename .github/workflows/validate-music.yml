@@ -1,0 +1,31 @@
+name: Validate Star Music
+on:
+  push:
+    paths:
+      - 'music.html'
+      - 'music.css'
+      - 'music.js'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'tests/music.test.cjs'
+      - '.github/workflows/validate-music.yml'
+  pull_request:
+    paths:
+      - 'music.html'
+      - 'music.css'
+      - 'music.js'
+      - 'sw.js'
+      - 'manifest.webmanifest'
+      - 'tests/music.test.cjs'
+      - '.github/workflows/validate-music.yml'
+permissions:
+  contents: read
+jobs:
+  music-static-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/music.test.cjs
