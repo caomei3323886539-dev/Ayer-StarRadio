@@ -238,3 +238,10 @@ body.detail-open{overflow:hidden}
 /* v0.9.1 search results grouped by published albums, creators and tracks */
 #viewRoot .section:has(.tiles)+.section{margin-top:22px}
 @media(max-width:900px){#viewRoot .section .tiles{scroll-margin-top:16px}}
+
+/* v0.9.2 personal cloud music center */
+.profile-hero{display:flex;align-items:center;gap:20px;padding:26px;border-radius:24px;background:linear-gradient(120deg,#d8ebff,#fff 72%);border:1px solid #d7e8f5;margin:12px 0 20px}
+.profile-avatar{display:grid;place-items:center;width:78px;height:78px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#7bb8e6,#e6f5ff);font-size:38px;color:#fff;box-shadow:0 8px 22px #5e9fc83b}
+.profile-details{min-width:0}.profile-details h2{margin:6px 0;font-size:24px;overflow-wrap:anywhere}.profile-details p{color:#6786a4;overflow-wrap:anywhere}
+.profile-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.profile-stat{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 10px;background:#fff;border:1px solid #d9e9f6;border-radius:17px;color:#3e739e;cursor:pointer}.profile-stat strong{font-size:26px}.profile-stat-icon{font-size:24px}.profile-actions{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:600px){.profile-hero{padding:16px;gap:12px}.profile-avatar{width:60px;height:60px}.profile-details h2{font-size:19px}.profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-stat{padding:14px 8px}}
