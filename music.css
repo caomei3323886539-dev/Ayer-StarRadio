@@ -181,3 +181,17 @@ body.detail-open{overflow:hidden}
  .player-detail.mode-lyrics .lyric-art{opacity:.28;transform:scale(.9)}
 }
 @media(prefers-reduced-motion:reduce){.player-detail .lyric-art,.player-detail .lyric-lines,.detail-backdrop-art{transition:none!important}}
+
+/* v0.8.5.1: detail transitions, stable lyric scroll and touch targets */
+.player-detail .lyric-disc{transform-origin:center;will-change:transform}
+.player-detail:not(.detail-visible) .lyric-disc{filter:drop-shadow(0 8px 12px #396e9820)}
+.player-detail.detail-visible .lyric-disc{animation:detail-disc-enter .48s cubic-bezier(.18,.8,.25,1) both}
+@keyframes detail-disc-enter{
+ from{transform:translate3d(var(--disc-from-x,0px),var(--disc-from-y,36px),0) scale(.45);opacity:.55}
+ to{transform:translate3d(0,0,0) scale(1);opacity:1}
+}
+.player-detail .lyric-lines{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#b8d6e9 transparent}
+.player-detail .lyric-line.active{scroll-margin-block:25vh}
+.player-detail .detail-view-toggle button{touch-action:manipulation;min-height:44px}
+.player-detail .lyric-art{touch-action:pan-y}
+@media(prefers-reduced-motion:reduce){.player-detail.detail-visible .lyric-disc{animation:none!important}.player-detail .lyric-lines{scroll-behavior:auto!important}}
