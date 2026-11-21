@@ -250,6 +250,27 @@ function renderArtists(root){
  for(const [name,arr] of artists)grid.append(collectionTile(name,arr.length+' 首歌曲',arr[0],()=>{state.artist=name;render()},'创作者'));
  root.append(grid);
 }
+function renderProfile(root){
+ const user=state.user;
+ pageHead(root,'个人音乐中心','同一账号在手机与电脑上访问自己的音乐收藏');
+ const hero=el('section','profile-hero');
+ const avatar=el('div','profile-avatar','✦'),details=el('div','profile-details');
+ details.append(el('span','eyebrow','AYER STAR MUSIC · LISTENER'),el('h2','',user?.user_metadata?.display_name||user?.email?.split('@')[0]||'星音听众'),el('p','',user?.email||'已登录账号'));
+ hero.append(avatar,details);root.append(hero);
+ const counts=el('div','profile-stats');
+ const stats=[['♡','收藏歌曲',availablePublic().filter(t=>state.favorites.has(t.id)).length+availablePrivate().filter(t=>t.is_favorite).length,'favorites'],['☷','我的歌单',state.playlists.length,'playlists'],['◷','最近播放',state.history.length,'recent'],['♬','私人曲库',availablePrivate().length,'private']];
+ for(const [icon,label,count,view] of stats){
+  const item=button('', 'profile-stat',()=>goto(view));
+  item.append(el('span','profile-stat-icon',icon),el('strong','',String(count)),el('span','',label));
+  counts.append(item);
+ }
+ root.append(counts);
+ const section=el('section','section');section.append(heading('我的快捷入口','管理个人音乐内容'));
+ const actions=el('div','profile-actions');
+ for(const [label,view] of [['我喜欢的音乐','favorites'],['管理我的歌单','playlists'],['查看播放历史','recent'],['打开私人音乐库','private']])actions.append(button(label,'soft-btn',()=>goto(view)));
+ section.append(actions);root.append(section);
+ root.append(el('p','hint','个人收藏、歌单和最近播放由账号云端数据提供。公开音乐仍须由管理员明确发布，私人音乐不会因进入个人主页而公开。'));
+}
 function renderFavorites(root){
  const arr=availablePublic().filter(t=>state.favorites.has(t.id)).concat(availablePrivate().filter(t=>t.is_favorite));
  pageHead(root,'我喜欢的音乐','已同步 '+arr.length+' 首收藏歌曲');
@@ -285,6 +306,7 @@ function renderPlaylists(root){
   const item=el('div','playlist-item'),left=el('div'),right=el('div');
   left.append(el('strong','',p.name),el('small','',state.items.filter(i=>i.playlist_id===p.id).length+' 首歌曲'));
   right.append(button('打开','',()=>{state.selectedPlaylist=p.id;render()}));
+  right.append(button('重命名','',()=>renamePlaylist(p.id,p.name)));
   right.append(button('删除','',()=>deletePlaylist(p.id,p.name)));
   item.append(left,right);list.append(item);
  }
@@ -339,10 +361,10 @@ function render(){
  const root=$('viewRoot');root.replaceChildren();
  if(state.search.trim()){renderSearch(root);return}
  if(!state.user&&accountRequired.includes(state.view)){
-  pageHead(root,({favorites:'我喜欢的音乐',recent:'最近播放',playlists:'我的歌单',private:'私人云音乐库'})[state.view],'请登录账号后继续');
+  pageHead(root,({favorites:'我喜欢的音乐',recent:'最近播放',playlists:'我的歌单',private:'私人云音乐库',profile:'个人音乐中心'})[state.view],'请登录账号后继续');
   root.append(loggedOut());return;
  }
- const pages={home:renderHome,discover:renderDiscover,albums:renderAlbums,artists:renderArtists,favorites:renderFavorites,recent:renderRecent,playlists:renderPlaylists,private:renderPrivate};
+ const pages={home:renderHome,discover:renderDiscover,albums:renderAlbums,artists:renderArtists,favorites:renderFavorites,recent:renderRecent,playlists:renderPlaylists,private:renderPrivate,profile:renderProfile};
  (pages[state.view]||renderHome)(root);
 }
 async function loadAll(){
@@ -430,6 +452,19 @@ async function removePlaylistTrack(trackId){
  try{
   safeError(await sb.from('radio_listener_playlist_tracks').delete().eq('playlist_id',state.selectedPlaylist).eq('track_id',trackId),'移除歌曲');
   state.items=state.items.filter(i=>!(i.playlist_id===state.selectedPlaylist&&i.track_id===trackId));render();
+ }catch(e){say(e.message)}
+}
+async function renamePlaylist(id,oldName){
+ if(!state.user)return;
+ const next=prompt('输入新的歌单名称',oldName);
+ if(next===null)return;
+ const name=next.trim();
+ if(!name||name.length>80){say('歌单名称须为 1 至 80 个字符。');return}
+ if(name===oldName)return;
+ try{
+  safeError(await sb.from('radio_listener_playlists').update({name}).eq('id',id).eq('user_id',state.user.id),'重命名歌单');
+  const playlist=state.playlists.find(p=>p.id===id);if(playlist)playlist.name=name;
+  render();say('歌单已重命名，其他设备登录后可同步。');
  }catch(e){say(e.message)}
 }
 async function deletePlaylist(id,name){
