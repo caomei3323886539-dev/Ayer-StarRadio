@@ -138,3 +138,13 @@ body.detail-open{overflow:hidden}
  .player-detail .detail-controls{gap:6px}
 }
 @media(prefers-reduced-motion:reduce){.player-detail{transition:none;transform:none}}
+
+/* v0.8.3 - restore original mini-player and make entire artwork/title hit area interactive */
+.player .player-song{pointer-events:auto!important;position:relative;z-index:3;cursor:pointer;touch-action:manipulation;border-radius:12px;min-width:0}
+.player .player-song:focus-visible{outline:3px solid #388bc9;outline-offset:-2px}
+.player .player-song .now-like{cursor:pointer}
+.player-open{display:none!important}
+@media(max-width:900px){
+ .player{grid-template-columns:minmax(105px,1fr) 83px 77px!important}
+ .player .player-song{min-width:0}
+}
