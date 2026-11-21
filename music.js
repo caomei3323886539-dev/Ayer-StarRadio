@@ -503,8 +503,7 @@ async function start(t,scope){
   const source=await sourceFor(t);if(token!==state.playToken)return;
   audio.src=source;audio.load();
   if(state.pendingResume>0){const resume=state.pendingResume;state.pendingResume=0;audio.addEventListener('loadedmetadata',()=>{if(token===state.playToken&&Number.isFinite(audio.duration))audio.currentTime=Math.min(resume,Math.max(0,audio.duration-1))},{once:true})}
-  void saveCloudCheckpoint(true);
-  try{await audio.play()}catch(e){if(e.name!=='AbortError')say('曲目已就绪，请再次点击播放键。')}
+  try{await audio.play();void saveCloudCheckpoint(true)}catch(e){if(e.name!=='AbortError')say('曲目已就绪，请再次点击播放键。')}
  }catch(e){if(token===state.playToken)say('无法播放「'+t.title+'」：'+e.message)}
 }
 async function togglePlay(){
