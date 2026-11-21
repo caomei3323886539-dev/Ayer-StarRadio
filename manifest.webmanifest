@@ -1,9 +1,9 @@
 {
   "id": "./",
-  "name": "艾耶尔大陆 · 星音电台",
-  "short_name": "星音电台",
-  "description": "星音电台 v0.7.3：公开 OST、个人云曲库、本地音乐与双语歌词统一首页",
-  "start_url": "./index.html",
+  "name": "艾耶尔大陆 · 星音音乐",
+  "short_name": "星音音乐",
+  "description": "公开OST音乐馆、私人云曲库、收藏、歌单、歌词与跨设备同步",
+  "start_url": "./music.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#d5eafb",
