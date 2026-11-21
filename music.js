@@ -483,12 +483,16 @@ function renderLyric(){
  }
  updateLyric();
 }
+let lyricScrollFrame=0;
 function updateLyric(){
  let index=-1;for(let i=0;i<state.lyrics.length;i++){if(audio.currentTime+0.09>=state.lyrics[i].sec)index=i;else break}
  if(index===state.lyricIndex)return;state.lyricIndex=index;
  const children=$('lyricLines').querySelectorAll('.lyric-line');
  children.forEach((node,i)=>node.classList.toggle('active',i===index));
- if(index>=0&&detailIsOpen())children[index]?.scrollIntoView({behavior:'smooth',block:'center'});
+ if(index>=0&&detailIsOpen()&&$('lyricsDialog').classList.contains('mode-lyrics')){
+  cancelAnimationFrame(lyricScrollFrame);
+  lyricScrollFrame=requestAnimationFrame(()=>children[index]?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'}));
+ }
 }
 async function start(t,scope){
  if(!t)return;
@@ -576,13 +580,17 @@ function setDetailMode(mode){
  $('showLyrics').classList.toggle('active',lyrics);
  $('showDisc').setAttribute('aria-pressed',String(!lyrics));
  $('showLyrics').setAttribute('aria-pressed',String(lyrics));
- if(lyrics)updateLyric();
+ if(lyrics){state.lyricIndex=-1;updateLyric();}
 }
 function openPlayerDetail(){
  const d=$('lyricsDialog');if(detailIsOpen())return;
  clearTimeout(detailCloseTimer);detailLastFocus=document.activeElement;
  d.hidden=false;d.setAttribute('aria-hidden','false');
  setDetailMode('disc');
+ const origin=$('vinyl').getBoundingClientRect();
+ const disc=$('lyricDisc');
+ disc.style.setProperty('--disc-from-x',Math.round(origin.left+origin.width/2-window.innerWidth/2)+'px');
+ disc.style.setProperty('--disc-from-y',Math.round(origin.top+origin.height/2-window.innerHeight/2)+'px');
  document.body.classList.add('detail-open');renderLyric();updatePlayer();
  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(!d.hidden)d.classList.add('detail-visible')}));
  $('closeLyrics').focus({preventScroll:true});
@@ -590,6 +598,7 @@ function openPlayerDetail(){
 function closePlayerDetail(){
  const d=$('lyricsDialog');if(d.hidden)return;
  d.classList.remove('detail-visible');document.body.classList.remove('detail-open');
+ cancelAnimationFrame(lyricScrollFrame);
  d.setAttribute('aria-hidden','true');clearTimeout(detailCloseTimer);
  const finish=()=>{if(d.classList.contains('detail-visible'))return;d.hidden=true;if(detailLastFocus?.isConnected)detailLastFocus.focus({preventScroll:true})};
  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return}
@@ -612,7 +621,8 @@ function attach(){
  $('showDisc').onclick=()=>setDetailMode('disc');
  $('showLyrics').onclick=()=>setDetailMode('lyrics');
  let detailTouchStart=null;
- $('lyricsDialog').addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,.lyric-lines'))return;detailTouchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+ $('lyricsDialog').addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,.lyric-lines,.detail-controls'))return;detailTouchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+ $('lyricsDialog').addEventListener('touchcancel',()=>{detailTouchStart=null},{passive:true});
  $('lyricsDialog').addEventListener('touchend',e=>{if(!detailTouchStart||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-detailTouchStart.x,dy=e.changedTouches[0].clientY-detailTouchStart.y;detailTouchStart=null;if(dy>100&&Math.abs(dy)>Math.abs(dx)*1.3)closePlayerDetail();else if(Math.abs(dx)>95&&Math.abs(dx)>Math.abs(dy)*1.3)advance(dx>0)},{passive:true});
  $('openPlayer').addEventListener('click',e=>{if(e.target.closest('#likeNow'))return;openPlayerDetail()});
  $('openPlayer').addEventListener('keydown',e=>{if(e.target!==$('openPlayer'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();openPlayerDetail()}});
