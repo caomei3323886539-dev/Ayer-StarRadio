@@ -438,7 +438,7 @@ function updateLyric(){
  if(index===state.lyricIndex)return;state.lyricIndex=index;
  const children=$('lyricLines').querySelectorAll('.lyric-line');
  children.forEach((node,i)=>node.classList.toggle('active',i===index));
- if(index>=0&&$('lyricsDialog').open)children[index]?.scrollIntoView({behavior:'smooth',block:'center'});
+ if(index>=0&&detailIsOpen())children[index]?.scrollIntoView({behavior:'smooth',block:'center'});
 }
 async function start(t,scope){
  if(!t)return;
@@ -514,27 +514,24 @@ function syncVisualViewport(){
  const bottom=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop));
  document.documentElement.style.setProperty('--visual-bottom',bottom+'px');
 }
+let detailCloseTimer=0;
+let detailLastFocus=null;
+function detailIsOpen(){return !$('lyricsDialog').hidden}
 function openPlayerDetail(){
- const d=$('lyricsDialog');
- if(d.open)return;
- try{
-  d.showModal();
-  document.body.classList.add('detail-open');
-  d.classList.remove('detail-visible');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{if(d.open)d.classList.add('detail-visible')}));
-  renderLyric();
-  updatePlayer();
- }catch(e){console.error('无法打开播放器详情',e);say('播放器详情打开失败，请刷新页面后重试。')}
+ const d=$('lyricsDialog');if(detailIsOpen())return;
+ clearTimeout(detailCloseTimer);detailLastFocus=document.activeElement;
+ d.hidden=false;d.setAttribute('aria-hidden','false');
+ document.body.classList.add('detail-open');renderLyric();updatePlayer();
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{if(!d.hidden)d.classList.add('detail-visible')}));
+ $('closeLyrics').focus({preventScroll:true});
 }
 function closePlayerDetail(){
- const d=$('lyricsDialog');
- if(!d.open)return;
- d.classList.remove('detail-visible');
- document.body.classList.remove('detail-open');
- if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){d.close();return}
- const done=()=>{if(d.open&&!d.classList.contains('detail-visible'))d.close()};
- d.addEventListener('transitionend',e=>{if(e.target===d)done()},{once:true});
- setTimeout(done,440);
+ const d=$('lyricsDialog');if(d.hidden)return;
+ d.classList.remove('detail-visible');document.body.classList.remove('detail-open');
+ d.setAttribute('aria-hidden','true');clearTimeout(detailCloseTimer);
+ const finish=()=>{if(d.classList.contains('detail-visible'))return;d.hidden=true;if(detailLastFocus?.isConnected)detailLastFocus.focus({preventScroll:true})};
+ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return}
+ detailCloseTimer=setTimeout(finish,420);
 }
 function attach(){
  syncVisualViewport();
@@ -553,7 +550,7 @@ function attach(){
  $('openPlayer').addEventListener('click',e=>{if(e.target.closest('#likeNow'))return;openPlayerDetail()});
  $('openPlayer').addEventListener('keydown',e=>{if(e.target!==$('openPlayer'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();openPlayerDetail()}});
  $('likeNow').addEventListener('click',e=>e.stopPropagation());
- $('lyricsDialog').addEventListener('cancel',e=>{e.preventDefault();closePlayerDetail()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&detailIsOpen()){e.preventDefault();closePlayerDetail()}});
  $('lyricsDialog').addEventListener('click',e=>{if(e.target===$('lyricsDialog'))closePlayerDetail()});
  $('detailPlay').onclick=togglePlay;
  $('detailPrev').onclick=()=>advance(true);
