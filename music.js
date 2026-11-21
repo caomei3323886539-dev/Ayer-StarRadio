@@ -466,23 +466,26 @@ async function removePlaylistTrack(trackId){
   state.items=state.items.filter(i=>!(i.playlist_id===state.selectedPlaylist&&i.track_id===trackId));render();
  }catch(e){say(e.message)}
 }
+const playlistMoveBusy=new Set();
 async function movePlaylistTrack(playlistId,trackId,direction){
- if(!state.user||![-1,1].includes(direction))return;
+ if(!state.user||![-1,1].includes(direction)||playlistMoveBusy.has(playlistId))return;
  const entries=state.items.filter(i=>i.playlist_id===playlistId).sort((a,b)=>a.sort_order-b.sort_order);
  const index=entries.findIndex(i=>i.track_id===trackId),other=index+direction;
  if(index<0||other<0||other>=entries.length)return;
- const first=entries[index],second=entries[other];
- // Give each item a unique non-conflicting order during the swap.
- const max=Math.max(0,...entries.map(i=>Number(i.sort_order)||0));
- const temp=max+1000;
+ playlistMoveBusy.add(playlistId);
  try{
-  const base=sb.from('radio_listener_playlist_tracks');
-  safeError(await base.update({sort_order:temp}).eq('playlist_id',playlistId).eq('track_id',first.track_id),'更新歌单顺序');
-  safeError(await base.update({sort_order:first.sort_order}).eq('playlist_id',playlistId).eq('track_id',second.track_id),'更新歌单顺序');
-  safeError(await base.update({sort_order:second.sort_order}).eq('playlist_id',playlistId).eq('track_id',first.track_id),'更新歌单顺序');
-  const old=first.sort_order;first.sort_order=second.sort_order;second.sort_order=old;
-  render();say('歌单顺序已保存至云端。');
- }catch(e){say('调整顺序失败，正在重新同步。');await loadAll()}
+  const result=await sb.rpc('radio_move_playlist_track',{
+   p_playlist_id:playlistId,p_track_id:trackId,p_direction:direction,
+   p_expected_order:entries.map(i=>i.track_id)
+  });
+  safeError(result,'更新歌单顺序');
+  const order=new Map((result.data||[]).map(i=>[i.track_id,i.sort_order]));
+  for(const item of state.items)if(item.playlist_id===playlistId&&order.has(item.track_id))item.sort_order=order.get(item.track_id);
+  render();say('歌单顺序已安全保存至云端。');
+ }catch(e){
+  say('歌单顺序可能已在其他设备改变，正在重新同步。');
+  await loadAll();
+ }finally{playlistMoveBusy.delete(playlistId)}
 }
 async function renamePlaylist(id,oldName){
  if(!state.user)return;
