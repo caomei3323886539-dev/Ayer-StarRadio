@@ -483,6 +483,7 @@ function updatePlayer(){
  $('detailRepeat').textContent=state.repeat?'↻¹':'↻';
  $('vinyl').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('lyricDisc').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
+ $('tonearm').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('lyricHeading').textContent=t?t.title:'实时歌词';
  $('lyricArtist').textContent=t?displayName(t):'星音音乐';
  $('timeNow').textContent=formatTime(audio.currentTime);
