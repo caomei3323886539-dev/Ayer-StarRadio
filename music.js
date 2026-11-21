@@ -296,11 +296,43 @@ function renderPrivate(root){
  root.append(el('p','hint','私人音频保存在受保护的云端存储桶中。上传不代表公开发布；管理员须在管理中心手动发布后，访客才能收听。'));
  root.append(songs.length?rowList(songs):empty('还没有云端私人音乐','可以从云音乐管理页面上传，上传成功后自动同步到这里。','前往云音乐管理',()=>location.assign('./cloud.html')));
 }
+function normalizedSearch(text){return String(text||'').normalize('NFKC').toLocaleLowerCase().trim()}
+function searchCatalog(query,tracks){
+ const term=normalizedSearch(query);
+ if(!term)return {tracks:[],albums:[],artists:[]};
+ const matching=tracks.filter(t=>[t.title,t.artist,t.album,...(Array.isArray(t.tags)?t.tags:[])].some(value=>normalizedSearch(value).includes(term)));
+ const albumMatches=[...groupBy(tracks.filter(t=>t.kind==='public'),albumName)].filter(([name])=>normalizedSearch(name).includes(term));
+ const artistMatches=[...groupBy(tracks.filter(t=>t.kind==='public'),displayName)].filter(([name])=>normalizedSearch(name).includes(term));
+ return {tracks:matching,albums:albumMatches,artists:artistMatches};
+}
 function renderSearch(root){
- const term=state.search.trim().toLocaleLowerCase(),all=availablePublic().concat(state.user?availablePrivate():[]);
- const matched=all.filter(t=>[t.title,t.artist,t.album,...(t.tags||[])].join(' ').toLocaleLowerCase().includes(term));
- pageHead(root,'搜索结果','“'+state.search+'” · 找到 '+matched.length+' 首歌曲');
- root.append(matched.length?rowList(matched):empty('没有找到匹配的音乐','可以尝试不同的歌曲名、专辑名或创作者名称。'));
+ const term=state.search.trim(),publicTracks=availablePublic(),privateTracks=state.user?availablePrivate():[];
+ const all=publicTracks.concat(privateTracks),results=searchCatalog(term,all);
+ pageHead(root,'搜索结果','“'+term+'” · 找到 '+results.tracks.length+' 首歌曲');
+ if(results.albums.length){
+  const section=el('section','section');section.append(heading('匹配专辑','按专辑继续浏览'));
+  const grid=el('div','tiles');
+  for(const [name,tracks] of results.albums.slice(0,8)){
+   grid.append(collectionTile(name,tracks.length+' 首歌曲',tracks[0],()=>{
+    state.search='';$('searchInput').value='';state.view='albums';state.album=name;render();
+   },'公开专辑'));
+  }
+  section.append(grid);root.append(section);
+ }
+ if(results.artists.length){
+  const section=el('section','section');section.append(heading('匹配创作者','查看创作者作品'));
+  const grid=el('div','tiles');
+  for(const [name,tracks] of results.artists.slice(0,8)){
+   grid.append(collectionTile(name,tracks.length+' 首歌曲',tracks[0],()=>{
+    state.search='';$('searchInput').value='';state.view='artists';state.artist=name;render();
+   },'创作者'));
+  }
+  section.append(grid);root.append(section);
+ }
+ const section=el('section','section');
+ section.append(heading('匹配歌曲',results.tracks.length+' 首'));
+ section.append(results.tracks.length?rowList(results.tracks):empty('没有找到匹配的歌曲','可以尝试歌曲名、专辑名称或创作者名称。'));
+ root.append(section);
 }
 function render(){
  setActiveNav();
