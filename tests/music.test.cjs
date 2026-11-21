@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0851"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0851"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=086"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=086"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0851'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0851'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=086'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=086'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -51,3 +51,5 @@ test('cross-browser sync uses account-scoped cloud checkpoints',()=>{assert.matc
 test('v0.8.5 immersive player mode and gestures',()=>{assert.match(html,/id="showDisc"/);assert.match(html,/id="showLyrics"/);assert.match(html,/id="detailBackdrop"/);assert.match(script,/function setDetailMode/);assert.match(script,/touchstart/);assert.match(script,/touchend/);assert.match(css,/\.player-detail\.mode-lyrics/)});
 
 test('v0.8.5.1 smooth vinyl transition and safe lyric scroll',()=>{assert.match(css,/@keyframes detail-disc-enter/);assert.match(script,/cancelAnimationFrame\(lyricScrollFrame\)/);assert.match(script,/touchcancel/);assert.match(css,/prefers-reduced-motion:reduce/)});
+
+test('v0.8.6 playback engine has local queue, next source preparation and reconnect recovery',()=>{assert.match(script,/ENGINE_QUEUE_KEY/);assert.match(script,/prepareNextSource/);assert.match(script,/retryCurrentSource/);assert.match(script,/addEventListener\('online'/);assert.match(css,/\.player-detail \.lyric-disc \.vinyl-label\{width:62%/)});
