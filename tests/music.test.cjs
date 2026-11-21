@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js"><\/script>/);
-  assert.match(html, /href="\.\/music\.css"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0841"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0841"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css'/);
-  assert.match(serviceWorker, /'\.\/music\.js'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0841'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0841'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
