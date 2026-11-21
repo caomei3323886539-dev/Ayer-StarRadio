@@ -24,3 +24,72 @@ dialog{max-width:calc(100vw - 20px);color:#355f83;border:1px solid #d7eafb;backg
 .player-extra #lyricsBtn,.player-extra #queueBtn{min-width:36px;min-height:42px;font-size:17px}
 .player-extra .volume-icon,.player-extra input{display:none}
 }
+
+/* v0.8.1: Android viewport-safe persistent bottom navigation */
+@media(max-width:900px){
+  :root{--visual-bottom:0px;--nav-height:calc(62px + env(safe-area-inset-bottom,0px))}
+  .sidebar{position:fixed;top:0;left:0;transform:translateX(-103%);transition:transform .2s;width:min(270px,83vw);height:100dvh;z-index:60;padding-bottom:100px}
+  .sidebar.open{transform:translateX(0)}
+  .mobile-menu,.mobile-brand{display:inline-flex!important}
+  .mobile-brand{font-size:14px;color:#2e74ad;font-weight:800;white-space:nowrap}
+  .topbar{padding:11px 13px;gap:8px}
+  .search-wrap{min-width:80px;max-width:none;height:42px;padding:0 10px}
+  .search-wrap kbd,.connection{display:none}
+  .account-actions{min-width:0;max-width:34vw}
+  .account-actions .pill{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding:9px 11px;min-height:40px;font-size:11px}
+  .content{padding:8px 15px 25px}
+  .hero{grid-template-columns:minmax(0,1fr) 114px;min-height:220px;padding:19px;gap:6px}
+  .hero h1{font-size:24px}
+  .hero p{font-size:11px;margin-bottom:15px}
+  .hero-art{width:100px;border-radius:16px}
+  .hero-art:after{font-size:55px}
+  .hero-actions .primary-btn,.hero-actions .soft-btn{padding:8px 13px;min-height:39px;font-size:11px}
+  .eyebrow{font-size:9px;margin-bottom:8px}
+  .section{margin-top:24px}
+  .section-heading h2{font-size:17px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .music-tile{padding:9px}
+  .workspace{padding-bottom:calc(165px + env(safe-area-inset-bottom,0px))}
+  .mobile-nav{
+    position:fixed!important;display:flex!important;
+    bottom:var(--visual-bottom)!important;left:0;right:0;
+    height:var(--nav-height);z-index:80;
+    align-items:center;justify-content:space-around;
+    padding:3px 4px env(safe-area-inset-bottom,0px);
+    background:#fbfdfff9;border-top:1px solid #d6e7f4;
+    box-shadow:0 -5px 22px #3a719a20;
+  }
+  .mobile-nav button{
+    display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    min-width:0;min-height:48px;border:0;background:transparent;color:#829db5;font-size:11px;
+  }
+  .mobile-nav button span{font-size:22px;line-height:1.1}
+  .mobile-nav button.active{color:#277eb9;font-weight:750}
+  .player{
+    position:fixed!important;
+    bottom:calc(var(--visual-bottom) + var(--nav-height))!important;
+    height:78px;z-index:79;
+    grid-template-columns:minmax(105px,1fr) 83px 77px;gap:2px;
+    padding:7px 11px;
+  }
+  .player-center{max-width:83px}
+  .player-controls{gap:2px}
+  .player-controls #prevBtn,.player-controls .minor{display:none}
+  .player-controls #nextBtn{min-width:35px;min-height:40px;font-size:17px}
+  .player-controls #playBtn{width:37px;height:37px}
+  .player-extra{display:flex!important;gap:0;justify-content:center}
+  .player-extra #lyricsBtn,.player-extra #queueBtn{min-width:36px;min-height:42px;font-size:17px}
+  .player-extra .volume-icon,.player-extra input,.timeline,.now-like{display:none!important}
+  .disc-wrap{width:50px;height:50px}
+  .disc-wrap .vinyl{width:49px;height:49px}
+  .player-song{gap:7px}
+  .player-meta strong{font-size:11px}
+  .player-meta span{font-size:10px}
+  .drawer{bottom:calc(var(--visual-bottom) + var(--nav-height) + 88px)}
+  .backdrop{z-index:59}
+}
+@media(max-width:360px){
+  .mobile-brand{display:none!important}
+  .hero{grid-template-columns:1fr}
+  .hero-art{display:none}
+}
