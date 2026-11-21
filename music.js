@@ -12,7 +12,7 @@ const state={
  covers:new Map(),coverObjects:[],lyrics:[],lyricIndex:-1,channel:null,
  pendingAdd:null,playToken:0,recordedKey:null,loadToken:0
 };
-const PUBLIC_COLS='track_id,title,artist,album,lyrics,published,published_at';
+const PUBLIC_COLS='track_id,title,artist,album,lyrics,published,published_at,updated_at';
 const PRIVATE_COLS='id,title,artist,album,lyrics,audio_path,cover_path,is_favorite,last_played_at,duration_seconds,created_at';
 const accountRequired=['favorites','recent','playlists','private'];
 function el(tag,cls,text){
@@ -44,7 +44,6 @@ function setActiveNav(){
   b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
  });
 }
-function closeMobile(){$('.unused');}
 function goto(view){
  state.view=view;state.search='';$('searchInput').value='';
  state.album=null;state.artist=null;state.selectedPlaylist=null;
@@ -286,7 +285,9 @@ async function loadAll(){
   const pub=await sb.from('radio_publications').select(PUBLIC_COLS).eq('published',true).order('published_at',{ascending:false});
   if(pub.error)throw pub.error;
   if(token!==state.loadToken)return;
+  const oldPublic=new Map(state.public.map(t=>[t.track_id,t.updated_at]));
   state.public=pub.data||[];
+  for(const t of state.public)if(oldPublic.get(t.track_id)!==t.updated_at){state.covers.delete('public:'+t.track_id);if(state.current?.kind==='public'&&state.current.id===t.track_id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
   if(state.user){
    const results=await Promise.all([
     sb.from('radio_tracks').select(PRIVATE_COLS).is('deleted_at',null).eq('sync_state','ready').order('created_at',{ascending:false}),
@@ -297,7 +298,9 @@ async function loadAll(){
    ]);
    if(token!==state.loadToken)return;
    for(const r of results)if(r.error)throw r.error;
+   const oldPrivate=new Map(state.private.map(t=>[t.id,t.cover_path]));
    state.private=results[0].data||[];
+   for(const t of state.private)if(oldPrivate.get(t.id)!==t.cover_path){state.covers.delete('private:'+t.id);if(state.current?.kind==='private'&&state.current.id===t.id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
    state.favorites=new Set((results[1].data||[]).map(x=>x.track_id));
    state.playlists=results[2].data||[];
    state.items=results[3].data||[];
@@ -305,12 +308,12 @@ async function loadAll(){
   }else{state.private=[];state.favorites.clear();state.history=[];state.playlists=[];state.items=[]}
   $('connection').textContent=state.user?'云端已登录':'公开模式';
   $('accountBtn').textContent=state.user?(state.user.email||'我的账号'):'登录 / 注册';
+  if(state.current){const refreshed=state.current.kind==='public'?findPublic(state.current.id):findPrivate(state.current.id);if(refreshed)state.current=refreshed}
   const current=state.current;
   if(current&&current.kind==='public'&&!state.public.some(t=>t.track_id===current.id)){
    audio.pause();audio.removeAttribute('src');audio.load();state.current=null;state.queue=[];state.index=-1;
    say('当前歌曲已被管理员撤回公开，播放已停止。');
   }
-  state.covers.forEach((v,k)=>{if(k.startsWith('public:')&&v)state.covers.delete(k)});
   render();updatePlayer();renderQueue();subscribe();
   if(!current||current.kind!=='public'||state.public.some(t=>t.track_id===current.id))silent();
  }catch(e){if(token!==state.loadToken)return;say('在线音乐馆连接失败：'+e.message);render()}
@@ -500,7 +503,7 @@ function attach(){
  $('accountBtn').onclick=openAuth;
  $('closeAuth').onclick=()=>$('authDialog').close();
  $('closePlaylist').onclick=()=>$('playlistDialog').close();
- $('closeAdd').onclick=()=>$('addDialog').close();
+ $('closeAdd').onclick=()=>{$('addDialog').close();state.pendingAdd=null};
  $('closeLyrics').onclick=()=>$('lyricsDialog').close();
  $('authForm').onsubmit=async e=>{
   e.preventDefault();$('signIn').disabled=true;
