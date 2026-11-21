@@ -295,7 +295,19 @@ function renderPlaylists(root){
   const head=el('div','category-header');head.append(button('← 我的歌单','',()=>{state.selectedPlaylist=null;render()}),el('h1','',p.name));
   root.append(head);
   const songs=playlistTracks(p.id);
-  if(songs.length){root.append(button('▶ 播放全部','primary-btn',()=>start(songs[0],songs)));root.append(el('div','', ''));root.append(rowList(songs))}
+  if(songs.length){
+  root.append(button('▶ 播放全部','primary-btn',()=>start(songs[0],songs)));
+  const list=el('div','playlist-edit-list');
+  songs.forEach((track,index)=>{
+   const row=el('div','playlist-edit-row');
+   const title=el('div','playlist-edit-title');title.append(el('strong','',track.title),el('small','',displayName(track)));
+   const actions=el('div','playlist-edit-actions');
+   const up=button('↑','',()=>movePlaylistTrack(p.id,track.id,-1));up.disabled=index===0;up.setAttribute('aria-label','上移 '+track.title);
+   const down=button('↓','',()=>movePlaylistTrack(p.id,track.id,1));down.disabled=index===songs.length-1;down.setAttribute('aria-label','下移 '+track.title);
+   actions.append(button('▶','',()=>start(track,songs)),up,down,button('移除','',()=>removePlaylistTrack(track.id)));
+   row.append(title,actions);list.append(row);
+  });root.append(list);
+ }
   else root.append(empty('歌单还是空的','在发现音乐中，点击歌曲旁的 ＋ 即可加入这张歌单。','去添加歌曲',()=>goto('discover')));
   return;
  }
@@ -453,6 +465,24 @@ async function removePlaylistTrack(trackId){
   safeError(await sb.from('radio_listener_playlist_tracks').delete().eq('playlist_id',state.selectedPlaylist).eq('track_id',trackId),'移除歌曲');
   state.items=state.items.filter(i=>!(i.playlist_id===state.selectedPlaylist&&i.track_id===trackId));render();
  }catch(e){say(e.message)}
+}
+async function movePlaylistTrack(playlistId,trackId,direction){
+ if(!state.user||![-1,1].includes(direction))return;
+ const entries=state.items.filter(i=>i.playlist_id===playlistId).sort((a,b)=>a.sort_order-b.sort_order);
+ const index=entries.findIndex(i=>i.track_id===trackId),other=index+direction;
+ if(index<0||other<0||other>=entries.length)return;
+ const first=entries[index],second=entries[other];
+ // Give each item a unique non-conflicting order during the swap.
+ const max=Math.max(0,...entries.map(i=>Number(i.sort_order)||0));
+ const temp=max+1000;
+ try{
+  const base=sb.from('radio_listener_playlist_tracks');
+  safeError(await base.update({sort_order:temp}).eq('playlist_id',playlistId).eq('track_id',first.track_id),'更新歌单顺序');
+  safeError(await base.update({sort_order:first.sort_order}).eq('playlist_id',playlistId).eq('track_id',second.track_id),'更新歌单顺序');
+  safeError(await base.update({sort_order:second.sort_order}).eq('playlist_id',playlistId).eq('track_id',first.track_id),'更新歌单顺序');
+  const old=first.sort_order;first.sort_order=second.sort_order;second.sort_order=old;
+  render();say('歌单顺序已保存至云端。');
+ }catch(e){say('调整顺序失败，正在重新同步。');await loadAll()}
 }
 async function renamePlaylist(id,oldName){
  if(!state.user)return;
