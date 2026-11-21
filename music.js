@@ -315,6 +315,7 @@ async function loadAll(){
    say('当前歌曲已被管理员撤回公开，播放已停止。');
   }
   render();updatePlayer();renderQueue();subscribe();
+  if(!state.user)restoreLocalQueue();
   if(state.user)await restoreCloudCheckpoint();else{state.cloudUser=null;state.cloudStamp=null}
   if(!current||current.kind!=='public'||state.public.some(t=>t.track_id===current.id))silent();
  }catch(e){if(token!==state.loadToken)return;say('在线音乐馆连接失败：'+e.message);render()}
@@ -371,6 +372,52 @@ async function deletePlaylist(id,name){
  }catch(e){say(e.message)}
 }
 /* v0.8.4.1: account-scoped cloud playback checkpoint, never sync protected media URLs. */
+/* v0.8.6: local queue fallback + short-lived next-track URL preparation. */
+const ENGINE_QUEUE_KEY='ayer-music-queue-v086';
+let nextSource=null,networkRetry=null;
+function persistLocalQueue(){
+ try{localStorage.setItem(ENGINE_QUEUE_KEY,JSON.stringify({queue:cloudQueueRefs(),current:state.current?{kind:state.current.kind,id:state.current.id}:null,position:audio.currentTime||0,shuffle:state.shuffle,repeat:state.repeat,updated:Date.now()}))}catch(_e){}
+}
+function restoreLocalQueue(){
+ if(state.current)return;
+ try{
+  const data=JSON.parse(localStorage.getItem(ENGINE_QUEUE_KEY)||'null');
+  if(!data||!Array.isArray(data.queue))return;
+  const q=data.queue.slice(0,200).map(cloudTrack).filter(Boolean);
+  const current=cloudTrack(data.current);
+  if(!current)return;
+  state.current=current;state.queue=q.some(t=>key(t)===key(current))?q:[current,...q];
+  state.index=state.queue.findIndex(t=>key(t)===key(current));
+  state.pendingResume=Math.max(0,Number(data.position)||0);
+  state.shuffle=!!data.shuffle;state.repeat=!!data.repeat;
+  updatePlayer();renderQueue();renderLyric();
+ }catch(e){console.warn('本地播放队列恢复失败',e)}
+}
+async function prepareNextSource(){
+ const next=state.queue[state.index+1]||state.queue[0];
+ if(!next||!navigator.onLine){nextSource=null;return}
+ const signature=key(next);
+ try{
+  const url=await sourceFor(next);
+  if(state.queue.some(t=>key(t)===signature))nextSource={signature,url,expires:Date.now()+180000};
+ }catch(_e){nextSource=null}
+}
+function scheduleNetworkRecovery(){
+ if(networkRetry)clearTimeout(networkRetry);
+ if(!state.current||!audio.paused)return;
+ networkRetry=setTimeout(()=>{networkRetry=null;if(navigator.onLine&&state.current&&audio.paused)retryCurrentSource()},1200);
+}
+async function retryCurrentSource(){
+ const t=state.current;if(!t)return;
+ const position=audio.currentTime||state.pendingResume||0,token=state.playToken;
+ try{
+  const url=await sourceFor(t);
+  if(token!==state.playToken)return;
+  audio.src=url;audio.load();
+  audio.addEventListener('loadedmetadata',()=>{if(token===state.playToken&&Number.isFinite(audio.duration))audio.currentTime=Math.min(position,Math.max(0,audio.duration-1))},{once:true});
+  say('连接已恢复，点击播放继续收听。');
+ }catch(e){say('网络恢复后仍无法获取歌曲：'+e.message)}
+}
 function cloudTrack(ref){
  if(!ref||!['public','private'].includes(ref.kind))return null;
  return ref.kind==='public'?findPublic(ref.id):findPrivate(ref.id);
@@ -500,20 +547,25 @@ async function start(t,scope){
  state.queue=list.filter(x=>x&&x.id);
  if(!state.queue.some(x=>key(x)===key(t)))state.queue.unshift(t);
  state.index=state.queue.findIndex(x=>key(x)===key(t));
- state.current=t;state.recordedKey=null;state.pendingResume=0;
+ state.current=t;state.recordedKey=null;
+ const resumePosition=state.pendingResume;state.pendingResume=0;
+ persistLocalQueue();
  const token=++state.playToken;
  audio.pause();audio.removeAttribute('src');audio.load();
  $('seekBar').value=0;$('timeNow').textContent='0:00';updatePlayer();renderLyric();renderQueue();
  try{
-  const source=await sourceFor(t);if(token!==state.playToken)return;
+  const cached=nextSource&&nextSource.signature===key(t)&&nextSource.expires>Date.now()?nextSource.url:null;
+  nextSource=null;
+  const source=cached||await sourceFor(t);if(token!==state.playToken)return;
   audio.src=source;audio.load();
-  if(state.pendingResume>0){const resume=state.pendingResume;state.pendingResume=0;audio.addEventListener('loadedmetadata',()=>{if(token===state.playToken&&Number.isFinite(audio.duration))audio.currentTime=Math.min(resume,Math.max(0,audio.duration-1))},{once:true})}
+  if(resumePosition>0){const resume=resumePosition;audio.addEventListener('loadedmetadata',()=>{if(token===state.playToken&&Number.isFinite(audio.duration))audio.currentTime=Math.min(resume,Math.max(0,audio.duration-1))},{once:true})}
+  void prepareNextSource();
   try{await audio.play();void saveCloudCheckpoint(true)}catch(e){if(e.name!=='AbortError')say('曲目已就绪，请再次点击播放键。')}
  }catch(e){if(token===state.playToken)say('无法播放「'+t.title+'」：'+e.message)}
 }
 async function togglePlay(){
  if(audio.src){if(audio.paused){try{await audio.play()}catch(e){say('无法开始播放：'+e.message)}}else audio.pause();return}
- const t=state.current||availablePublic()[0]||availablePrivate()[0];if(t){const resume=state.pendingResume;start(t,state.queue);if(resume>0)state.pendingResume=resume}else say('暂无可播放歌曲。');
+ const t=state.current||availablePublic()[0]||availablePrivate()[0];if(t)start(t,state.queue);else say('暂无可播放歌曲。');
 }
 function advance(back=false,fromEnded=false){
  const arr=state.queue;if(!arr.length)return;
@@ -681,15 +733,16 @@ function attach(){
   $('detailTimeNow').textContent=formatTime(audio.currentTime);
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('detailSeek').value=String(100*audio.currentTime/audio.duration);
   updateLyric();
-  if(!audio.paused)void saveCloudCheckpoint();
+  if(!audio.paused){void saveCloudCheckpoint();if(Math.floor(audio.currentTime)%10===0)persistLocalQueue()}
  });
  audio.addEventListener('durationchange',updatePlayer);
- audio.addEventListener('seeked',()=>void saveCloudCheckpoint(true));
- audio.addEventListener('pause',()=>void saveCloudCheckpoint(true));
+ audio.addEventListener('seeked',()=>{void saveCloudCheckpoint(true);persistLocalQueue()});
+ audio.addEventListener('pause',()=>{void saveCloudCheckpoint(true);persistLocalQueue()});
+ window.addEventListener('online',scheduleNetworkRecovery);
  window.addEventListener('pagehide',()=>{if(state.user&&state.current&&navigator.sendBeacon){/* next periodic checkpoint already persisted */}});
  for(const ev of ['playing','play','pause','waiting','canplay','ended','seeking'])audio.addEventListener(ev,()=>{updatePlayer();if(ev==='playing')recordPlay()});
  audio.addEventListener('ended',()=>advance(false,true));
- audio.addEventListener('error',()=>{if(state.current)say('音频加载失败，请确认网络与音乐的发布状态。')});
+ audio.addEventListener('error',()=>{if(state.current){say('音频加载失败，请确认网络与音乐的发布状态。');if(!navigator.onLine)scheduleNetworkRecovery()}});
  $('mobileMenu').onclick=()=>{document.querySelector('.sidebar').classList.toggle('open');$('backdrop').hidden=!document.querySelector('.sidebar').classList.contains('open')};
  $('backdrop').onclick=()=>{document.querySelector('.sidebar').classList.remove('open');$('backdrop').hidden=true};
  if('mediaSession' in navigator){
