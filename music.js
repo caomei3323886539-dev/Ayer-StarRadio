@@ -490,6 +490,9 @@ function subscribe(){
  if(state.user){
   channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_tracks',filter:'user_id=eq.'+state.user.id},()=>loadAll());
   channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_listener_playlists',filter:'user_id=eq.'+state.user.id},()=>loadAll());
+  channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_listener_playlist_tracks'},()=>loadAll());
+  channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_public_favorites',filter:'user_id=eq.'+state.user.id},()=>loadAll());
+  channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_listener_history',filter:'user_id=eq.'+state.user.id},()=>loadAll());
  }
  state.channel=channel.subscribe();
 }
