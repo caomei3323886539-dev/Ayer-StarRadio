@@ -612,6 +612,20 @@ async function restoreCloudCheckpoint(){
  }catch(e){console.warn('跨浏览器播放状态恢复失败',e)}
  finally{state.cloudRestoring=false}
 }
+let lastMediaPositionSecond=-1;
+function updateMediaPosition(){
+ if(!('mediaSession' in navigator)||typeof navigator.mediaSession.setPositionState!=='function')return;
+ if(!state.current||!Number.isFinite(audio.duration)||audio.duration<=0)return;
+ const second=Math.floor(audio.currentTime);
+ if(second===lastMediaPositionSecond)return;
+ lastMediaPositionSecond=second;
+ try{navigator.mediaSession.setPositionState({duration:audio.duration,playbackRate:audio.playbackRate||1,position:Math.max(0,Math.min(audio.duration,audio.currentTime))})}catch(_e){}
+}
+function seekBy(seconds){
+ if(!Number.isFinite(audio.duration)||audio.duration<=0)return;
+ audio.currentTime=Math.max(0,Math.min(audio.duration, audio.currentTime+seconds));
+ updateMediaPosition();
+}
 function updatePlayer(){
  const t=state.current;
  $('nowTitle').textContent=t?t.title:'等待播放';
@@ -652,6 +666,7 @@ function updatePlayer(){
  if('mediaSession' in navigator&&t){
   navigator.mediaSession.metadata=new MediaMetadata({title:t.title,artist:displayName(t),album:albumName(t)});
   navigator.mediaSession.playbackState=audio.paused?'paused':'playing';
+  updateMediaPosition();
  }
 }
 function parseLyrics(raw){
@@ -881,9 +896,10 @@ function attach(){
   $('detailTimeNow').textContent=formatTime(audio.currentTime);
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('detailSeek').value=String(100*audio.currentTime/audio.duration);
   updateLyric();
+  updateMediaPosition();
   if(!audio.paused){void saveCloudCheckpoint();if(Math.floor(audio.currentTime)%10===0)persistLocalQueue()}
  });
- audio.addEventListener('durationchange',updatePlayer);
+ audio.addEventListener('durationchange',()=>{lastMediaPositionSecond=-1;updatePlayer()});
  audio.addEventListener('seeked',()=>{void saveCloudCheckpoint(true);persistLocalQueue()});
  audio.addEventListener('pause',()=>{void saveCloudCheckpoint(true);persistLocalQueue()});
  window.addEventListener('online',scheduleNetworkRecovery);
@@ -894,7 +910,7 @@ function attach(){
  $('mobileMenu').onclick=()=>{document.querySelector('.sidebar').classList.toggle('open');$('backdrop').hidden=!document.querySelector('.sidebar').classList.contains('open')};
  $('backdrop').onclick=()=>{document.querySelector('.sidebar').classList.remove('open');$('backdrop').hidden=true};
  if('mediaSession' in navigator){
-  const actions={play:togglePlay,pause:()=>audio.pause(),previoustrack:()=>advance(true),nexttrack:()=>advance(false),seekto:details=>{if(Number.isFinite(details.seekTime))audio.currentTime=details.seekTime}};
+  const actions={play:togglePlay,pause:()=>audio.pause(),previoustrack:()=>advance(true),nexttrack:()=>advance(false),seekbackward:details=>seekBy(-(Number(details?.seekOffset)||10)),seekforward:details=>seekBy(Number(details?.seekOffset)||10),seekto:details=>{if(Number.isFinite(details.seekTime)&&Number.isFinite(audio.duration))audio.currentTime=Math.max(0,Math.min(audio.duration,details.seekTime))}};
   for(const [name,fn] of Object.entries(actions)){try{navigator.mediaSession.setActionHandler(name,fn)}catch(_e){}}
  }
  sb.auth.onAuthStateChange((event,session)=>{if(event==='INITIAL_SESSION')return;const next=session?.user?.id||null;if(next!==state.user?.id)queueMicrotask(()=>{clearArtObjects();loadAll()})});
