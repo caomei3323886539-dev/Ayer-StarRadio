@@ -8,7 +8,7 @@
 <title>星音音乐 · 艾耶尔大陆在线音乐平台</title>
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./music.css?v=0861">
+<link rel="stylesheet" href="./music.css?v=0862">
 </head>
 <body>
 <div class="app-shell">
@@ -96,7 +96,7 @@
   <div class="dialog-head"><button type="button" id="closeLyrics" class="icon-btn" aria-label="收起播放器">⌄</button><div class="detail-heading"><small>AYER STAR MUSIC · NOW PLAYING</small><h2 id="lyricHeading">正在播放</h2></div><button type="button" id="detailQueueBtn" class="icon-btn" aria-label="打开播放队列">☷</button></div>
   <div class="detail-backdrop-art" id="detailBackdrop" aria-hidden="true"></div>
   <div class="detail-view-toggle" role="group" aria-label="播放器显示模式"><button type="button" id="showDisc" class="active" aria-pressed="true">黑胶唱片</button><button type="button" id="showLyrics" aria-pressed="false">实时歌词</button></div>
-  <div class="lyric-layout" id="detailLayout"><div class="lyric-art"><div class="lyric-disc vinyl" id="lyricDisc"><div class="vinyl-label" id="lyricArt">✦</div></div><h3 id="lyricArtist">星音音乐</h3></div><div id="lyricLines" class="lyric-lines"></div></div>
+  <div class="lyric-layout" id="detailLayout"><div class="lyric-art"><div class="turntable-stage"><div class="lyric-disc vinyl" id="lyricDisc"><div class="vinyl-label" id="lyricArt">✦</div></div><svg class="tonearm" id="tonearm" viewBox="0 0 220 220" aria-hidden="true" focusable="false"><defs><linearGradient id="armMetal" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#ffffff"/><stop offset=".55" stop-color="#c6d6e5"/><stop offset="1" stop-color="#829db4"/></linearGradient></defs><circle cx="184" cy="29" r="19" fill="#7995aa" opacity=".22"/><circle cx="184" cy="29" r="12" fill="url(#armMetal)" stroke="#7d9bad" stroke-width="3"/><g class="tonearm-moving"><path d="M184 29 L151 76 L113 126 L64 153" fill="none" stroke="#8195a7" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity=".35"/><path d="M184 29 L151 76 L113 126 L64 153" fill="none" stroke="url(#armMetal)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><rect x="43" y="146" width="31" height="18" rx="5" fill="#eef5fb" stroke="#809caf" stroke-width="3" transform="rotate(-20 58 155)"/><path d="M48 155h18" stroke="#829bb1" stroke-width="2"/></g><circle cx="184" cy="29" r="5" fill="#f7fbff"/></svg></div><h3 id="lyricArtist">星音音乐</h3></div><div id="lyricLines" class="lyric-lines"></div></div>
   <div class="detail-controls"><div class="detail-timeline"><span id="detailTimeNow">0:00</span><input id="detailSeek" aria-label="播放器详情进度" type="range" min="0" max="100" step="0.1" value="0"><span id="detailTimeTotal">0:00</span></div><div class="detail-buttons"><button type="button" id="detailShuffle" class="icon-btn" aria-label="随机播放">⤨</button><button type="button" id="detailPrev" class="icon-btn" aria-label="上一首">⏮</button><button type="button" id="detailPlay" class="play-main" aria-label="播放或暂停">▶</button><button type="button" id="detailNext" class="icon-btn" aria-label="下一首">⏭</button><button type="button" id="detailRepeat" class="icon-btn" aria-label="切换循环">↻</button></div></div>
 </section>
 
@@ -122,6 +122,6 @@
 </dialog>
 
 <div class="backdrop" id="backdrop" hidden></div>
-<script type="module" src="./music.js?v=0861"></script>
+<script type="module" src="./music.js?v=0862"></script>
 </body>
 </html>
