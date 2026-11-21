@@ -221,3 +221,7 @@ body.detail-open{overflow:hidden}
 }
 @media(max-height:680px){.player-detail .turntable-stage,.player-detail .lyric-art h3{transform:translateY(-24px)}}
 @media(prefers-reduced-motion:reduce){.player-detail .tonearm-moving{transition:none!important}}
+
+/* v0.8.6.3: extend tonearm stylus into the outer groove while preserving the upper-right pivot */
+.player-detail .tonearm{height:75%;width:54%;top:-31%;right:-27%}
+@media(max-width:900px){.player-detail .tonearm{height:72%;width:50%;top:-29%;right:-22%}}
