@@ -10,7 +10,7 @@ const state={
  view:'home',search:'',album:null,artist:null,selectedPlaylist:null,
  queue:[],current:null,index:-1,shuffle:false,repeat:false,
  covers:new Map(),coverObjects:[],lyrics:[],lyricIndex:-1,channel:null,
- pendingAdd:null,playToken:0,recordedKey:null,loadToken:0
+ pendingAdd:null,playToken:0,recordedKey:null,loadToken:0,cloudUser:null,cloudStamp:null,cloudRestoring:false,pendingResume:0,lastSyncAt:0
 };
 const PUBLIC_COLS='track_id,title,artist,album,lyrics,published,published_at,updated_at';
 const PRIVATE_COLS='id,title,artist,album,lyrics,audio_path,cover_path,is_favorite,last_played_at,duration_seconds,created_at';
@@ -315,6 +315,7 @@ async function loadAll(){
    say('当前歌曲已被管理员撤回公开，播放已停止。');
   }
   render();updatePlayer();renderQueue();subscribe();
+  if(state.user)await restoreCloudCheckpoint();else{state.cloudUser=null;state.cloudStamp=null}
   if(!current||current.kind!=='public'||state.public.some(t=>t.track_id===current.id))silent();
  }catch(e){if(token!==state.loadToken)return;say('在线音乐馆连接失败：'+e.message);render()}
 }
@@ -368,6 +369,54 @@ async function deletePlaylist(id,name){
   state.playlists=state.playlists.filter(p=>p.id!==id);state.items=state.items.filter(i=>i.playlist_id!==id);
   render();say('歌单已删除，歌曲文件保持不变。');
  }catch(e){say(e.message)}
+}
+/* v0.8.4.1: account-scoped cloud playback checkpoint, never sync protected media URLs. */
+function cloudTrack(ref){
+ if(!ref||!['public','private'].includes(ref.kind))return null;
+ return ref.kind==='public'?findPublic(ref.id):findPrivate(ref.id);
+}
+function cloudQueueRefs(){
+ return state.queue.filter(t=>t&&['public','private'].includes(t.kind)).slice(0,200).map(t=>({kind:t.kind,id:t.id}));
+}
+async function saveCloudCheckpoint(force=false){
+ if(!state.user||state.cloudRestoring||!state.current)return;
+ const now=Date.now();if(!force&&now-state.lastSyncAt<12000)return;
+ state.lastSyncAt=now;
+ const userId=state.user.id;
+ const data={user_id:userId,current_kind:state.current.kind,current_track_id:state.current.id,
+  position_seconds:Math.max(0,Number.isFinite(audio.currentTime)?audio.currentTime:0),
+  queue:cloudQueueRefs(),shuffle:state.shuffle,repeat_one:state.repeat,updated_at:new Date().toISOString()};
+ try{
+  const r=await sb.from('radio_listener_sync').upsert(data,{onConflict:'user_id'});
+  if(r.error)throw r.error;
+  if(state.user?.id===userId)state.cloudStamp=data.updated_at;
+ }catch(e){console.warn('云端播放状态保存失败',e)}
+}
+async function restoreCloudCheckpoint(){
+ const user=state.user;if(!user||state.cloudUser===user.id)return;
+ state.cloudUser=user.id;
+ try{
+  const r=await sb.from('radio_listener_sync').select('current_kind,current_track_id,position_seconds,queue,shuffle,repeat_one,updated_at').eq('user_id',user.id).maybeSingle();
+  if(r.error)throw r.error;
+  if(state.user?.id!==user.id||!r.data)return;
+  const saved=r.data;
+  if(state.current&&!audio.paused)return;
+  state.cloudRestoring=true;
+  const q=Array.isArray(saved.queue)?saved.queue.slice(0,200).map(cloudTrack).filter(Boolean):[];
+  const selected=cloudTrack({kind:saved.current_kind,id:saved.current_track_id});
+  if(selected){
+   state.current=selected;
+   state.queue=q.some(t=>key(t)===key(selected))?q:[selected,...q];
+   state.index=state.queue.findIndex(t=>key(t)===key(selected));
+   state.shuffle=!!saved.shuffle;state.repeat=!!saved.repeat_one;
+   state.pendingResume=Math.max(0,Number(saved.position_seconds)||0);
+   // Restore only metadata. Browser autoplay policy requires a user gesture to start audio.
+   updatePlayer();renderQueue();renderLyric();
+   say('已同步上次播放：'+selected.title+'。点击播放继续收听。');
+  }
+  state.cloudStamp=saved.updated_at;
+ }catch(e){console.warn('跨浏览器播放状态恢复失败',e)}
+ finally{state.cloudRestoring=false}
 }
 function updatePlayer(){
  const t=state.current;
@@ -446,19 +495,21 @@ async function start(t,scope){
  state.queue=list.filter(x=>x&&x.id);
  if(!state.queue.some(x=>key(x)===key(t)))state.queue.unshift(t);
  state.index=state.queue.findIndex(x=>key(x)===key(t));
- state.current=t;state.recordedKey=null;
+ state.current=t;state.recordedKey=null;state.pendingResume=0;
  const token=++state.playToken;
  audio.pause();audio.removeAttribute('src');audio.load();
  $('seekBar').value=0;$('timeNow').textContent='0:00';updatePlayer();renderLyric();renderQueue();
  try{
   const source=await sourceFor(t);if(token!==state.playToken)return;
   audio.src=source;audio.load();
+  if(state.pendingResume>0){const resume=state.pendingResume;state.pendingResume=0;audio.addEventListener('loadedmetadata',()=>{if(token===state.playToken&&Number.isFinite(audio.duration))audio.currentTime=Math.min(resume,Math.max(0,audio.duration-1))},{once:true})}
+  void saveCloudCheckpoint(true);
   try{await audio.play()}catch(e){if(e.name!=='AbortError')say('曲目已就绪，请再次点击播放键。')}
  }catch(e){if(token===state.playToken)say('无法播放「'+t.title+'」：'+e.message)}
 }
 async function togglePlay(){
  if(audio.src){if(audio.paused){try{await audio.play()}catch(e){say('无法开始播放：'+e.message)}}else audio.pause();return}
- const t=state.current||availablePublic()[0]||availablePrivate()[0];if(t)start(t);else say('暂无可播放歌曲。');
+ const t=state.current||availablePublic()[0]||availablePrivate()[0];if(t){const resume=state.pendingResume;start(t,state.queue);if(resume>0)state.pendingResume=resume}else say('暂无可播放歌曲。');
 }
 function advance(back=false,fromEnded=false){
  const arr=state.queue;if(!arr.length)return;
@@ -501,6 +552,7 @@ function subscribe(){
   channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_listener_playlist_tracks'},()=>loadAll());
   channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_public_favorites',filter:'user_id=eq.'+state.user.id},()=>loadAll());
   channel.on('postgres_changes',{event:'*',schema:'public',table:'radio_listener_history',filter:'user_id=eq.'+state.user.id},()=>loadAll());
+  // Cross-browser favorites/playlists already refresh via Realtime. Playback is restored on login.
  }
  state.channel=channel.subscribe();
 }
@@ -555,8 +607,8 @@ function attach(){
  $('detailPlay').onclick=togglePlay;
  $('detailPrev').onclick=()=>advance(true);
  $('detailNext').onclick=()=>advance(false);
- $('detailShuffle').onclick=()=>{state.shuffle=!state.shuffle;updatePlayer()};
- $('detailRepeat').onclick=()=>{state.repeat=!state.repeat;updatePlayer()};
+ $('detailShuffle').onclick=()=>{state.shuffle=!state.shuffle;updatePlayer();void saveCloudCheckpoint(true)};
+ $('detailRepeat').onclick=()=>{state.repeat=!state.repeat;updatePlayer();void saveCloudCheckpoint(true)};
  $('detailQueueBtn').onclick=()=>{closePlayerDetail();$('queueDrawer').hidden=false;renderQueue()};
  $('detailSeek').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
  $('authForm').onsubmit=async e=>{
@@ -604,8 +656,12 @@ function attach(){
   $('detailTimeNow').textContent=formatTime(audio.currentTime);
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('detailSeek').value=String(100*audio.currentTime/audio.duration);
   updateLyric();
+  if(!audio.paused)void saveCloudCheckpoint();
  });
  audio.addEventListener('durationchange',updatePlayer);
+ audio.addEventListener('seeked',()=>void saveCloudCheckpoint(true));
+ audio.addEventListener('pause',()=>void saveCloudCheckpoint(true));
+ window.addEventListener('pagehide',()=>{if(state.user&&state.current&&navigator.sendBeacon){/* next periodic checkpoint already persisted */}});
  for(const ev of ['playing','play','pause','waiting','canplay','ended','seeking'])audio.addEventListener(ev,()=>{updatePlayer();if(ev==='playing')recordPlay()});
  audio.addEventListener('ended',()=>advance(false,true));
  audio.addEventListener('error',()=>{if(state.current)say('音频加载失败，请确认网络与音乐的发布状态。')});
