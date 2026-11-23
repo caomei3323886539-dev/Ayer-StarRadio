@@ -23,7 +23,7 @@
 <section class="glass" id="loginPanel"><h2>☁ 登录云音乐馆</h2><label for="email">邮箱地址</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"><div class="row"><button class="primary" id="send" type="button">发送邮箱登录链接</button></div><p class="notice">请在同一设备打开邮件中的登录链接。如果登录后仍未显示，可以返回此页面刷新。</p></section>
 <section class="glass hidden" id="userPanel"><div class="row spread"><div><h2>我的云音乐库</h2><div class="notice" id="account"></div></div><button id="logout" type="button">退出登录</button></div>
 <label for="upload">选择手机或电脑上的歌曲上传至云端</label><input id="upload" type="file" accept="audio/*,.mp3,.wav,.flac,.m4a,.ogg" multiple><div class="row"><button class="primary" id="uploadBtn" type="button">上传所选音乐</button><button id="refresh" type="button">刷新云曲库</button></div>
-<div class="help">仅拥有相关音乐的上传权利时才上传。音频保存在私有存储桶，歌曲资料仅登录本人可读。目前支持单首音频不超过 50 MiB（约 52.4 MB）。超过该大小时需要调整 Supabase 项目级限制；网络不稳定时建议使用稳定 Wi-Fi 上传。</div>
+<div class="help">仅拥有相关音乐的上传权利时才上传。音频保存在私有存储桶，歌曲资料仅登录本人可读。已加入 TUS 分片上传、进度显示和中断续传。当前服务端仍限制 50 MiB；200 MB 是待启用目标，必须先确认项目套餐及全局限制。断网后请重新选择同一文件并点击上传，系统将尝试续传。</div>
 
 <p id="publisherHint" class="help hidden">官方发布管理：私人歌曲默认不公开。只有明确点击“公开发布”并确认后，游客才能听到；点击“撤回公开”后从公开目录移除，已签发的临时播放链接可能在到期前仍有效。</p>
 <section class="cover-panel" id="coverSyncPanel"><h3>✦ 云端封面同步</h3>
@@ -47,6 +47,7 @@
 <div class="cloudbar"><div id="playTitle" class="notice">尚未选择云端歌曲</div><audio controls id="player" preload="metadata"></audio></div>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
+import * as tus from 'https://esm.sh/tus-js-client@4.3.1';
 const SB_URL='https://nnoffobuktejgtmwfvbn.supabase.co', SB_KEY='sb_publishable_ypAoa0UggQNWR9Rt9HWelQ_ao_Ih5Yw';
 const sb=createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=id=>document.getElementById(id);let currentUser=null, channel=null, cloudTracks=[], cloudPlaylists=[], cloudPlaylistItems=[], lastPlayback=null, activeTrackId=null, activeCoverUrls=[], lastProgressWrite=0, pendingProgress=null, isPublisher=false, publicationMap=new Map(), plannedCoverMatches=[];const text=(id,msg)=>$(id).textContent=msg;const status=msg=>text('status',msg);
@@ -359,22 +360,49 @@ $('syncMatchedCovers').onclick=async()=>{
  }finally{$('syncMatchedCovers').disabled=false;$('scanLocalCovers').disabled=false}
 };
 
+const AUDIO_UPLOAD_LIMIT=50*1024*1024; // 200 MB target requires project-level approval
+function uploadFingerprint(file,userId){
+ return 'ayer-tus-v1:'+userId+':'+file.name+':'+file.size+':'+file.lastModified;
+}
+async function uploadAudioResumable(file,path,fingerprint){
+ const {data:{session},error}=await sb.auth.getSession();
+ if(error||!session?.access_token)throw Error('登录状态已失效，请重新登录');
+ return new Promise((resolve,reject)=>{
+  const upload=new tus.Upload(file,{
+   endpoint:'https://nnoffobuktejgtmwfvbn.storage.supabase.co/storage/v1/upload/resumable',
+   chunkSize:6*1024*1024,retryDelays:[0,3000,5000,10000,20000],
+   headers:{authorization:'Bearer '+session.access_token,'x-upsert':'false'},
+   uploadDataDuringCreation:true,removeFingerprintOnSuccess:true,
+   metadata:{bucketName:'ayer-audio',objectName:path,contentType:file.type||'application/octet-stream',cacheControl:'3600'},
+   onError:err=>reject(err),
+   onProgress:(sent,total)=>status('分片上传 '+file.name+'：'+(100*sent/total).toFixed(1)+'%（'+(sent/1048576).toFixed(1)+' / '+(total/1048576).toFixed(1)+' MiB）'),
+   onSuccess:()=>resolve()
+  });
+  upload.findPreviousUploads().then(previous=>{
+   if(previous.length)upload.resumeFromPreviousUpload(previous[0]);
+   upload.start();
+  }).catch(reject);
+ });
+}
 async function uploadOne(file,meta={}){
  if(!currentUser)throw Error('请先登录');
- if(file.size>50*1024*1024)throw Error('文件超过当前云存储桶 50 MiB 上限。更大文件需要提高 Supabase 项目级限制并启用可续传上传。');
- if(!(/\.(mp3|wav|m4a|flac|ogg)$/i.test(file.name)||file.type.startsWith('audio/')))throw Error('不支持的音频格式');
- const id=crypto.randomUUID(),ext=(file.name.split('.').pop()||'mp3').replace(/[^a-z0-9]/gi,'').toLowerCase(),path=currentUser.id+'/'+id+'.'+ext;
- const uploaded=await sb.storage.from('ayer-audio').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
- if(uploaded.error)throw Error('音频存储失败：'+uploaded.error.message);
+ if(file.size>AUDIO_UPLOAD_LIMIT)throw Error('当前 Supabase 项目尚未启用 200 MB：现行上限为 50 MiB，不能通过分片绕过。');
+ if(!(/\\.(mp3|wav|m4a|flac|ogg)$/i.test(file.name)||file.type.startsWith('audio/')))throw Error('不支持的音频格式');
+ const userId=currentUser.id,fingerprint=uploadFingerprint(file,userId);
+ let id,path;
+ try{
+  const pending=JSON.parse(localStorage.getItem(fingerprint)||'null');
+  if(pending?.id&&pending?.path?.startsWith(userId+'/')){id=pending.id;path=pending.path}
+ }catch(_e){}
+ if(!id){id=crypto.randomUUID();const ext=(file.name.split('.').pop()||'mp3').replace(/[^a-z0-9]/gi,'').toLowerCase();path=userId+'/'+id+'.'+ext}
+ localStorage.setItem(fingerprint,JSON.stringify({id,path}));
+ await uploadAudioResumable(file,path,fingerprint);
  let coverPath=null,coverWarning='';
  if(embeddedCover(meta.cover)){try{coverPath=await uploadCoverObject(meta.cover,meta.title||'cover')}catch(e){coverWarning=e.message;console.warn('Local cover upload skipped',e)}}
- const record={id,title:(meta.title||file.name.replace(/\.[^.]+$/,'')).slice(0,200),artist:meta.artist||'',album:meta.album||'',lyrics:meta.lyrics||'',audio_path:path,cover_path:coverPath,file_size_bytes:file.size,mime_type:file.type||null,sync_state:'ready'};
- const {error}=await sb.from('radio_tracks').insert(record);
- if(error){
-  await sb.storage.from('ayer-audio').remove([path]);
-  if(coverPath)await sb.storage.from('ayer-covers').remove([coverPath]);
-  throw Error('歌曲资料写入失败：'+error.message);
- }
+ const record={id,title:(meta.title||file.name.replace(/\\.[^.]+$/,'')).slice(0,200),artist:meta.artist||'',album:meta.album||'',lyrics:meta.lyrics||'',audio_path:path,cover_path:coverPath,file_size_bytes:file.size,mime_type:file.type||null,sync_state:'ready'};
+ const {error:dbError}=await sb.from('radio_tracks').upsert(record,{onConflict:'id'});
+ if(dbError)throw Error('音频已上传，但歌曲资料保存失败；重新选择同一文件可重试：'+dbError.message);
+ localStorage.removeItem(fingerprint);
  return {...record,coverWarning};
 }
 $('uploadBtn').onclick=async()=>{const files=Array.from($('upload').files||[]);if(!files.length){status('请先选择音乐文件');return}$('uploadBtn').disabled=true;let ok=0;for(const file of files){try{status('正在上传：'+file.name);await uploadOne(file);ok++}catch(e){status('已上传 '+ok+' 首，失败：'+e.message);break}}$('uploadBtn').disabled=false;$('upload').value='';await loadSongs();if(ok===files.length)status('全部上传成功，共 '+ok+' 首；电脑端登录相同账号后自动显示。')};
