@@ -23,7 +23,7 @@
 <section class="glass" id="loginPanel"><h2>☁ 登录云音乐馆</h2><label for="email">邮箱地址</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"><div class="row"><button class="primary" id="send" type="button">发送邮箱登录链接</button></div><p class="notice">请在同一设备打开邮件中的登录链接。如果登录后仍未显示，可以返回此页面刷新。</p></section>
 <section class="glass hidden" id="userPanel"><div class="row spread"><div><h2>我的云音乐库</h2><div class="notice" id="account"></div></div><button id="logout" type="button">退出登录</button></div>
 <label for="upload">选择手机或电脑上的歌曲上传至云端</label><input id="upload" type="file" accept="audio/*,.mp3,.wav,.flac,.m4a,.ogg" multiple><div class="row"><button class="primary" id="uploadBtn" type="button">上传所选音乐</button><button id="refresh" type="button">刷新云曲库</button></div>
-<div class="help">仅拥有相关音乐的上传权利时才上传。音频保存在私有存储桶，歌曲资料仅登录本人可读。单个文件超过 40 MB 时建议先压缩或使用分片上传。</div>
+<div class="help">仅拥有相关音乐的上传权利时才上传。音频保存在私有存储桶，歌曲资料仅登录本人可读。目前支持单首音频不超过 50 MiB（约 52.4 MB）。超过该大小时需要调整 Supabase 项目级限制；网络不稳定时建议使用稳定 Wi-Fi 上传。</div>
 
 <p id="publisherHint" class="help hidden">官方发布管理：私人歌曲默认不公开。只有明确点击“公开发布”并确认后，游客才能听到；点击“撤回公开”后从公开目录移除，已签发的临时播放链接可能在到期前仍有效。</p>
 <section class="cover-panel" id="coverSyncPanel"><h3>✦ 云端封面同步</h3>
@@ -361,7 +361,7 @@ $('syncMatchedCovers').onclick=async()=>{
 
 async function uploadOne(file,meta={}){
  if(!currentUser)throw Error('请先登录');
- if(file.size>40*1024*1024)throw Error('文件超过 40 MB，当前页面暂不支持大文件上传');
+ if(file.size>50*1024*1024)throw Error('文件超过当前云存储桶 50 MiB 上限。更大文件需要提高 Supabase 项目级限制并启用可续传上传。');
  if(!(/\.(mp3|wav|m4a|flac|ogg)$/i.test(file.name)||file.type.startsWith('audio/')))throw Error('不支持的音频格式');
  const id=crypto.randomUUID(),ext=(file.name.split('.').pop()||'mp3').replace(/[^a-z0-9]/gi,'').toLowerCase(),path=currentUser.id+'/'+id+'.'+ext;
  const uploaded=await sb.storage.from('ayer-audio').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});
