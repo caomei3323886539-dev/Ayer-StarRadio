@@ -8,7 +8,7 @@
 <title>星音音乐 · 艾耶尔大陆在线音乐平台</title>
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./music.css?v=098">
+<link rel="stylesheet" href="./music.css?v=0981">
 </head>
 <body>
 <div class="app-shell">
@@ -41,6 +41,7 @@
     <header class="topbar">
       <button type="button" class="icon-btn mobile-menu" id="mobileMenu" aria-label="打开菜单">☰</button>
       <a class="mobile-brand" href="./music.html">✦ 星音音乐</a>
+      <button type="button" class="icon-btn mobile-search-toggle" id="mobileSearchToggle" aria-controls="searchInput" aria-expanded="false" aria-label="展开搜索">⌕</button>
       <div class="search-wrap"><span aria-hidden="true">⌕</span><label class="sr-only" for="searchInput">搜索歌曲、歌手或专辑</label><input id="searchInput" autocomplete="off" placeholder="搜索歌曲、歌手、专辑…"><kbd>⌕</kbd></div>
       <div class="account-actions">
         <span class="connection" id="connection">公开模式</span>
@@ -85,6 +86,7 @@
     <span class="volume-icon" aria-hidden="true">◖))</span>
     <label class="sr-only" for="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.01" value="1">
   </div>
+  <div class="mini-progress" aria-hidden="true"><div class="mini-progress-fill" id="miniProgressFill"></div></div>
   <audio id="audio" preload="metadata"></audio>
 </div>
 
@@ -123,6 +125,6 @@
 </dialog>
 
 <div class="backdrop" id="backdrop" hidden></div>
-<script type="module" src="./music.js?v=098"></script>
+<script type="module" src="./music.js?v=0981"></script>
 </body>
 </html>
