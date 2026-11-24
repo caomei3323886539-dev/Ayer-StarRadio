@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=095"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=095"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=096"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=096"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=095'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=095'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=096'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=096'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -66,10 +66,12 @@ test('v0.9.1 grouped music search respects public/private navigation',()=>{asser
 
 test('v0.9.2 personal center and cloud playlist rename',()=>{assert.match(html,/data-view="profile"/);assert.match(script,/function renderProfile/);assert.match(script,/async function renamePlaylist/);assert.match(script,/radio_listener_playlists'\)\.update\(\{name\}\)/);assert.match(css,/\.profile-stats/)});
 
-test('v0.9.2.1 playlist ordering and mobile profile entry',()=>{assert.match(html,/data-view="profile"><span>◉<\/span>我的/);assert.match(script,/async function movePlaylistTrack/);assert.match(script,/sort_order:temp/);assert.match(script,/removePlaylistTrack\(track.id\)/);assert.match(css,/\.playlist-edit-row/)});
+test('v0.9.2.1 playlist ordering and mobile profile entry',()=>{assert.match(html,/data-view="profile"><span>◉<\/span>我的/);assert.match(script,/async function movePlaylistTrack/);assert.match(script,/removePlaylistTrack\(track.id\)/);assert.match(css,/\.playlist-edit-row/)});
 
 test('v0.9.3 uses atomic server-side playlist ordering with stale-order protection',()=>{assert.match(script,/sb\.rpc\('radio_move_playlist_track'/);assert.match(script,/p_expected_order:entries\.map/);assert.match(script,/playlistMoveBusy/);assert.doesNotMatch(script,/sort_order:temp/)});
 
 test('v0.9.4 guards repeated favorite requests and sparse playlist positions',()=>{assert.match(script,/const favoriteBusy=new Set/);assert.match(script,/favoriteBusy\.has\(songKey\)/);assert.match(script,/finally\{favoriteBusy\.delete\(songKey\)\}/);assert.match(script,/Math\.max\(-1,\.\.\.state\.items/)});
 
 test('v0.9.5 Android media session position and seek actions',()=>{assert.match(script,/function updateMediaPosition/);assert.match(script,/setPositionState/);assert.match(script,/seekbackward:details/);assert.match(script,/seekforward:details/);assert.match(script,/lastMediaPositionSecond/)});
+
+test('v0.9.6 recovery respects playback intent and bounded retries',()=>{assert.match(script,/recoveryAttempts>=3/);assert.match(script,/play:requestPlayback,pause:pausePlayback/);assert.match(script,/function pausePlayback/);assert.match(script,/addEventListener\('pagehide',persistLocalQueue\)/);assert.match(script,/token!==state.playToken\|\|!wantsPlayback/);assert.match(html,/id="detailVolume"/);});
