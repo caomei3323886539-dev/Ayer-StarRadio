@@ -277,26 +277,144 @@ function renderArtists(root){
  for(const [name,arr] of artists)grid.append(collectionTile(name,arr.length+' 首歌曲',arr[0],()=>{state.artist=name;render()},'创作者'));
  root.append(grid);
 }
+/* v0.9.8.2: personal music hub. Everything here is account-scoped or explicitly public. */
+function profileAction(icon,title,description,onClick,variant=''){
+ const item=button('','profile-v2-action '+variant,onClick,title);
+ item.append(el('span','profile-v2-action-icon',icon));
+ const copy=el('span','profile-v2-action-text');
+ copy.append(el('strong','',title),el('small','',description));
+ item.append(copy,el('span','profile-v2-arrow','›'));
+ return item;
+}
 function renderProfile(root){
- const user=state.user;
- pageHead(root,'个人音乐中心','同一账号在手机与电脑上访问自己的音乐收藏');
- const hero=el('section','profile-hero');
- const avatar=el('div','profile-avatar','✦'),details=el('div','profile-details');
- details.append(el('span','eyebrow','AYER STAR MUSIC · LISTENER'),el('h2','',user?.user_metadata?.display_name||user?.email?.split('@')[0]||'星音听众'),el('p','',user?.email||'已登录账号'));
- hero.append(avatar,details);root.append(hero);
- const counts=el('div','profile-stats');
- const stats=[['♡','收藏歌曲',availablePublic().filter(t=>state.favorites.has(t.id)).length+availablePrivate().filter(t=>t.is_favorite).length,'favorites'],['☷','我的歌单',state.playlists.length,'playlists'],['◷','最近播放',state.history.length,'recent'],['♬','私人曲库',availablePrivate().length,'private']];
- for(const [icon,label,count,view] of stats){
-  const item=button('', 'profile-stat',()=>goto(view));
-  item.append(el('span','profile-stat-icon',icon),el('strong','',String(count)),el('span','',label));
-  counts.append(item);
+ const user=state.user, page=el('div','profile-v2');
+ const hero=el('section','profile-v2-hero');
+ const banner=el('div','profile-v2-hero-copy');
+ banner.append(el('span','profile-v2-eyebrow','✦ AYER STAR MUSIC · TRAVELER ARCHIVE'));
+ banner.append(el('h1','',user?'我的星音空间':'欢迎来到星音音乐'));
+ banner.append(el('p','',user?'把喜欢的旋律收藏成自己的旅程。音乐、歌单与私人曲库，在这里继续。':'聆听艾耶尔大陆的旋律。登录后可管理收藏、在线歌单及私人云音乐库。'));
+ const avatar=el('div','profile-v2-avatar');
+ avatar.setAttribute('aria-hidden','true');
+ avatar.append(el('span','profile-v2-avatar-star','✦'),el('span','profile-v2-avatar-ring',''));
+ const intro=el('div','profile-v2-intro');
+ const badge=el('span','profile-v2-user-badge',user?'已登录 · 星音旅人':'访客 · 公开音乐馆');
+ intro.append(badge);
+ if(user){
+  const name=String(user.user_metadata?.display_name||user.email?.split('@')[0]||'星音旅人');
+  intro.append(el('strong','profile-v2-name',name),el('span','profile-v2-email',user.email||'星音账号'));
+ }else intro.append(el('strong','profile-v2-name','从一首歌开始旅程'));
+ banner.append(intro);
+ const heroActions=el('div','profile-v2-hero-actions');
+ heroActions.append(button(user?'管理账号':'登录 / 注册','profile-v2-primary',openAuth));
+ heroActions.append(button(user?'编辑昵称':'探索音乐馆','profile-v2-secondary',user?()=>{}:()=>goto('discover')));
+ banner.append(heroActions);
+ hero.append(banner,avatar);page.append(hero);
+ if(!user){
+  heroActions.lastElementChild.onclick=()=>goto('discover');
+  const guest=el('section','profile-v2-section');
+  guest.append(heading('星音旅人专属空间','登录后开启完整的个人音乐功能'));
+  const links=el('div','profile-v2-actions');
+  links.append(profileAction('♡','我的收藏','收藏心动旋律并同步到云端',openAuth,'favorite'));
+  links.append(profileAction('☷','个人歌单','为你的冒险建立播放清单',openAuth,'playlist'));
+  links.append(profileAction('♬','私人音乐','上传并保护仅自己可见的歌曲',openAuth,'private'));
+  links.append(profileAction('✧','公开音乐馆','无须登录即可收听',()=>goto('discover'),'discover'));
+  guest.append(links);page.append(guest);root.append(page);return;
  }
- root.append(counts);
- const section=el('section','section');section.append(heading('我的快捷入口','管理个人音乐内容'));
- const actions=el('div','profile-actions');
- for(const [label,view] of [['我喜欢的音乐','favorites'],['管理我的歌单','playlists'],['查看播放历史','recent'],['打开私人音乐库','private']])actions.append(button(label,'soft-btn',()=>goto(view)));
- section.append(actions);root.append(section);
- root.append(el('p','hint','个人收藏、歌单和最近播放由账号云端数据提供。公开音乐仍须由管理员明确发布，私人音乐不会因进入个人主页而公开。'));
+ const editBtn=heroActions.lastElementChild;
+ const editor=el('form','profile-v2-editor');editor.hidden=true;
+ const editLabel=el('label','','编辑旅人昵称');editLabel.setAttribute('for','profileDisplayName');
+ const field=el('input');field.id='profileDisplayName';field.type='text';field.maxLength=28;field.required=true;field.autocomplete='nickname';
+ field.value=String(user.user_metadata?.display_name||user.email?.split('@')[0]||'');
+ const save=button('保存昵称','profile-v2-primary',null),cancel=button('取消','profile-v2-secondary',()=>{editor.hidden=true});
+ save.type='submit';editLabel.append(field);editor.append(editLabel,save,cancel);banner.append(editor);
+ editBtn.onclick=()=>{editor.hidden=!editor.hidden;if(!editor.hidden)field.focus()};
+ editor.onsubmit=async event=>{
+  event.preventDefault();
+  const name=field.value.trim();
+  if(!name||name.length>28){say('昵称需要填写，且不能超过 28 个字符。');return}
+  save.disabled=true;
+  try{
+   const response=await sb.auth.updateUser({data:{display_name:name}});
+   if(response.error)throw response.error;
+   if(state.user?.id!==user.id)return;
+   state.user=response.data?.user||{...state.user,user_metadata:{...state.user.user_metadata,display_name:name}};
+   say('旅人昵称已更新。');render();
+  }catch(e){say('昵称修改失败：'+e.message)}
+  finally{save.disabled=false}
+ };
+ const publics=availablePublic(),privates=availablePrivate();
+ const liked=publics.filter(t=>state.favorites.has(t.id)).concat(privates.filter(t=>t.is_favorite));
+ const recent=state.history.map(h=>{const t=findPublic(h.track_id);return t?{...t,played_at:h.played_at||''}:null}).filter(Boolean)
+  .concat(privates.filter(t=>t.last_played_at).map(t=>({...t,played_at:t.last_played_at})))
+  .sort((a,b)=>new Date(b.played_at||0)-new Date(a.played_at||0));
+ const metrics=[
+  ['♡','喜欢的旋律',liked.length,'favorites','favorites'],
+  ['☷','我的歌单',state.playlists.length,'playlists','playlists'],
+  ['◷','收听足迹',recent.length,'recent','recent'],
+  ['♬','私人音乐',privates.length,'private','private']
+ ];
+ const stats=el('section','profile-v2-stats');
+ stats.setAttribute('aria-label','个人音乐资料概览');
+ for(const [icon,label,count,view,variant] of metrics){
+  const item=button('','profile-v2-stat '+variant,()=>goto(view),label+'：'+count);
+  item.append(el('span','profile-v2-stat-icon',icon));
+  const info=el('span','profile-v2-stat-copy');info.append(el('strong','',String(count)),el('small','',label));
+  item.append(info,el('span','profile-v2-stat-chevron','›'));stats.append(item);
+ }
+ page.append(stats);
+ const overview=el('section','profile-v2-section');
+ overview.append(heading('继续你的音乐旅程','衔接上次聆听的旋律'));
+ const playing=state.current&&((state.current.kind==='public'&&publics.some(t=>t.id===state.current.id))||(state.current.kind==='private'&&privates.some(t=>t.id===state.current.id)))?state.current:null;
+ const featured=playing||recent[0]||liked[0]||privates[0]||publics[0];
+ if(featured){
+  const feature=el('div','profile-v2-now');
+  const art=el('div','profile-v2-now-art','✦');setArt(featured,art);
+  const copy=el('div','profile-v2-now-copy');
+  copy.append(el('small','profile-v2-now-label',playing?'上次播放的歌曲':'为你找到一首旋律'));
+  copy.append(el('strong','',featured.title),el('span','',displayName(featured)+' · '+albumName(featured)));
+  const actions=el('div','profile-v2-now-actions');
+  actions.append(button('▶ 继续播放','profile-v2-primary',()=>{if(playing&&state.current&&key(playing)===key(state.current))void requestPlayback();else void start(featured,[featured,...recent.filter(t=>key(t)!==key(featured))])}));
+  actions.append(button('播放队列','profile-v2-secondary',()=>{$('queueDrawer').hidden=false;renderQueue()}));
+  copy.append(actions);feature.append(art,copy);overview.append(feature);
+ }else overview.append(empty('从一段旋律开始','音乐馆发布歌曲或你上传私人音乐后，即可从这里继续收听。','去发现音乐',()=>goto('discover')));
+ page.append(overview);
+ const entry=el('section','profile-v2-section');
+ entry.append(heading('我的音乐宝库','收藏、歌单与私人音乐的专属入口'));
+ const entries=el('div','profile-v2-actions');
+ entries.append(profileAction('♡','喜欢的音乐',liked.length+' 首心动旋律',()=>goto('favorites'),'favorite'));
+ entries.append(profileAction('☷','我的歌单',state.playlists.length+' 个在线歌单',()=>goto('playlists'),'playlist'));
+ entries.append(profileAction('♬','私人云曲库',privates.length+' 首仅自己可见的音乐',()=>goto('private'),'private'));
+ entries.append(profileAction('⇧','上传与管理','管理私人音乐及封面',()=>location.assign('./cloud.html'),'upload'));
+ entry.append(entries);page.append(entry);
+ const favoritesSection=el('section','profile-v2-section');
+ favoritesSection.append(heading('最近喜欢的旋律','收藏中的精选歌曲','查看全部',()=>goto('favorites')));
+ favoritesSection.append(liked.length?rowList(liked.slice(0,4)):empty('还没有收藏歌曲','在歌曲旁点击 ♡，收藏喜欢的旋律。','发现歌曲',()=>goto('discover')));
+ page.append(favoritesSection);
+ const lists=el('section','profile-v2-section');
+ lists.append(heading('自己创建的歌单','为不同旅程准备不同的音乐','全部歌单',()=>goto('playlists')));
+ const mini=el('div','profile-v2-playlists');
+ for(const p of state.playlists.slice(0,4)){
+  const count=state.items.filter(item=>item.playlist_id===p.id).length;
+  mini.append(profileAction('♫',p.name,count+' 首已添加歌曲',()=>{goto('playlists');state.selectedPlaylist=p.id;render()},'playlist'));
+ }
+ mini.append(profileAction('＋','新建歌单','收藏专属于你的冒险旋律',()=>$('playlistDialog').showModal(),'create'));
+ lists.append(mini);page.append(lists);
+ if(recent.length){
+  const history=el('section','profile-v2-section');
+  history.append(heading('最近听过', '云端同步的播放足迹','查看全部',()=>goto('recent')));
+  history.append(rowList(recent.slice(0,3)));page.append(history);
+ }
+ const account=el('section','profile-v2-section profile-v2-account');
+ account.append(heading('旅人账号与隐私','在你的音乐空间里安心收藏与聆听'));
+ const details=el('div','profile-v2-account-grid');
+ const identity=el('div','profile-v2-account-item');
+ identity.append(el('span','','当前账号'),el('strong','',user.email||'已登录星音账号'));
+ const protection=el('div','profile-v2-account-item');
+ protection.append(el('span','','私人音乐权限'),el('strong','','仅当前账号可访问'));
+ details.append(identity,protection);account.append(details);
+ account.append(el('p','profile-v2-privacy','私人曲目不会因加入收藏、创建歌单或进入个人主页而自动公开。只有管理员明确发布的歌曲才会进入公开音乐馆。'));
+ page.append(account);
+ root.append(page);
 }
 function renderFavorites(root){
  const arr=availablePublic().filter(t=>state.favorites.has(t.id)).concat(availablePrivate().filter(t=>t.is_favorite));
