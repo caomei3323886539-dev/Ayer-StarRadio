@@ -888,8 +888,19 @@ function attach(){
  $('closeQueue').onclick=()=>{$('queueDrawer').hidden=true};
  $('lyricsBtn').onclick=openPlayerDetail;
  $('seekBar').oninput=e=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(e.target.value)/100*audio.duration};
- $('volume').oninput=e=>{audio.volume=Number(e.target.value)};
- audio.volume=Number($('volume').value);
+ function setVolume(value){
+  const v=Math.max(0,Math.min(1,Number(value)||0));
+  audio.volume=v;
+  $('volume').value=String(v);
+  $('detailVolume').value=String(v);
+  $('detailVolumeValue').textContent=Math.round(v*100)+'%';
+  try{localStorage.setItem('ayer-music-volume-v2',String(v))}catch(_e){}
+ }
+ $('volume').oninput=e=>setVolume(e.target.value);
+ $('detailVolume').oninput=e=>setVolume(e.target.value);
+ let savedVolume=1;
+ try{const saved=localStorage.getItem('ayer-music-volume-v2');if(saved!==null&&Number.isFinite(Number(saved)))savedVolume=Number(saved)}catch(_e){}
+ setVolume(savedVolume);
  audio.addEventListener('timeupdate',()=>{
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('seekBar').value=String(100*audio.currentTime/audio.duration);
   $('timeNow').textContent=formatTime(audio.currentTime);
