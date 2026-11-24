@@ -205,6 +205,7 @@ function renderHome(root){
  const songs=sortPublicTracks(availablePublic(),'newest');
  const albums=groupBy(songs,albumName);
  const creators=groupBy(songs,displayName);
+ const localSongs=availableLocal();
  const page=el('div','ayer-home');
  const top=el('div','ayer-home-top');
  top.append(el('div','ayer-home-kicker','AYER STAR MUSIC · 艾耶尔大陆'),el('h1','','让每一段旅程，都有自己的旋律'));
@@ -246,6 +247,12 @@ function renderHome(root){
   albumsSection.append(grid);
  }else albumsSection.append(empty('尚无公开专辑','正式发布歌曲后，将自动整理专辑。'));
  page.append(albumsSection);
+ if(localSongs.length){
+  const offline=el('section','ayer-recommend section');
+  offline.append(heading('收藏在此设备的旋律','原有本地音乐和离线歌曲 · 无须登录','本地音乐馆',()=>goto('local')));
+  offline.append(rowList(localSongs.slice().sort((a,b)=>b.addedAt-a.addedAt).slice(0,4)));
+  page.append(offline);
+ }
  if(state.user){
   const personal=[...availablePrivate().slice(0,4)];
   const mine=el('section','ayer-recommend section');
@@ -438,7 +445,7 @@ function renderProfile(root){
  const hero=el('section','profile-v2-hero');
  const banner=el('div','profile-v2-hero-copy');
  banner.append(el('span','profile-v2-eyebrow','✦ AYER STAR MUSIC · TRAVELER ARCHIVE'));
- banner.append(el('h1','',user?'我的星音空间':'欢迎来到星音音乐'));
+ banner.append(el('h1','',user?'我的星音空间':'欢迎来到星音电台'));
  banner.append(el('p','',user?'把喜欢的旋律收藏成自己的旅程。音乐、歌单与私人曲库，在这里继续。':'聆听艾耶尔大陆的旋律。登录后可管理收藏、在线歌单及私人云音乐库。'));
  const avatar=el('div','profile-v2-avatar');
  avatar.setAttribute('aria-hidden','true');
@@ -464,6 +471,7 @@ function renderProfile(root){
   links.append(profileAction('☷','个人歌单','为你的冒险建立播放清单',openAuth,'playlist'));
   links.append(profileAction('♬','私人音乐','上传并保护仅自己可见的歌曲',openAuth,'private'));
   links.append(profileAction('✧','公开音乐馆','无须登录即可收听',()=>goto('discover'),'discover'));
+  links.append(profileAction('♬','本机离线音乐',state.local.length+' 首保存在此设备的歌曲',()=>goto('local'),'private'));
   guest.append(links);page.append(guest);root.append(page);return;
  }
  const editBtn=heroActions.lastElementChild;
@@ -508,6 +516,9 @@ function renderProfile(root){
   item.append(info,el('span','profile-v2-stat-chevron','›'));stats.append(item);
  }
  page.append(stats);
+ const localBanner=profileAction('♬','本机离线音乐',state.local.length+' 首在当前设备保存 · 无需云端登录',()=>goto('local'),'private');
+ localBanner.classList.add('profile-v2-local-entry');
+ page.append(localBanner);
  const overview=el('section','profile-v2-section');
  overview.append(heading('继续你的音乐旅程','衔接上次聆听的旋律'));
  const playing=state.current&&((state.current.kind==='public'&&publics.some(t=>t.id===state.current.id))||(state.current.kind==='private'&&privates.some(t=>t.id===state.current.id)))?state.current:null;
@@ -531,6 +542,7 @@ function renderProfile(root){
  entries.append(profileAction('☷','我的歌单',state.playlists.length+' 个在线歌单',()=>goto('playlists'),'playlist'));
  entries.append(profileAction('♬','私人云曲库',privates.length+' 首仅自己可见的音乐',()=>goto('private'),'private'));
  entries.append(profileAction('⇧','上传与管理','管理私人音乐及封面',()=>location.assign('./cloud.html'),'upload'));
+ entries.append(profileAction('♬','本地音乐与歌单',state.local.length+' 首设备内音乐',()=>goto('local'),'private'));
  entry.append(entries);page.append(entry);
  const favoritesSection=el('section','profile-v2-section');
  favoritesSection.append(heading('最近喜欢的旋律','收藏中的精选歌曲','查看全部',()=>goto('favorites')));
@@ -970,7 +982,7 @@ function updatePlayer(){
  $('lyricDisc').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('tonearm').classList.toggle('is-playing',!!t&&!audio.paused&&!audio.ended&&audio.readyState>=2);
  $('lyricHeading').textContent=t?t.title:'实时歌词';
- $('lyricArtist').textContent=t?displayName(t):'星音音乐';
+ $('lyricArtist').textContent=t?displayName(t):'星音电台';
  $('timeNow').textContent=formatTime(audio.currentTime);
  $('timeTotal').textContent=formatTime(audio.duration);
  $('detailTimeNow').textContent=formatTime(audio.currentTime);
@@ -1039,6 +1051,9 @@ async function start(t,scope){
  const resumePosition=state.pendingResume;state.pendingResume=0;
  const token=++state.playToken;
  audio.pause();audio.removeAttribute('src');audio.load();
+ if(t.kind!=='local'&&state.localAudioUrl){
+  URL.revokeObjectURL(state.localAudioUrl);state.localAudioUrl=null;state.localAudioId=null;
+ }
  recoveryPosition=resumePosition;persistLocalQueue();
  $('seekBar').value=0;$('timeNow').textContent='0:00';updatePlayer();renderLyric();renderQueue();
  try{
