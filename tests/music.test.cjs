@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0981"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0981"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0982"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0982"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0981'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0981'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0982'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0982'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -110,4 +110,33 @@ test('v0.9.8.1 service worker parses and avoids caching protected media',()=>{
  assert.match(serviceWorker,/url\.pathname\.includes\('\/storage\/'\)/);
  assert.match(serviceWorker,/url\.pathname\.includes\('\/functions\/'\)/);
  assert.match(serviceWorker,/caches\.open\(CACHE\)\.then\(cache=>cache\.put\(path,copy\)\)\)/);
+});
+
+test('v0.9.8.2 My Music uses responsive traveler profile, account-safe stats and playlists',()=>{
+ assert.match(script,/function renderProfile\(root\)/);
+ assert.match(script,/if\(!user\)\{/);
+ assert.match(script,/profile-v2-hero/);
+ assert.match(script,/profile-v2-stats/);
+ assert.match(script,/profile-v2-now/);
+ assert.match(script,/profile-v2-actions/);
+ assert.match(script,/profile-v2-playlists/);
+ assert.match(script,/state\.history\.map/);
+ assert.match(script,/state\.favorites\.has\(t\.id\)/);
+ assert.match(script,/availablePrivate\(\)/);
+ assert.match(script,/goto\('playlists'\);state\.selectedPlaylist=p\.id;render\(\)/);
+ assert.match(css,/\.profile-v2-hero\{/);
+ assert.match(css,/\.profile-v2-stat\{/);
+ assert.match(css,/\.profile-v2-action\{/);
+ assert.match(css,/\.profile-v2-editor\[hidden\]\{display:none!important\}/);
+ assert.match(css,/@media\(max-width:540px\)/);
+});
+test('v0.9.8.2 nickname editing requires signed-in account and does not expose private tracks',()=>{
+ assert.match(script,/sb\.auth\.updateUser\(\{data:\{display_name:name\}\}\)/);
+ assert.match(script,/if\(state\.user\?\.id!==user\.id\)return/);
+ assert.match(script,/name\.length>28/);
+ assert.match(script,/field\.type='text'/);
+ assert.match(script,/editor\.onsubmit=async event/);
+ assert.match(script,/if\(!user\)\{[\s\S]*?openAuth/);
+ assert.doesNotMatch(script,/profileDisplayName.*innerHTML/);
+ assert.match(script,/只有管理员明确发布的歌曲才会进入公开音乐馆/);
 });
