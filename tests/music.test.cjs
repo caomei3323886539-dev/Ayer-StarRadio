@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=098"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=098"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0981"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0981"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=098'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=098'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0981'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0981'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -86,4 +86,21 @@ test('v0.9.8 fantasy music home uses published songs and responsive rails',()=>{
  assert.match(script,/state\.user\&\&state\.private\.length|if\(state\.user\)/);
  assert.match(css,/\.ayer-feature-card/);
  assert.match(css,/@media\(max-width:720px\)/);
+});
+
+test('v0.9.8.1 mobile search is interactive without changing music access',()=>{
+ assert.match(html,/id="mobileSearchToggle"[^>]*aria-expanded="false"/);
+ assert.match(script,/function setMobileSearchOpen\(open,clearOnClose=false\)/);
+ assert.match(script,/setMobileSearchOpen\(false\)/);
+ assert.match(script,/\.classList\.contains\('search-open'\)/);
+ assert.match(css,/\.topbar\.search-open \.search-wrap\{display:flex\}/);
+ assert.match(css,/\.mobile-search-toggle\{display:none!important\}/);
+});
+test('v0.9.8.1 floating player stays above Android navigation and shows progress',()=>{
+ assert.match(html,/id="miniProgressFill"/);
+ assert.match(script,/function updateMiniProgress\(\)/);
+ assert.match(script,/updateMiniProgress\(\);/);
+ assert.match(css,/bottom:calc\(var\(--visual-bottom,0px\) \+ var\(--nav-height,62px\) \+ 9px\)!important/);
+ assert.match(css,/\.player \.mini-progress-fill/);
+ assert.match(css,/\.ayer-recommend \.track-actions \.mini-action:nth-child\(3\)\{display:none\}/);
 });
