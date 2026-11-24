@@ -21,8 +21,9 @@ jobs:
           import re
           s=Path('index.html').read_text(encoding='utf-8')
           matches=re.findall(r'<script>(.*?)</script>',s,re.S)
-          assert len(matches)==1
-          Path('/tmp/ayer-player.js').write_text(matches[0],encoding='utf-8')
+          assert len(matches)==2  # safe redirect + original preserved legacy application
+          assert "get('legacy')!=='1'" in matches[0]
+          Path('/tmp/ayer-player.js').write_text(matches[1],encoding='utf-8')
           for required in [
               'unifiedMusicHall','initUnifiedCloud()', 'refreshUnifiedCloud()',
               "sb.from('radio_publications')", ".eq('published',true)",
@@ -50,10 +51,15 @@ jobs:
           (async()=>{
             const hasChrome=require('node:child_process').spawnSync('bash',['-lc','command -v google-chrome || command -v google-chrome-stable'],{encoding:'utf8'}).status===0;
             const browser=await chromium.launch(hasChrome?{channel:'chrome',headless:true,args:['--no-sandbox']}:{headless:true,args:['--no-sandbox']});
+            const primary=await browser.newPage();
+            await primary.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
+            await primary.waitForURL('**/music.html',{timeout:15000});
+            assert.ok((await primary.locator('[data-view="local"]').count())>0,'Unified home must expose legacy local songs');
+            await primary.close();
             for(const [width,height] of [[390,844],[1366,768]]){
               const page=await browser.newPage({viewport:{width,height}});
               const errors=[];page.on('pageerror',e=>errors.push(e.message));
-              await page.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
+              await page.goto('http://127.0.0.1:8765/index.html?legacy=1',{waitUntil:'domcontentloaded'});
               await page.waitForFunction(()=>document.querySelector('#hubCount')?.textContent.startsWith('全馆'),null,{timeout:40000});
               const hub=page.locator('#unifiedMusicHall');
               assert.equal(await hub.isVisible(),true,'The cloud collection must appear on the main page');
