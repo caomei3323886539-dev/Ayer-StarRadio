@@ -11,12 +11,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=096"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=096"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=098"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=098"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=096'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=096'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=098'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=098'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -75,3 +75,15 @@ test('v0.9.4 guards repeated favorite requests and sparse playlist positions',()
 test('v0.9.5 Android media session position and seek actions',()=>{assert.match(script,/function updateMediaPosition/);assert.match(script,/setPositionState/);assert.match(script,/seekbackward:details/);assert.match(script,/seekforward:details/);assert.match(script,/lastMediaPositionSecond/)});
 
 test('v0.9.6 recovery respects playback intent and bounded retries',()=>{assert.match(script,/recoveryAttempts>=3/);assert.match(script,/play:requestPlayback,pause:pausePlayback/);assert.match(script,/function pausePlayback/);assert.match(script,/addEventListener\('pagehide',persistLocalQueue\)/);assert.match(script,/token!==state.playToken\|\|!wantsPlayback/);assert.match(html,/id="detailVolume"/);});
+
+test('v0.9.8 fantasy music home uses published songs and responsive rails',()=>{
+ assert.match(script,/function renderHome\(root\)/);
+ assert.match(script,/ayer-home-tabs/);
+ assert.match(script,/ayer-featured-rail/);
+ assert.match(script,/ayer-recommend/);
+ assert.match(script,/sortPublicTracks\(availablePublic\(\),'newest'\)/);
+ assert.match(script,/state\.favorites\.has\(t\.id\)/);
+ assert.match(script,/state\.user\&\&state\.private\.length|if\(state\.user\)/);
+ assert.match(css,/\.ayer-feature-card/);
+ assert.match(css,/@media\(max-width:720px\)/);
+});
