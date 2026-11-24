@@ -572,3 +572,51 @@ body.detail-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
  .profile-v2-stat,.profile-v2-action{transition:none!important}
 }
+
+/* v0.9.9 — unified offline music and legacy playlist management */
+.unified-local{--local-ink:#305873;--local-border:#d8e9f5;min-width:0;color:var(--local-ink);padding-bottom:24px}
+.unified-local .summary-top{align-items:center;margin-top:9px}
+.local-summary{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:16px 20px;margin:16px 0 15px;border-radius:17px;background:linear-gradient(120deg,#d7eaff,#fff8e8);border:1px solid #e1ecf6;color:#426b8d;font-size:13px;font-weight:700}
+.local-summary span{padding:6px 11px;background:#ffffffe5;border-radius:99px;border:1px solid #e6eef5}
+.local-action-bar{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:5px 0 15px;overscroll-behavior-x:contain}
+.local-action-bar::-webkit-scrollbar{display:none}
+.local-filter{border:1px solid #c9dfef;border-radius:999px;padding:10px 15px;min-height:44px;flex:0 0 auto;white-space:nowrap;background:#fff;color:#547f9f;font-size:13px;cursor:pointer}
+.local-filter.active{background:#317cb6;color:#fff;border-color:#317cb6;box-shadow:0 5px 16px #4588b736;font-weight:700}
+.local-playlist-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.local-playlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:12px;margin:14px 0}
+.local-playlist-card{display:flex;align-items:center;gap:13px;text-align:left;min-height:95px;border:1px solid #d8e7f3;border-radius:16px;padding:13px 16px;background:#fffefa;box-shadow:0 8px 20px #668ca018;cursor:pointer;color:#365b7c}
+.local-playlist-card:hover{background:#f6faff;border-color:#99c9e8}
+.local-playlist-cover{flex:0 0 60px;display:grid;place-items:center;width:60px;height:60px;border-radius:14px;background:linear-gradient(145deg,#93c5e7,#e3e2fb);color:#fff;font-size:32px}
+.local-playlist-title{display:flex;min-width:0;flex-direction:column;gap:7px}
+.local-playlist-title strong{font-size:14px;overflow-wrap:anywhere}
+.local-playlist-title small{font-size:12px;color:#7997af}
+.local-bottom-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 0;padding:16px 15px;border:1px solid #d7e8f5;border-radius:15px;background:#f7fbff}
+.local-help{color:#68879e;font-size:12px;line-height:1.8;flex-basis:100%;margin:0}
+.local-warning{padding:12px 15px;border:1px solid #efd1ab;border-radius:12px;background:#fff7ed;color:#925c26;font-size:13px}
+.unified-local .list{background:#ffffffd8}
+.unified-local .track-row{min-height:70px}
+.unified-local .track-cover{border-radius:10px;width:54px;height:54px}
+.unified-local .mini-action{min-width:44px;min-height:44px}
+.unified-local .track-desc{overflow:hidden}
+.unified-local .track-desc small{color:#6d89a0}
+@media(max-width:900px){
+ .mobile-nav button{min-width:0;min-height:48px}
+ .mobile-nav button span{font-size:21px}
+ .unified-local .summary-top{gap:10px}
+ .unified-local .summary-top h1{font-size:23px}
+ .unified-local .summary-top p{font-size:12px}
+ .local-summary{padding:11px 12px;gap:7px}
+ .local-playlist-grid{grid-template-columns:1fr}
+ .unified-local .track-row{gap:7px;padding:9px 3px}
+ .unified-local .track-cover{width:49px;height:49px;flex-shrink:0}
+ .unified-local .track-actions{gap:0}
+ .unified-local .track-actions .mini-action{min-width:37px}
+ .unified-local .track-desc .tile-title{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:380px){
+ .mobile-nav button{font-size:10px}
+ .mobile-nav button span{font-size:19px}
+ .local-filter{padding:9px 12px}
+ .unified-local .track-cover{width:43px;height:43px}
+ .unified-local .track-actions .mini-action{min-width:34px}
+}
