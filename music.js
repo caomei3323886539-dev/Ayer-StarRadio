@@ -46,6 +46,7 @@ function setActiveNav(){
 }
 function goto(view){
  state.view=view;state.search='';$('searchInput').value='';
+ setMobileSearchOpen(false);
  state.album=null;state.artist=null;state.selectedPlaylist=null;
  if(view==='discover')state.discoverFilter='all';
  document.querySelector('.sidebar').classList.remove('open');$('backdrop').hidden=true;
@@ -663,7 +664,21 @@ function seekBy(seconds){
  audio.currentTime=Math.max(0,Math.min(audio.duration, audio.currentTime+seconds));
  updateMediaPosition();
 }
+function updateMiniProgress(){
+ const duration=audio.duration;
+ const progress=Number.isFinite(duration)&&duration>0?Math.max(0,Math.min(1,audio.currentTime/duration)):0;
+ $('miniProgressFill').style.transform='scaleX('+progress+')';
+}
+function setMobileSearchOpen(open,clearOnClose=false){
+ const bar=document.querySelector('.topbar');
+ bar.classList.toggle('search-open',open);
+ $('mobileSearchToggle').setAttribute('aria-expanded',String(open));
+ $('mobileSearchToggle').setAttribute('aria-label',open?'关闭搜索':'展开搜索');
+ if(open)$('searchInput').focus();
+ else if(clearOnClose&&state.search){state.search='';$('searchInput').value='';render()}
+}
 function updatePlayer(){
+ updateMiniProgress();
  const t=state.current;
  $('nowTitle').textContent=t?t.title:'等待播放';
  $('nowArtist').textContent=t?displayName(t):'在音乐馆选择一首歌曲';
@@ -863,6 +878,8 @@ function attach(){
  window.addEventListener('resize',syncVisualViewport,{passive:true});
  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goto(b.dataset.view)));
  $('searchInput').addEventListener('input',e=>{state.search=e.target.value;render()});
+ $('mobileSearchToggle').onclick=()=>setMobileSearchOpen(!document.querySelector('.topbar').classList.contains('search-open'),true);
+ $('searchInput').addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.topbar').classList.contains('search-open')){e.stopPropagation();setMobileSearchOpen(false,true);$('mobileSearchToggle').focus()}});
  $('accountBtn').onclick=openAuth;
  $('closeAuth').onclick=()=>$('authDialog').close();
  $('closePlaylist').onclick=()=>$('playlistDialog').close();
@@ -937,6 +954,7 @@ function attach(){
  try{const saved=localStorage.getItem('ayer-music-volume-v2');if(saved!==null&&Number.isFinite(Number(saved)))savedVolume=Number(saved)}catch(_e){}
  setVolume(savedVolume);
  audio.addEventListener('timeupdate',()=>{
+  updateMiniProgress();
   if(Number.isFinite(audio.duration)&&audio.duration>0)$('seekBar').value=String(100*audio.currentTime/audio.duration);
   $('timeNow').textContent=formatTime(audio.currentTime);
   $('detailTimeNow').textContent=formatTime(audio.currentTime);
