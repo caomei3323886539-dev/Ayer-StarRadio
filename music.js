@@ -155,38 +155,64 @@ function rowList(arr){
 }
 function tiles(arr){const root=el('div','tiles');for(const t of arr)root.append(tile(t));return root}
 function renderHome(root){
- const songs=availablePublic();
- const hero=el('section','hero'),copy=el('div');
- copy.append(el('span','eyebrow','AYER STAR MUSIC · ORIGINAL OST'),el('h1','','让每一段旅程，都有属于自己的旋律'),el('p','','从艾耶尔大陆的清晨，到神之谷的星空。聆听已正式发布的原创音乐，收藏你喜欢的声音。'));
- const actions=el('div','hero-actions');
- actions.append(button('♫ 发现音乐','primary-btn',()=>goto('discover')));
- actions.append(button('我的音乐','soft-btn',()=>goto('private')));
- copy.append(actions);
- const heroImg=el('div','hero-art','✦');if(songs.length)setArt(songs[0],heroImg);
- hero.append(copy,heroImg);root.append(hero);
- const section=el('section','section');section.append(heading('最新公开歌曲',songs.length+' 首经过正式发布的音乐','查看全部',()=>goto('discover')));
- section.append(songs.length?tiles(songs.slice(0,8)):empty('公开音乐馆等待开幕','管理员尚未正式发布歌曲。现有私人音乐仍保持私有，不会显示在此处。'));
- root.append(section);
- const groups=groupBy(songs,t=>albumName(t));
- const albums=el('section','section');albums.append(heading('探索音乐专辑','以专辑为单位欣赏完整的故事','全部专辑',()=>goto('albums')));
- if(groups.size){const grid=el('div','tiles');
-  for(const [name,tracks] of Array.from(groups).slice(0,6))grid.append(collectionTile(name,tracks.length+' 首歌曲',tracks[0],()=>{state.view='albums';state.album=name;render()},'OST'));
-  albums.append(grid);
- }else albums.append(empty('尚无公开专辑','管理员发布音乐后，专辑分类会自动出现。'));
- root.append(albums);
+ const songs=sortPublicTracks(availablePublic(),'newest');
+ const albums=groupBy(songs,albumName);
  const creators=groupBy(songs,displayName);
+ const page=el('div','ayer-home');
+ const top=el('div','ayer-home-top');
+ top.append(el('div','ayer-home-kicker','AYER STAR MUSIC · 艾耶尔大陆'),el('h1','','让每一段旅程，都有自己的旋律'));
+ const tabs=el('nav','ayer-home-tabs');tabs.setAttribute('aria-label','主页音乐分类');
+ const categories=[['home','推荐'],['discover','音乐'],['albums','专辑'],['artists','创作者'],['favorites','心动']];
+ for(const [view,label] of categories){const tab=button(label,view==='home'?'is-current':'',()=>goto(view));if(view==='home')tab.setAttribute('aria-current','page');tabs.append(tab)}
+ top.append(tabs);page.append(top);
+ const carousel=el('section','ayer-featured');
+ carousel.append(heading('探索今日星音','听见大陆各处的故事'));
+ const rail=el('div','ayer-featured-rail');
+ const cards=[
+  {title:'最新星音',subtitle:'刚刚来到音乐馆的旋律',track:songs[0],view:'discover',kind:'latest'},
+  {title:'神之谷 · 云端漫游',subtitle:'穿过天空与浮岛的音乐旅程',track:songs.find(t=>/神之谷|神女|天空|星|sky/i.test(t.title+' '+albumName(t)))||songs[1],view:'albums',kind:'valley'},
+  {title:'萨德尔 · 沙海回响',subtitle:'在沙漠的尽头听见约定',track:songs.find(t=>/萨德尔|砂|沙|ともだち/i.test(t.title+' '+albumName(t)))||songs[2],view:'discover',kind:'desert'}
+ ];
+ for(const card of cards){
+  const item=button('','ayer-feature-card '+card.kind,()=>{if(card.track)start(card.track,songs);else goto(card.view)});
+  item.setAttribute('aria-label',card.title+(card.track?'，播放 '+card.track.title:'，浏览音乐馆'));
+  const artworkBox=el('div','ayer-feature-art','✦');
+  if(card.track)setArt(card.track,artworkBox);
+  const overlay=el('div','ayer-feature-copy');
+  overlay.append(el('small','',card.subtitle),el('strong','',card.title),el('span','',card.track?card.track.title:'等待新的正式发布歌曲'));
+  item.append(artworkBox,overlay);rail.append(item);
+ }
+ carousel.append(rail);page.append(carousel);
+ const rec=el('section','ayer-recommend section');
+ rec.append(heading('根据你的喜爱探索星音',state.user?'你收藏的音乐与最新公开歌曲':'精选已公开的原创音乐','查看全部',()=>goto('discover')));
+ const liked=state.user?songs.filter(t=>state.favorites.has(t.id)):[];
+ const recTracks=[...liked,...songs.filter(t=>!liked.some(x=>key(x)===key(t)))].slice(0,6);
+ rec.append(recTracks.length?rowList(recTracks):empty('期待第一首公开旋律','管理员正式发布歌曲后，音乐会出现在这里。'));page.append(rec);
+ const newSection=el('section','ayer-recommend section');
+ newSection.append(heading('最近来到音乐馆',songs.length+' 首已正式发布的歌曲','全部音乐',()=>goto('discover')));
+ newSection.append(songs.length?rowList(songs.slice(0,5)):empty('音乐馆正在准备中','私人曲目不会出现在公开主页。'));page.append(newSection);
+ const albumsSection=el('section','ayer-home-albums section');
+ albumsSection.append(heading('沿着旋律旅行','探索艾耶尔大陆的故事与专辑','全部专辑',()=>goto('albums')));
+ if(albums.size){
+  const grid=el('div','ayer-album-rail');
+  for(const [name,tracks] of Array.from(albums).slice(0,8))grid.append(collectionTile(name,tracks.length+' 首歌曲',tracks[0],()=>{state.view='albums';state.album=name;render()},'专辑'));
+  albumsSection.append(grid);
+ }else albumsSection.append(empty('尚无公开专辑','正式发布歌曲后，将自动整理专辑。'));
+ page.append(albumsSection);
+ if(state.user){
+  const personal=[...availablePrivate().slice(0,4)];
+  const mine=el('section','ayer-recommend section');
+  mine.append(heading('继续聆听我的音乐','仅当前账号可访问的私人歌曲','进入私人曲库',()=>goto('private')));
+  mine.append(personal.length?rowList(personal):empty('私人云音乐库尚无歌曲','上传的私人歌曲不会自动公开。'));page.append(mine);
+ }
  if(creators.size){
   const section=el('section','section');
-  section.append(heading('遇见音乐创作者','探索艾耶尔大陆音乐的创作者','全部创作者',()=>goto('artists')));
-  const grid=el('div','tiles');
-  for(const [name,tracks] of Array.from(creators).slice(0,5))
-   grid.append(collectionTile(name,tracks.length+' 首已发布作品',tracks[0],()=>{state.view='artists';state.artist=name;render()},'创作者'));
-  section.append(grid);root.append(section);
+  section.append(heading('音乐旅途的创作者','每一段旋律都有自己的故事','全部创作者',()=>goto('artists')));
+  const grid=el('div','ayer-album-rail');
+  for(const [name,tracks] of Array.from(creators).slice(0,6))grid.append(collectionTile(name,tracks.length+' 首公开作品',tracks[0],()=>{state.view='artists';state.artist=name;render()},'创作者'));
+  section.append(grid);page.append(section);
  }
- if(state.user&&state.private.length){const mine=el('section','section');
-  mine.append(heading('继续欣赏我的音乐','只有当前账号可以读取的私人音频','进入私人曲库',()=>goto('private')));
-  mine.append(tiles(availablePrivate().slice(0,4)));root.append(mine);
- }
+ root.append(page);
 }
 function groupBy(arr,fn){const map=new Map();for(const t of arr){const k=fn(t);if(!map.has(k))map.set(k,[]);map.get(k).push(t)}return map}
 function pageHead(root,title,description,right,fn){
