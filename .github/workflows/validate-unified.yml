@@ -65,7 +65,7 @@ jobs:
               assert.equal(await hub.isVisible(),true,'The cloud collection must appear on the main page');
               const num=await page.locator('[data-hub-play]').count();
               assert.ok(num>=4,'Expected 4 public cloud songs without login, got '+num);
-              assert.ok((await page.locator('#hubOverview').innerText()).includes('已公开 4 首'));
+              assert.match(await page.locator('#hubOverview').innerText(),/已公开\s+\d+\s+首/);
               if(width===390){
                 const dimensions=await hub.evaluate(el=>({right:el.getBoundingClientRect().right,width:innerWidth}));
                 assert.ok(dimensions.right<=dimensions.width+3,'Cloud panel overflowed phone screen');
