@@ -306,11 +306,10 @@ function renderProfile(root){
  banner.append(intro);
  const heroActions=el('div','profile-v2-hero-actions');
  heroActions.append(button(user?'管理账号':'登录 / 注册','profile-v2-primary',openAuth));
- heroActions.append(button(user?'编辑昵称':'探索音乐馆','profile-v2-secondary',user?()=>{}:()=>goto('discover')));
+ heroActions.append(button(user?'编辑昵称':'探索音乐馆','profile-v2-secondary',user?null:()=>goto('discover')));
  banner.append(heroActions);
  hero.append(banner,avatar);page.append(hero);
  if(!user){
-  heroActions.lastElementChild.onclick=()=>goto('discover');
   const guest=el('section','profile-v2-section');
   guest.append(heading('星音旅人专属空间','登录后开启完整的个人音乐功能'));
   const links=el('div','profile-v2-actions');
