@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "cloud.html"
+      - "tests/cloud-editor.test.cjs"
       - ".github/workflows/validate-cloud.yml"
   workflow_dispatch:
 jobs:
@@ -27,3 +28,5 @@ jobs:
           PY
       - name: JavaScript syntax check
         run: node --check cloud-module.mjs
+      - name: Cloud editor regression tests
+        run: node --test tests/cloud-editor.test.cjs
