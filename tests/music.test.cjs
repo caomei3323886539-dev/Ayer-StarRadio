@@ -60,7 +60,7 @@ test('v0.8.6.2 turntable tonearm and elevated disc',()=>{assert.match(html,/id="
 
 test('v0.8.6.3 extended stylus reaches vinyl grooves',()=>{assert.match(html,/viewBox="0 0 220 300"/);assert.match(html,/L58 267/);assert.match(css,/\.player-detail \.tonearm\{height:75%/)});
 
-test('v0.9.0 public music discovery filters and sort',()=>{assert.match(script,/function sortPublicTracks/);assert.match(script,/discoverFilter:'all'/);assert.match(script,/音乐创作者/);assert.match(script,/state\.discoverFilter\.startsWith\('album:'\)/);assert.match(css,/\.music-filter-tabs/)});
+test('v0.9.0 public music discovery filters and sort',()=>{assert.match(script,/function sortPublicTracks/);assert.match(script,/discoverFilter:'all'/);assert.match(script,/音乐旅途的创作者/);assert.match(script,/state\.discoverFilter\.startsWith\('album:'\)/);assert.match(css,/\.music-filter-tabs/)});
 
 test('v0.9.1 grouped music search respects public/private navigation',()=>{assert.match(script,/function normalizedSearch/);assert.match(script,/function searchCatalog/);assert.match(script,/匹配专辑/);assert.match(script,/匹配创作者/);assert.match(script,/tracks\.filter\(t=>t\.kind==='public'\)/)});
 
