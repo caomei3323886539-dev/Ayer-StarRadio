@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
+const {spawnSync} = require('node:child_process');
 
 const read = path => fs.readFileSync(path,'utf8');
 const html = read('music.html');
@@ -11,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0982"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0982"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=099"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=099"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0982'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0982'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=099'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=099'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -26,9 +27,9 @@ test('every UI element referenced by music.js exists', () => {
   assert.deepEqual([...new Set(referenced)].filter(id=>!present.has(id)),[]);
 });
 
-test('music.js has valid syntax', () => {
-  const body = script.replace(/^import\s+\{createClient\}\s+from\s+['"][^'"]+['"];\s*/m,'');
-  assert.doesNotThrow(()=>new vm.Script(body,{filename:'music.js'}));
+test('music.js has valid ES module syntax including top-level offline fallback', () => {
+  const checked=spawnSync(process.execPath,['--input-type=module','--check'],{input:script,encoding:'utf8'});
+  assert.equal(checked.status,0,checked.stderr);
 });
 
 test('streaming uses explicit publication gate and protected private storage', () => {
@@ -139,4 +140,46 @@ test('v0.9.8.2 nickname editing requires signed-in account and does not expose p
  assert.match(script,/if\(!user\)\{[\s\S]*?openAuth/);
  assert.doesNotMatch(script,/profileDisplayName.*innerHTML/);
  assert.match(script,/只有管理员明确发布的歌曲才会进入公开音乐馆/);
+});
+
+test('v0.9.9 preserves legacy IndexedDB and routes primary entry to unified player',()=>{
+ const index=read('index.html'),local=read('local-library.js');
+ assert.match(index,/get\('legacy'\)!=='1'/);
+ assert.match(index,/location\.replace\(new URL\('\.\/music\.html'/);
+ assert.match(index,/indexedDB\.open\(DB_NAME,2\)/);
+ assert.match(local,/LEGACY_DB_NAME='ayer-star-radio'/);
+ assert.match(local,/LEGACY_DB_VERSION=2/);
+ assert.match(local,/SONG_STORE='songs', PLAYLIST_STORE='playlists'/);
+ assert.match(local,/createObjectStore\(SONG_STORE,\{keyPath:'id'\}\)/);
+ assert.match(local,/createObjectStore\(PLAYLIST_STORE,\{keyPath:'id'\}\)/);
+ assert.doesNotMatch(local,/deleteDatabase|\.clear\(/);
+ assert.equal(manifest.start_url,'./music.html');
+ assert.equal(manifest.short_name,'星音电台');
+});
+test('v0.9.9 serves local library through both desktop and Android views',()=>{
+ assert.match(html,/<button[^>]*data-view="local"/);
+ assert.match(html,/id="localImport"[^>]*multiple hidden/);
+ assert.match(html,/index\.html\?legacy=1/);
+ assert.match(script,/function renderLocal\(root\)/);
+ assert.match(script,/function availableLocal\(\)/);
+ assert.match(script,/function loadLocalLibrary\(\)/);
+ assert.match(script,/async function importLocalFiles\(files\)/);
+ assert.match(script,/function addLocalToPlaylist\(t\)/);
+ assert.match(script,/function removeLocalFromPlaylist\(playlist\)/);
+ assert.match(script,/function createLocalPlaylist\(\)/);
+ assert.match(css,/\.unified-local/);
+ assert.match(css,/\.local-playlist-grid/);
+ assert.match(serviceWorker,/local-library\.js\?v=099/);
+});
+test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
+ assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
+ assert.match(script,/if\(!sb\)\{state\.user=null;render\(\);say\('离线模式/);
+ assert.match(script,/t\.kind==='local'/);
+ assert.match(script,/URL\.createObjectURL\(song\.blob\)/);
+ assert.match(script,/state\.current\.kind==='local'\)return/);
+ assert.match(script,/\['public','private'\]\.includes\(t\.kind\)/);
+ assert.match(script,/ref\?\.kind==='local'\?findLocal/);
+ assert.match(script,/if\(next\.kind==='local'\|/);
+ assert.match(script,/if\(t\.kind!=='local'&&state\.localAudioUrl\)/);
+ assert.match(script,/if\(sb\)sb\.auth\.onAuthStateChange/);
 });
