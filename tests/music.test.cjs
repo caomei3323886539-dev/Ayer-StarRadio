@@ -179,7 +179,7 @@ test('v0.9.9 offline playback does not expose local tracks through cloud APIs',(
  assert.match(script,/state\.current\.kind==='local'\)return/);
  assert.match(script,/\['public','private'\]\.includes\(t\.kind\)/);
  assert.match(script,/ref\?\.kind==='local'\?findLocal/);
- assert.match(script,/if\(next\.kind==='local'\|/);
+ assert.match(script,/next\.kind==='local'\|\|/);
  assert.match(script,/if\(t\.kind!=='local'&&state\.localAudioUrl\)/);
  assert.match(script,/if\(sb\)sb\.auth\.onAuthStateChange/);
 });
