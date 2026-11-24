@@ -248,3 +248,62 @@ body.detail-open{overflow:hidden}
 
 /* v0.9.2.1 cloud playlist ordering and mobile profile navigation */
 .playlist-edit-list{display:flex;flex-direction:column;gap:9px;margin-top:16px}.playlist-edit-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #d9e9f5;border-radius:14px;background:#ffffffd9}.playlist-edit-title{min-width:0;display:flex;flex-direction:column;gap:4px}.playlist-edit-title strong{overflow-wrap:anywhere}.playlist-edit-title small{color:#6887a3}.playlist-edit-actions{display:flex;gap:5px;flex-shrink:0}.playlist-edit-actions button{min-height:40px;min-width:36px;border:1px solid #d9e9f5;background:#f4faff;border-radius:9px;color:#376d98;padding:6px 9px}.playlist-edit-actions button:disabled{opacity:.35;cursor:not-allowed}@media(max-width:600px){.playlist-edit-row{align-items:flex-start;flex-direction:column}.playlist-edit-actions{width:100%;justify-content:flex-end}}
+
+/* v0.9.8 Ayer fantasy mobile-first music home; scoped so legacy pages and player remain intact */
+.ayer-home{--ayer-ink:#28486a;--ayer-accent:#4085b9;--ayer-muted:#7b93aa;color:var(--ayer-ink);padding-bottom:20px}
+.ayer-home-top{padding:13px 3px 3px}
+.ayer-home-kicker{font-size:11px;letter-spacing:2.2px;font-weight:700;color:#79a7ca}
+.ayer-home-top h1{font-size:clamp(21px,2.5vw,33px);font-weight:780;line-height:1.45;margin:7px 0 14px;color:#2e587e}
+.ayer-home-tabs{display:flex;gap:clamp(16px,3.5vw,36px);align-items:center;overflow-x:auto;scrollbar-width:none;padding:0 2px 10px;white-space:nowrap}
+.ayer-home-tabs::-webkit-scrollbar,.ayer-featured-rail::-webkit-scrollbar,.ayer-album-rail::-webkit-scrollbar{display:none}
+.ayer-home-tabs button{background:none;border:0;border-bottom:3px solid transparent;min-height:44px;border-radius:0;color:#8193a6;padding:9px 2px;font-size:15px;font-weight:650;flex:none;cursor:pointer}
+.ayer-home-tabs button.is-current{color:#276da3;border-bottom-color:#3c90c7}
+.ayer-featured{margin-top:12px}
+.ayer-featured .section-heading{margin-bottom:14px}
+.ayer-featured-rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;padding:3px 4px 16px;margin:0 -4px}
+.ayer-feature-card{position:relative;display:block;flex:0 0 clamp(215px,28vw,290px);height:clamp(255px,31vw,340px);padding:0;border:1px solid #e6f1ff;border-radius:19px;overflow:hidden;background:linear-gradient(155deg,#8ec3e7,#436a9b 60%,#173d67);color:#fff;text-align:left;scroll-snap-align:start;box-shadow:0 9px 24px #3b7eb32b;cursor:pointer}
+.ayer-feature-card.valley{background:linear-gradient(145deg,#a3ddec,#4d8eba 60%,#224767)}
+.ayer-feature-card.desert{background:linear-gradient(145deg,#f0e3bc,#c9a274 60%,#605b81)}
+.ayer-feature-card:focus-visible{outline:3px solid #75b9ee;outline-offset:3px}
+.ayer-feature-art{position:absolute;inset:0;display:grid;place-items:center;font-size:85px;color:#e7f8ff85;background:radial-gradient(circle at 24% 19%,#fff8,transparent 42%)}
+.ayer-feature-art img{width:100%;height:100%;object-fit:cover}
+.ayer-feature-copy{position:absolute;z-index:1;bottom:0;left:0;right:0;min-height:128px;padding:44px 17px 19px;display:flex;flex-direction:column;gap:5px;background:linear-gradient(transparent,#112c50ea 43%,#102545f5)}
+.ayer-feature-copy small{color:#cbdffa;font-size:11px}
+.ayer-feature-copy strong{font-size:22px;line-height:1.2;letter-spacing:.5px}
+.ayer-feature-copy span{color:#d9e7f8;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ayer-home .section{margin-top:31px}
+.ayer-home .section-heading h2{font-size:21px;color:#293f5f;letter-spacing:0}
+.ayer-home .section-heading p{font-size:12px;color:#8195ac}
+.ayer-recommend .list{background:#ffffff82;border:1px solid #e0ecf8;border-radius:19px;padding:2px 15px;box-shadow:0 5px 25px #527caa0c}
+.ayer-recommend .track-row{border-bottom-color:#eaf1f8;min-height:74px}
+.ayer-recommend .track-row:last-child{border-bottom:0}
+.ayer-recommend .track-number{display:none}
+.ayer-recommend .track-cover{width:58px;height:58px;border-radius:12px}
+.ayer-recommend .track-desc .tile-title{font-size:15px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.ayer-recommend .track-desc small{color:#8799aa}
+.ayer-album-rail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;padding:1px 2px 14px;scrollbar-width:none}
+.ayer-album-rail .music-tile{flex:0 0 clamp(145px,18vw,192px);min-width:0;scroll-snap-align:start}
+@media(max-width:720px){
+ body:has(.ayer-home){background:linear-gradient(175deg,#f9fbff 0%,#edf6ff 36%,#f5faff 100%)}
+ .content:has(.ayer-home){padding-top:3px;padding-left:15px;padding-right:15px}
+ .ayer-home-top{padding-top:9px}
+ .ayer-home-top h1{font-size:22px;margin-bottom:7px}
+ .ayer-home-tabs{gap:27px}
+ .ayer-home-tabs button{font-size:16px}
+ .ayer-featured{margin-top:13px}
+ .ayer-featured-rail{gap:12px;margin-right:-15px;padding-right:15px}
+ .ayer-feature-card{flex-basis:min(72vw,275px);height:clamp(275px,82vw,340px);border-radius:12px}
+ .ayer-feature-copy strong{font-size:21px}
+ .ayer-home .section{margin-top:27px}
+ .ayer-home .section-heading h2{font-size:19px}
+ .ayer-home .section-heading p{display:none}
+ .ayer-recommend .list{padding:0 8px;background:transparent;border:0;box-shadow:none}
+ .ayer-recommend .track-row{padding:10px 1px;gap:10px}
+ .ayer-recommend .track-cover{width:53px;height:53px;border-radius:9px}
+ .ayer-recommend .track-desc{min-width:0}
+ .ayer-recommend .track-desc .tile-title{font-size:16px}
+ .ayer-recommend .track-actions .mini-action{min-width:44px;min-height:44px}
+ .ayer-album-rail{margin-right:-15px;padding-right:15px}
+ .ayer-album-rail .music-tile{flex-basis:148px}
+}
+@media(prefers-reduced-motion:reduce){.ayer-featured-rail,.ayer-album-rail{scroll-behavior:auto}}
