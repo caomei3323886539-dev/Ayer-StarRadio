@@ -307,3 +307,111 @@ body.detail-open{overflow:hidden}
  .ayer-album-rail .music-tile{flex-basis:148px}
 }
 @media(prefers-reduced-motion:reduce){.ayer-featured-rail,.ayer-album-rail{scroll-behavior:auto}}
+
+/* v0.9.8.1 — fine-grained home presentation and Android safe-area mini player */
+.ayer-home{position:relative;isolation:isolate}
+.ayer-home::before{content:"";position:absolute;inset:0 0 auto 0;height:220px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 95% 0%,#fff4db82,transparent 55%),radial-gradient(ellipse at 20% 10%,#bfe6fc61,transparent 70%)}
+.ayer-home-top h1{letter-spacing:.15px}
+.ayer-home-kicker{color:#577f9f}
+.ayer-home .section-heading button{color:#296f9e;text-decoration:none}
+.ayer-home .section-heading button:focus-visible,.ayer-home-tabs button:focus-visible{outline:3px solid #4595cb;outline-offset:2px}
+.ayer-featured-rail,.ayer-album-rail{-webkit-overflow-scrolling:touch;scroll-padding-inline:4px}
+.ayer-feature-card{transition:transform .2s ease,box-shadow .2s ease;isolation:isolate}
+.ayer-feature-card:active{transform:scale(.985)}
+.ayer-feature-card .ayer-feature-art img{object-position:center 35%}
+.ayer-feature-art:not(:has(img))::after{content:"✧";position:absolute;right:17px;top:14px;font-size:44px;color:#ffffff7d;text-shadow:0 0 24px #fff9}
+.ayer-feature-card.valley .ayer-feature-art:not(:has(img)){background:radial-gradient(circle at 30% 24%,#effcffbd,transparent 40%),linear-gradient(140deg,#a5dce8,#75abd9 45%,#386590)}
+.ayer-feature-card.desert .ayer-feature-art:not(:has(img)){background:radial-gradient(circle at 50% 12%,#fff5d0e0,transparent 50%),linear-gradient(145deg,#d8c6a3,#e9b989 47%,#677ea9)}
+.ayer-feature-copy{pointer-events:none}
+.ayer-feature-copy span{max-width:100%}
+.ayer-recommend .track-row{transition:background-color .16s ease}
+.ayer-recommend .track-row.playing-row{background:#eaf7ff9c;border-radius:12px;padding-inline:9px}
+.ayer-recommend .track-desc .tile-title{display:block;overflow:hidden;min-width:0}
+.ayer-recommend .track-desc small{font-size:12px;color:#607a93}
+.ayer-recommend .track-actions .mini-action:nth-child(3){display:none}
+.ayer-recommend .track-actions .mini-action{color:#497496;cursor:pointer}
+.ayer-recommend .track-actions .mini-action:last-child{color:#2d6b9c}
+.ayer-album-rail .music-tile{border:1px solid #e4ecf5;background:#fffc;box-shadow:0 8px 19px #567d9d17;border-radius:16px}
+.ayer-album-rail .tile-cover{border-radius:12px}
+.ayer-album-rail .tile-title{color:#2d5172}
+.ayer-album-rail .tile-sub{color:#647e97}
+.ayer-home .empty{background:#f9fcffb8;border-color:#cfe3f5}
+/* Thin progress display is decorative; the existing seek bars remain authoritative. */
+.player .mini-progress{position:absolute;left:15px;right:15px;bottom:0;height:3px;background:#e3eff9;overflow:hidden;border-radius:6px 6px 0 0;pointer-events:none}
+.player .mini-progress-fill{width:100%;height:100%;background:linear-gradient(90deg,#79c3ec,#367fbf);transform:scaleX(0);transform-origin:left center;will-change:transform}
+.mobile-search-toggle{display:none!important}
+@media (max-width:900px){
+  .topbar{min-height:61px;gap:7px;padding:9px 12px;align-items:center;border-bottom:1px solid #dcebf7;background:#f8fbffed;box-shadow:0 3px 18px #548db112}
+  .topbar .mobile-menu{flex:0 0 44px;min-width:44px;min-height:44px}
+  .topbar .mobile-brand{flex:1 1 auto;min-width:0;max-width:none;overflow:hidden;text-overflow:ellipsis;font-size:15px;font-weight:800;letter-spacing:.25px}
+  .topbar .account-actions{order:3;flex:0 1 auto;max-width:34vw;margin-left:0}
+  .topbar .account-actions .pill{max-width:110px;padding-inline:10px}
+  .topbar .mobile-search-toggle{display:inline-grid!important;place-items:center;order:4;flex:0 0 44px;min-width:44px;min-height:44px;margin-left:0;border-radius:50%;color:#357cae;font-size:27px}
+  .topbar .search-wrap{display:none;order:5;width:100%;flex:1 0 100%;min-width:0;max-width:none;height:46px;padding-inline:14px;margin:1px 0 2px}
+  .topbar.search-open{flex-wrap:wrap}
+  .topbar.search-open .search-wrap{display:flex}
+  .topbar.search-open .search-wrap input{font-size:16px}
+  .topbar.search-open .mobile-search-toggle{background:#e4f2ff}
+  .workspace{padding-bottom:calc(var(--nav-height,62px) + 105px)}
+  .player{
+    left:11px!important;right:11px!important;
+    bottom:calc(var(--visual-bottom,0px) + var(--nav-height,62px) + 9px)!important;
+    height:70px;min-height:70px;
+    grid-template-columns:minmax(0,1fr) 83px 77px!important;
+    gap:3px;padding:7px 9px 9px 10px;
+    border:1px solid #d7e7f6;border-radius:22px;
+    background:#ffffffed;box-shadow:0 7px 26px #456c9734;
+    backdrop-filter:blur(22px);
+  }
+  .player .disc-wrap{width:47px;height:47px;flex:0 0 47px}
+  .player .disc-wrap .vinyl{width:47px;height:47px}
+  .player .player-song{gap:9px}
+  .player .player-meta strong{font-size:12px;color:#263f59}
+  .player .player-meta span{font-size:10px;color:#6c869e}
+  .player .play-main{min-width:38px;min-height:38px}
+  .player .mini-progress{left:20px;right:20px;height:2px;bottom:2px;border-radius:10px}
+  .mobile-nav{background:#f9fcfff9;border-color:#dbeaf6;box-shadow:0 -5px 16px #5984a519}
+  .mobile-nav button{transition:color .12s ease;touch-action:manipulation}
+  .mobile-nav button.active{color:#267bb6}
+  .drawer{bottom:calc(var(--visual-bottom,0px) + var(--nav-height,62px) + 90px)}
+  .ayer-home-top{padding:10px 1px 3px}
+  .ayer-home-top h1{font-size:clamp(20px,5.2vw,24px);margin:7px 0 8px;line-height:1.45}
+  .ayer-home-kicker{font-size:10px;letter-spacing:1.6px}
+  .ayer-home-tabs{gap:clamp(21px,6vw,32px);padding-bottom:8px}
+  .ayer-home-tabs button{font-size:16px;min-height:44px;padding-block:9px}
+  .ayer-featured-rail{gap:12px;scroll-padding-inline:4px}
+  .ayer-feature-card{flex-basis:clamp(171px,52vw,218px);height:auto;aspect-ratio:0.77;border-radius:14px}
+  .ayer-feature-copy{min-height:118px;padding:37px 12px 13px;gap:4px}
+  .ayer-feature-copy small{font-size:11px}
+  .ayer-feature-copy strong{font-size:clamp(16px,4.3vw,19px);line-height:1.26;overflow-wrap:anywhere}
+  .ayer-feature-copy span{font-size:11px}
+  .ayer-home .section-heading h2{font-size:19px;line-height:1.4}
+  .ayer-home .section-heading button{min-height:44px;padding-inline:5px}
+  .ayer-recommend .list{padding:0;background:transparent}
+  .ayer-recommend .track-row{min-height:69px;padding-block:8px;gap:11px}
+  .ayer-recommend .track-cover{width:54px;height:54px;flex:0 0 54px;border-radius:11px}
+  .ayer-recommend .track-desc .tile-title{font-size:15px;line-height:1.4;margin-top:0;padding-bottom:0}
+  .ayer-recommend .track-desc small{font-size:11px}
+  .ayer-recommend .track-actions{gap:0}
+  .ayer-recommend .track-actions .mini-action{min-width:43px;min-height:44px;font-size:19px}
+  .ayer-album-rail{gap:12px}
+  .ayer-album-rail .music-tile{flex-basis:150px;padding:9px}
+}
+@media (max-width:380px){
+  .topbar .mobile-brand{font-size:13px}
+  .topbar .account-actions{max-width:31vw}
+  .topbar .account-actions .pill{max-width:90px;padding-inline:7px;font-size:10px}
+  .ayer-home-tabs{gap:19px}
+  .ayer-feature-card{flex-basis:clamp(166px,51vw,195px)}
+  .ayer-recommend .track-row{gap:7px}
+  .ayer-recommend .track-cover{width:48px;height:48px;flex-basis:48px}
+  .ayer-recommend .track-actions .mini-action{min-width:39px}
+  .player{grid-template-columns:minmax(0,1fr) 78px 73px!important;padding-left:8px;padding-right:6px}
+  .player .disc-wrap{width:42px;height:42px;flex-basis:42px}
+  .player .disc-wrap .vinyl{width:42px;height:42px}
+  .player .player-song{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ayer-feature-card,.ayer-recommend .track-row,.mobile-nav button{transition:none!important}
+ .player .mini-progress-fill{will-change:auto}
+}
