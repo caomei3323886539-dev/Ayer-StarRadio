@@ -2,6 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
+  <!-- v0.9.9: unified entry. Legacy mode is opt-in and never erases IndexedDB. -->
+  <script>
+   if(new URLSearchParams(location.search).get('legacy')!=='1'){
+    location.replace(new URL('./music.html'+location.hash,location.href).href);
+   }
+  </script>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#2d6fae">
   <meta name="description" content="艾耶尔大陆·星音电台：本地离线音乐馆、OST 专辑、收藏与歌单。">
