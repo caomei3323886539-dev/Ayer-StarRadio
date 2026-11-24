@@ -104,3 +104,10 @@ test('v0.9.8.1 floating player stays above Android navigation and shows progress
  assert.match(css,/\.player \.mini-progress-fill/);
  assert.match(css,/\.ayer-recommend \.track-actions \.mini-action:nth-child\(3\)\{display:none\}/);
 });
+
+test('v0.9.8.1 service worker parses and avoids caching protected media',()=>{
+ assert.doesNotThrow(()=>new vm.Script(serviceWorker,{filename:'sw.js'}));
+ assert.match(serviceWorker,/url\.pathname\.includes\('\/storage\/'\)/);
+ assert.match(serviceWorker,/url\.pathname\.includes\('\/functions\/'\)/);
+ assert.match(serviceWorker,/caches\.open\(CACHE\)\.then\(cache=>cache\.put\(path,copy\)\)\)/);
+});
