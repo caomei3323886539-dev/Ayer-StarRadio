@@ -9,7 +9,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="preload" as="image" href="./assets/ayer_home_harpist.webp">
-<link rel="stylesheet" href="./music.css?v=0998">
+<link rel="stylesheet" href="./music.css?v=0999">
 </head>
 <body>
 <div class="app-shell">
@@ -58,11 +58,11 @@
 </div>
 
 <nav class="mobile-nav ayer-celestial-nav" aria-label="星音电台底部导航">
-  <button type="button" data-view="home" class="active" aria-label="首页" aria-current="page"><span aria-hidden="true">⌂</span><span class="ayer-nav-label">首页</span></button>
-  <button type="button" data-view="discover" aria-label="音乐馆"><span aria-hidden="true">♫</span><span class="ayer-nav-label">音乐馆</span></button>
-  <button type="button" data-view="playlists" aria-label="歌单"><span aria-hidden="true">☷</span><span class="ayer-nav-label">歌单</span></button>
-  <button type="button" data-view="favorites" aria-label="收藏"><span aria-hidden="true">♡</span><span class="ayer-nav-label">收藏</span></button>
-  <button type="button" data-view="profile" aria-label="我的"><span aria-hidden="true">✦</span><span class="ayer-nav-label">我的</span></button>
+  <button type="button" data-view="home" class="active" aria-label="首页" aria-current="page"><span class="ayer-nav-art" aria-hidden="true"><img src="./assets/nav-home.svg" alt="" width="40" height="37"></span><span class="ayer-nav-label">首页</span></button>
+  <button type="button" data-view="discover" aria-label="音乐馆"><span class="ayer-nav-art" aria-hidden="true"><img src="./assets/nav-discover.svg" alt="" width="40" height="37"></span><span class="ayer-nav-label">音乐馆</span></button>
+  <button type="button" data-view="playlists" aria-label="歌单"><span class="ayer-nav-art" aria-hidden="true"><img src="./assets/nav-playlists.svg" alt="" width="40" height="37"></span><span class="ayer-nav-label">歌单</span></button>
+  <button type="button" data-view="favorites" aria-label="收藏"><span class="ayer-nav-art" aria-hidden="true"><img src="./assets/nav-favorites.svg" alt="" width="40" height="37"></span><span class="ayer-nav-label">收藏</span></button>
+  <button type="button" data-view="profile" aria-label="我的"><span class="ayer-nav-art" aria-hidden="true"><img src="./assets/nav-profile.svg" alt="" width="40" height="37"></span><span class="ayer-nav-label">我的</span></button>
 </nav>
 
 <div class="player" id="player">
@@ -127,6 +127,6 @@
 
 <div class="backdrop" id="backdrop" hidden></div>
 <label class="sr-only" for="localImport">从设备导入本地音频文件</label><input id="localImport" type="file" accept="audio/*,.mp3,.wav,.flac,.ogg,.aac,.m4a" multiple hidden>
-<script type="module" src="./music.js?v=0998"></script>
+<script type="module" src="./music.js?v=0999"></script>
 </body>
 </html>
