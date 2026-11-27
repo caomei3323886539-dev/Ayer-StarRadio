@@ -1,4 +1,4 @@
-import {readLocalLibrary,saveLocalSong,saveLocalPlaylist,importLocalSongs} from './local-library.js?v=099';
+import {readLocalLibrary,saveLocalSong,saveLocalPlaylist,importLocalSongs} from './local-library.js?v=0994';
 
 // The offline library must remain usable when the cloud SDK is unreachable.
 let createClient=null;
@@ -104,37 +104,81 @@ async function sourceFor(t){
  const result=await sb.storage.from('ayer-audio').createSignedUrl(t.audio_path,3600);
  return safeError(result,'私人音乐访问').signedUrl;
 }
+// Cover cache: public images only, versioned by publication timestamp.
+const COVER_CACHE='ayer-public-cover-v1';
+const coverPending=new Map(),coverRetry=new Map();
+let coverEpoch=0;
+function coverIdentity(t){
+ return t.kind==='public'?key(t)+':'+(t.updated_at||t.published_at||'0'):
+ t.kind==='private'?key(t)+':'+(state.user?.id||'guest')+':'+(t.cover_path||''):key(t);
+}
+function coverRequest(t){
+ return new Request(new URL('./__cover_cache__/'+encodeURIComponent(t.id)+'/'+encodeURIComponent(t.updated_at||t.published_at||'0'),location.href));
+}
+async function publicCoverBlob(t){
+ let cache=null;
+ try{if('caches' in window)cache=await caches.open(COVER_CACHE)}catch(_e){}
+ const request=coverRequest(t);
+ if(cache){try{const hit=await cache.match(request);if(hit)return await hit.blob()}catch(_e){}}
+ const url=await mediaUrl(t.id,'cover');
+ const response=await fetch(url,{credentials:'omit'});
+ if(!response.ok)throw Error('封面请求失败');
+ const blob=await response.blob();
+ if(!blob.type.startsWith('image/')||blob.size>8*1024*1024)throw Error('封面格式无效');
+ if(cache){try{
+  await cache.put(request,new Response(blob,{headers:{'Content-Type':blob.type}}));
+  const keys=await cache.keys();
+  for(const old of keys.filter(k=>k.url.includes('/__cover_cache__/'+encodeURIComponent(t.id)+'/')&&k.url!==request.url))await cache.delete(old);
+  for(const old of (await cache.keys()).slice(0,-80))await cache.delete(old);
+ }catch(_e){}}
+ return blob;
+}
 async function artwork(t){
- const k=key(t);
+ const k=coverIdentity(t),epoch=coverEpoch;
  if(state.covers.has(k))return state.covers.get(k);
- let url=null;
- try{
-  if(t.kind==='local'){
-   const cover=localTrackData(t.id)?.cover;
-   if(cover instanceof Blob){url=URL.createObjectURL(cover);state.coverObjects.push(url)}
-   else if(typeof cover==='string'&&/^data:image\/(?:png|jpeg|webp);base64,/i.test(cover))url=cover;
-  }else if(t.kind==='public')url=await mediaUrl(t.id,'cover');
-  else if(t.cover_path&&state.user){
-   const r=await sb.storage.from('ayer-covers').download(t.cover_path);
-   if(r.error)throw r.error;
-   url=URL.createObjectURL(r.data);state.coverObjects.push(url);
-  }
- }catch(_e){/* Artwork is optional. Keep a neutral placeholder. */}
- state.covers.set(k,url);
- return url;
+ if(coverPending.has(k))return coverPending.get(k);
+ if((coverRetry.get(k)||0)>Date.now())return null;
+ const task=(async()=>{
+  let url=null,blob=null;
+  try{
+   if(t.kind==='local'){
+    const cover=localTrackData(t.id)?.cover;
+    if(cover instanceof Blob)blob=cover;
+    else if(typeof cover==='string'&&/^data:image\/(?:png|jpeg|webp);base64,/i.test(cover))url=cover;
+   }else if(t.kind==='public'){
+    try{blob=await publicCoverBlob(t)}catch(_e){url=await mediaUrl(t.id,'cover')}
+   }else if(t.cover_path&&state.user){
+    const r=await sb.storage.from('ayer-covers').download(t.cover_path);
+    if(r.error)throw r.error;
+    blob=r.data;
+   }
+   if(epoch!==coverEpoch)return null;
+   if(blob){url=URL.createObjectURL(blob);state.coverObjects.push(url)}
+   if(url){state.covers.set(k,url);coverRetry.delete(k)}
+   return url;
+  }catch(_e){coverRetry.set(k,Date.now()+10000);return null}
+ })();
+ coverPending.set(k,task);
+ try{return await task}finally{if(coverPending.get(k)===task)coverPending.delete(k)}
 }
 function setArt(t,holder){
  if(!t||!holder)return;
- holder.replaceChildren();
- holder.textContent='✦';
- artwork(t).then(url=>{
-  if(!url||!holder.isConnected)return;
-  const img=el('img');img.alt=t.title+' 的封面';img.loading='lazy';img.src=url;
-  img.onerror=()=>{img.remove();if(!holder.textContent)holder.textContent='✦'};
-  holder.replaceChildren(img);
- });
+ const identity=coverIdentity(t);
+ holder.dataset.coverIdentity=identity;
+ holder.replaceChildren();holder.textContent='✦';
+ const apply=url=>{
+  if(!url||holder.dataset.coverIdentity!==identity)return;
+  const img=el('img');img.alt=t.title+' 的封面';img.decoding='async';
+  img.loading='eager';
+  if(holder.classList.contains('ayer-feature-art')||holder.id==='playerArt')img.fetchPriority='high';
+  img.onerror=()=>{if(holder.dataset.coverIdentity!==identity)return;state.covers.delete(identity);img.remove();if(!holder.textContent)holder.textContent='✦'};
+  holder.replaceChildren(img);img.src=url;
+ };
+ if(state.covers.has(identity))apply(state.covers.get(identity));
+ else artwork(t).then(apply);
 }
 function clearArtObjects(){
+ coverEpoch++;coverPending.clear();coverRetry.clear();
  for(const url of state.coverObjects)URL.revokeObjectURL(url);
  state.coverObjects=[];state.covers.clear();
 }
@@ -722,15 +766,17 @@ async function loadAll(){
  const token=++state.loadToken;
  if(!sb){state.user=null;render();say('离线模式：本机音乐可正常使用；连接网络后重新打开即可同步云端歌曲。');return}
  try{
-  const auth=await sb.auth.getUser();
+  const publicRequest=Promise.resolve(sb.from('radio_publications').select(PUBLIC_COLS).eq('published',true).order('published_at',{ascending:false}));
+  const [auth]=await Promise.all([sb.auth.getUser(),publicRequest]);
   if(token!==state.loadToken)return;
   state.user=auth.error?null:auth.data?.user||null;
-  const pub=await sb.from('radio_publications').select(PUBLIC_COLS).eq('published',true).order('published_at',{ascending:false});
+  const pub=await publicRequest;
   if(pub.error)throw pub.error;
   if(token!==state.loadToken)return;
   const oldPublic=new Map(state.public.map(t=>[t.track_id,t.updated_at]));
   state.public=pub.data||[];
-  for(const t of state.public)if(oldPublic.get(t.track_id)!==t.updated_at){state.covers.delete('public:'+t.track_id);if(state.current?.kind==='public'&&state.current.id===t.track_id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
+  for(const t of state.public)if(oldPublic.get(t.track_id)!==t.updated_at){for(const k of state.covers.keys())if(k.startsWith('public:'+t.track_id+':'))state.covers.delete(k);if(state.current?.kind==='public'&&state.current.id===t.track_id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
+  if(state.view==='home'&&!state.search)render();
   if(state.user){
    const results=await Promise.all([
     sb.from('radio_tracks').select(PRIVATE_COLS).is('deleted_at',null).eq('sync_state','ready').order('created_at',{ascending:false}),
@@ -743,7 +789,7 @@ async function loadAll(){
    for(const r of results)if(r.error)throw r.error;
    const oldPrivate=new Map(state.private.map(t=>[t.id,t.cover_path]));
    state.private=results[0].data||[];
-   for(const t of state.private)if(oldPrivate.get(t.id)!==t.cover_path){state.covers.delete('private:'+t.id);if(state.current?.kind==='private'&&state.current.id===t.id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
+   for(const t of state.private)if(oldPrivate.get(t.id)!==t.cover_path){for(const k of state.covers.keys())if(k.startsWith('private:'+t.id+':'))state.covers.delete(k);if(state.current?.kind==='private'&&state.current.id===t.id){$('playerArt').dataset.song='';$('lyricArt').dataset.song=''}}
    state.favorites=new Set((results[1].data||[]).map(x=>x.track_id));
    state.playlists=results[2].data||[];
    state.items=results[3].data||[];
