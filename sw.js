@@ -1,6 +1,6 @@
 /* Ayer Star Music v0.8.0: shell-only PWA, never cache protected media. */
-const CACHE='ayer-star-radio-v099-20261124';
-const SHELL=['./','./index.html','./music.html','./music.css?v=099','./music.js?v=099','./local-library.js?v=099','./cloud.html','./public.html','./manifest.webmanifest','./icon.svg'];
+const CACHE='ayer-star-radio-v0991-20261127';
+const SHELL=['./','./index.html','./music.html','./music.css?v=0991','./music.js?v=0991','./local-library.js?v=0991','./assets/ayer-home-sky.svg','./cloud.html','./public.html','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('ayer-star-radio-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
