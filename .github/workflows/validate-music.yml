@@ -6,6 +6,7 @@ on:
       - 'music.css'
       - 'music.js'
       - 'local-library.js'
+      - 'assets/ayer_home_harpist.webp'
       - 'sw.js'
       - 'manifest.webmanifest'
       - 'tests/music.test.cjs'
