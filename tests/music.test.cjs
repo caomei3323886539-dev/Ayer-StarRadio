@@ -67,7 +67,7 @@ test('v0.9.1 grouped music search respects public/private navigation',()=>{asser
 
 test('v0.9.2 personal center and cloud playlist rename',()=>{assert.match(html,/data-view="profile"/);assert.match(script,/function renderProfile/);assert.match(script,/async function renamePlaylist/);assert.match(script,/radio_listener_playlists'\)\.update\(\{name\}\)/);assert.match(css,/\.profile-stats/)});
 
-test('v0.9.2.1 playlist ordering and mobile profile entry',()=>{assert.match(html,/data-view="profile"><span>◉<\/span>我的/);assert.match(script,/async function movePlaylistTrack/);assert.match(script,/removePlaylistTrack\(track.id\)/);assert.match(css,/\.playlist-edit-row/)});
+test('v0.9.2.1 playlist ordering and mobile profile entry',()=>{assert.match(html,/data-view="profile" aria-label="我的"/);assert.match(script,/async function movePlaylistTrack/);assert.match(script,/removePlaylistTrack\(track.id\)/);assert.match(css,/\.playlist-edit-row/)});
 
 test('v0.9.3 uses atomic server-side playlist ordering with stale-order protection',()=>{assert.match(script,/sb\.rpc\('radio_move_playlist_track'/);assert.match(script,/p_expected_order:entries\.map/);assert.match(script,/playlistMoveBusy/);assert.doesNotMatch(script,/sort_order:temp/)});
 
