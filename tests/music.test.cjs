@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0995"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0995"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0996"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0996"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0995'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0995'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0996'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0996'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=0995/);
+ assert.match(serviceWorker,/local-library\.js\?v=0996/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -253,6 +253,21 @@ test('v0.9.9.5 overlays the title onto the original art without a separate pale 
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message\{[\s\S]*?background:transparent;color:#fff/);
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message p\{display:none\}/);
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-buttons\{gap:7px;flex-wrap:nowrap\}/);
- assert.match(html,/music\.css\?v=0995/);
- assert.match(serviceWorker,/ayer-star-radio-v0995-overlay-20261127/);
+ assert.match(html,/music\.css\?v=0996/);
+ assert.match(serviceWorker,/ayer-star-radio-v0996-nav-20261127/);
+});
+
+test('v0.9.9.6 official five-tab image-backed navigation routes and accessibility',()=>{
+ const nav=html.match(/<nav class="mobile-nav ayer-celestial-nav"[\s\S]*?<\/nav>/);
+ assert.ok(nav);
+ assert.equal((nav[0].match(/data-view="/g)||[]).length,5);
+ for(const route of ['home','discover','playlists','favorites','profile'])assert.match(nav[0],new RegExp('data-view="'+route+'"'));
+ assert.doesNotMatch(nav[0],/data-view="local"/);
+ for(const label of ['首页','音乐馆','歌单','收藏','我的'])assert.match(nav[0],new RegExp('aria-label="'+label+'"'));
+ assert.match(css,/background:url\('\.\/assets\/ayer-bottom-nav\.webp'\)/);
+ assert.match(css,/grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+ assert.match(css,/--nav-height:calc\(82px \+ env\(safe-area-inset-bottom,0px\)\)/);
+ assert.match(css,/\.mobile-nav\.ayer-celestial-nav button\.active/);
+ assert.match(serviceWorker,/assets\/ayer-bottom-nav\.webp/);
+ assert.match(html,/music\.css\?v=0996/);
 });
