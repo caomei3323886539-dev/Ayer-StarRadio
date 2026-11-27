@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0991"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0991"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0992"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0992"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0991'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0991'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0992'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0992'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=0991/);
+ assert.match(serviceWorker,/local-library\.js\?v=0992/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -195,4 +195,20 @@ test('v0.9.9.1 Ayer fantasy homepage keeps live controls and new decorative asse
  assert.match(css,/\.ayer-feature-medallion/);
  assert.match(serviceWorker,/assets\/ayer-home-sky\.svg/);
  assert.match(script,/sortPublicTracks\(availablePublic\(\),'newest'\)/);
+});
+
+test('v0.9.9.2 high-detail sky-hall illustrated musician remains decorative',()=>{
+ const harp=read('assets/ayer-harpist.svg');
+ assert.match(harp,/<svg[^>]*viewBox="0 0 460 520"/);
+ assert.match(harp,/竖琴/);
+ assert.match(harp,/id="harp"/);
+ assert.match(script,/ayer-hero-musician/);
+ assert.match(script,/heroineArtwork\.src='\.\/assets\/ayer-harpist\.svg'/);
+ assert.match(script,/heroine\.setAttribute\('aria-hidden','true'\)/);
+ assert.match(script,/hero\.append\(heroSky,ornamental,heroine,heroContent\)/);
+ assert.match(css,/\.ayer-hero-musician\{/);
+ assert.match(css,/\.ayer-hero-ornaments/);
+ assert.match(css,/\.topbar \.pill\.accent/);
+ assert.match(css,/\.player \.disc-wrap/);
+ assert.match(serviceWorker,/assets\/ayer-harpist\.svg/);
 });
