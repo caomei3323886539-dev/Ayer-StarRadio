@@ -768,3 +768,32 @@ body.detail-open{overflow:hidden}
  .ayer-original-art-ready .ayer-hero-sky{background:linear-gradient(90deg,#184276b0,#225c8d66 48%,transparent 76%)}
  .ayer-original-art-ready .ayer-hero-message h1{max-width:225px}
 }
+
+/* v0.9.9.4: preserve complete painted composition, compact mobile typography. */
+.ayer-illustrated-hero.ayer-original-art-ready{
+ background-image:linear-gradient(90deg,#173e7399 0%,#245e9620 42%,transparent 62%),url('./assets/ayer_home_harpist.webp');
+ background-size:100% 100%,contain;
+ background-position:center,right center;
+ background-color:#3976b9;
+}
+.ayer-original-art-ready .ayer-hero-sky{background:none}
+.ayer-home .section-heading{justify-content:flex-start}
+.ayer-home .section-heading>div{flex:1;min-width:0}
+.ayer-home .section-heading button{flex-shrink:0;margin-left:auto}
+@media(max-width:900px){
+ .ayer-illustrated-hero.ayer-original-art-ready{display:block;min-height:0;aspect-ratio:auto;background-image:none;background-color:#e6f2ff}
+ .ayer-original-art-ready .ayer-hero-sky{position:relative;z-index:0;inset:auto;width:100%;aspect-ratio:3/1;background:url('./assets/ayer_home_harpist.webp') center/contain no-repeat}
+ .ayer-original-art-ready .ayer-hero-message{width:100%;padding:12px 16px 15px;background:linear-gradient(110deg,#dceeff,#f8fbff);text-shadow:none;color:#315b88}
+ .ayer-original-art-ready .ayer-hero-message h1{max-width:none;color:#294f81;font-size:clamp(18px,4.5vw,26px);line-height:1.4;margin:4px 0}
+ .ayer-original-art-ready .ayer-hero-kicker{max-width:none;color:#527da5}
+ .ayer-original-art-ready .ayer-hero-message p{color:#486d94;max-width:none;text-shadow:none;margin-bottom:10px}
+ .ayer-original-art-ready .ayer-hero-foot{display:none}
+ .ayer-original-art-ready .ayer-hero-ornaments{display:none}
+ .ayer-original-art-ready::before{inset:4px;border-color:#f7e2ae70}
+ .ayer-original-art-ready::after{display:none}
+ .ayer-feature-card{flex-basis:calc((100% - 12px)/2);aspect-ratio:1/1.13;height:auto;min-width:0}
+ .ayer-featured-rail{margin-right:0;padding-right:5px;gap:12px}
+ .ayer-feature-card .ayer-feature-copy{min-height:90px;padding:24px 10px 12px}
+ .ayer-feature-card .ayer-feature-copy strong{font-size:clamp(13px,3.5vw,18px)}
+ .ayer-feature-card .ayer-feature-copy small,.ayer-feature-card .ayer-feature-copy span:last-child{font-size:10px}
+}
