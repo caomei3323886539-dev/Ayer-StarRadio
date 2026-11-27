@@ -211,6 +211,13 @@ function renderHome(root){
  const hero=el('section','ayer-illustrated-hero');
  const heroSky=el('div','ayer-hero-sky');
  heroSky.setAttribute('aria-hidden','true');
+ // The approved original illustration is preferred; the previous vector remains a
+ // non-blocking fallback until the binary asset is available on GitHub Pages.
+ const officialBanner=new Image();
+ officialBanner.decoding='async';
+ officialBanner.onload=()=>{if(hero.isConnected)hero.classList.add('ayer-original-art-ready')};
+ officialBanner.onerror=()=>{if(hero.isConnected)hero.classList.remove('ayer-original-art-ready')};
+ officialBanner.src='./assets/ayer_home_harpist.webp';
  const heroine=el('div','ayer-hero-musician');
  heroine.setAttribute('aria-hidden','true');
  const heroineArtwork=el('img');
