@@ -620,3 +620,41 @@ body.detail-open{overflow:hidden}
  .unified-local .track-cover{width:43px;height:43px}
  .unified-local .track-actions .mini-action{min-width:34px}
 }
+
+/* Ayer Star Radio v0.9.9.1 · illustrated star-hall homepage */
+.ayer-home{--ayer-gold:#e6c98d;--ayer-ink:#2a5683;padding-bottom:30px;color:var(--ayer-ink)}
+.ayer-home-top{padding:0;margin-bottom:14px}
+.ayer-illustrated-hero{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:270px;margin:2px 0 15px;border:2px solid #fff2d1;border-radius:24px;background:linear-gradient(100deg,#3b78b8d9 0%,#68aadb99 52%,#a9d7f766),url('./assets/ayer-home-sky.svg') center/cover no-repeat;box-shadow:0 14px 30px #4d8eb735,inset 0 0 0 3px #e8d8a766}
+.ayer-illustrated-hero:before{content:"";position:absolute;inset:8px;border:1px solid #fff5d17d;border-radius:17px;pointer-events:none}
+.ayer-illustrated-hero:after{content:"✦";position:absolute;right:16px;top:10px;color:#fff1c2;font-size:32px;text-shadow:0 0 12px white;pointer-events:none}
+.ayer-hero-sky{position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#204f879b,transparent 72%)}
+.ayer-hero-message{position:relative;z-index:1;width:min(78%,600px);padding:26px 32px;color:white;text-shadow:0 2px 7px #245c8570}
+.ayer-hero-kicker{font-size:11px;letter-spacing:2.2px;font-weight:750;color:#fff3cf}
+.ayer-hero-message h1{margin:10px 0 9px;font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:clamp(23px,3.4vw,39px);line-height:1.5;color:#fff;font-weight:730}
+.ayer-hero-message p{max-width:430px;font-size:12px;line-height:1.9;color:#f6faff;margin:0 0 17px}
+.ayer-hero-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.ayer-hero-primary,.ayer-hero-secondary{min-height:44px;border-radius:999px;padding:10px 17px;font-size:12px!important;font-weight:720!important;cursor:pointer}
+.ayer-hero-primary{color:#2e648f;background:linear-gradient(125deg,#fff9e6,#eed9a8);border:1px solid #fff1c9}
+.ayer-hero-secondary{color:#275e90;background:#ecf7ffeb;border:1px solid #eefbff}
+.ayer-home-tabs{gap:16px;margin:0 0 12px;padding:4px 8px 12px;border:1px solid #e0eafa;border-radius:18px;background:linear-gradient(110deg,#fdfdffec,#e8f1ffbd);box-shadow:0 5px 19px #3b7eb319}
+.ayer-home-tabs button{min-height:44px;padding:8px 13px;border-radius:999px;border:1px solid transparent;font-weight:700;color:#527ca4}
+.ayer-home-tabs button.is-current{color:#fff;background:linear-gradient(110deg,#4d92cc,#2b64a7);border-color:#e8c882;box-shadow:0 4px 13px #477ebb35;outline:2px solid #fff8e2;outline-offset:-5px}
+.ayer-home .section-heading{position:relative;display:flex;align-items:center;gap:9px;padding-bottom:10px;margin-bottom:12px}
+.ayer-home .section-heading:before{content:"✧";flex:none;color:#cbac71;font-size:26px}
+.ayer-home .section-heading h2{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:22px;color:#315a89}
+.ayer-home .section-heading p{display:block;font-size:10px;letter-spacing:1px;color:#7b96b7}
+.ayer-home .section-heading button{margin-left:auto;color:#3477ae;min-height:44px}
+.ayer-featured{margin-top:15px}
+.ayer-featured-rail{gap:13px;padding:4px 5px 18px}
+.ayer-feature-card{border:1.5px solid #e9d39a;border-radius:19px;box-shadow:0 9px 24px #3e78ae33,inset 0 0 0 3px #fff1d553}
+.ayer-feature-card:before{content:"";position:absolute;z-index:1;inset:5px;border:1px solid #f4e0b477;border-radius:14px;pointer-events:none}
+.ayer-feature-copy{background:linear-gradient(transparent,#173d74df 41%,#162d54f4)}
+.ayer-feature-copy strong{font-family:Georgia,'Songti SC','Noto Serif SC',serif}
+.ayer-feature-copy span:last-child{padding-right:30px}
+.ayer-feature-medallion{position:absolute;bottom:11px;right:12px;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1px solid #ffe9b0;background:#3a70aa;color:#ffecca;font-size:20px}
+.ayer-home .ayer-recommend .list{background:linear-gradient(#ffffffec,#f5faffec);border:1px solid #dbe9f8;border-radius:18px;box-shadow:0 7px 20px #4585b215}
+.ayer-home .ayer-recommend .track-cover{border:1px solid #eed7a7}
+.ayer-home-albums .music-tile{border-color:#f2dda9}
+.ayer-illustrated-hero button:focus-visible,.ayer-home-tabs button:focus-visible{outline:3px solid #ffe5a0;outline-offset:2px}
+@media(max-width:900px){.ayer-illustrated-hero{min-height:228px;border-radius:18px;background-position:59% center}.ayer-hero-message{padding:20px;width:83%}.ayer-hero-message h1{font-size:clamp(21px,5vw,29px)}.ayer-home-tabs{gap:10px;padding:3px 6px 9px}.ayer-home-tabs button{font-size:14px}.ayer-home .section-heading h2{font-size:19px}.ayer-feature-card{flex-basis:clamp(176px,55vw,245px)}}
+@media(max-width:540px){.ayer-illustrated-hero{min-height:207px;background-position:63% center}.ayer-hero-message{padding:15px;width:88%}.ayer-hero-kicker{font-size:9px;letter-spacing:1px}.ayer-hero-message h1{font-size:21px;margin:6px 0}.ayer-hero-message p{font-size:10px;line-height:1.6;margin-bottom:10px;max-width:235px}.ayer-hero-buttons{gap:6px}.ayer-hero-primary,.ayer-hero-secondary{min-height:39px;padding:7px 11px;font-size:11px!important}.ayer-home-tabs button{padding:7px 10px}.ayer-home .section-heading h2{font-size:18px}.ayer-home .section-heading p{font-size:9px;letter-spacing:.3px}.ayer-feature-card{flex-basis:clamp(176px,57vw,220px)}.ayer-feature-medallion{width:25px;height:25px;font-size:15px}}
