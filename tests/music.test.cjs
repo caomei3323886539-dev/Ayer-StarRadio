@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0992"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0992"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0993"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0993"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0992'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0992'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0993'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0993'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=0992/);
+ assert.match(serviceWorker,/local-library\.js\?v=0993/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -211,4 +211,15 @@ test('v0.9.9.2 high-detail sky-hall illustrated musician remains decorative',()=
  assert.match(css,/\.topbar \.pill\.accent/);
  assert.match(css,/\.player \.disc-wrap/);
  assert.match(serviceWorker,/assets\/ayer-harpist\.svg/);
+});
+
+test('v0.9.9.3 original harpist artwork replaces vector only after successful load',()=>{
+ assert.match(script,/officialBanner\.src='\.\/assets\/ayer_home_harpist\.webp'/);
+ assert.match(script,/officialBanner\.onload=\(\)=>/);
+ assert.match(script,/officialBanner\.onerror=\(\)=>/);
+ assert.match(script,/hero\.classList\.add\('ayer-original-art-ready'\)/);
+ assert.match(css,/\.ayer-illustrated-hero\.ayer-original-art-ready/);
+ assert.match(css,/\.ayer-original-art-ready \.ayer-hero-musician\{display:none\}/);
+ assert.match(css,/url\('\.\/assets\/ayer_home_harpist\.webp'\)/);
+ assert.match(script,/heroineArtwork\.src='\.\/assets\/ayer-harpist\.svg'/);
 });
