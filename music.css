@@ -797,3 +797,79 @@ body.detail-open{overflow:hidden}
  .ayer-feature-card .ayer-feature-copy strong{font-size:clamp(13px,3.5vw,18px)}
  .ayer-feature-card .ayer-feature-copy small,.ayer-feature-card .ayer-feature-copy span:last-child{font-size:10px}
 }
+
+/* v0.9.9.5 — unified painted hero: text overlays the left sky, never a stacked blank panel.
+   Keep the complete 3:1 painting in view; a subtle glass tint ensures contrast. */
+@media(max-width:900px){
+ .ayer-illustrated-hero.ayer-original-art-ready{
+  position:relative;isolation:isolate;display:flex;align-items:center;
+  aspect-ratio:2.5/1;min-height:0;height:auto;
+  overflow:hidden;background:#83b7e5;
+ }
+ .ayer-original-art-ready .ayer-hero-sky{
+  position:absolute;inset:0;z-index:-1;display:block;
+  width:100%;height:100%;aspect-ratio:auto;
+  background-image:linear-gradient(90deg,#194b85bb 0%,#24578f8c 35%,#5f9bcc16 67%,transparent 86%),url('./assets/ayer_home_harpist.webp');
+  background-size:100% 100%,contain;
+  background-position:center,center;
+  background-repeat:no-repeat;
+ }
+ .ayer-original-art-ready .ayer-hero-message{
+  position:relative;z-index:1;box-sizing:border-box;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  width:64%;max-width:420px;height:100%;
+  padding:11px 12px 11px 18px;
+  background:transparent;color:#fff;
+  text-shadow:0 1px 6px #234976d9;
+ }
+ .ayer-original-art-ready .ayer-hero-kicker{display:block;color:#f8e8c4}
+ .ayer-original-art-ready .ayer-hero-message h1{
+  color:#fff;margin:5px 0 6px;max-width:300px;
+  font-size:clamp(17px,2.75vw,25px);line-height:1.37;
+ }
+ .ayer-original-art-ready .ayer-hero-message p{
+  color:#f6fbff;text-shadow:0 1px 4px #235482;
+  font-size:11px;line-height:1.55;max-width:300px;
+  margin:0 0 9px;
+ }
+ .ayer-original-art-ready .ayer-hero-buttons{gap:7px;flex-wrap:nowrap}
+ .ayer-original-art-ready .ayer-hero-primary,
+ .ayer-original-art-ready .ayer-hero-secondary{
+  min-height:40px;padding:7px 11px;white-space:nowrap;
+ }
+ .ayer-original-art-ready .ayer-hero-foot{display:none}
+ .ayer-original-art-ready .ayer-hero-ornaments{display:none}
+}
+@media(max-width:540px){
+ .ayer-illustrated-hero.ayer-original-art-ready{
+  aspect-ratio:2.45/1;min-height:0;
+  background-image:none;background-color:#7daddb;
+ }
+ .ayer-original-art-ready .ayer-hero-message{
+  width:65%;max-width:none;padding:9px 4px 9px 12px;
+ }
+ .ayer-original-art-ready .ayer-hero-kicker{
+  display:none;
+ }
+ .ayer-original-art-ready .ayer-hero-message h1{
+  max-width:205px;font-size:clamp(14px,4.15vw,19px);
+  line-height:1.3;margin:0 0 7px;letter-spacing:.1px;
+ }
+ .ayer-original-art-ready .ayer-hero-message p{display:none}
+ .ayer-original-art-ready .ayer-hero-buttons{gap:5px}
+ .ayer-original-art-ready .ayer-hero-primary,
+ .ayer-original-art-ready .ayer-hero-secondary{
+  min-height:39px;padding:6px 8px;font-size:10px!important;
+  box-shadow:0 2px 7px #163e703f;
+ }
+ .ayer-original-art-ready .ayer-hero-sky{
+  background-image:linear-gradient(90deg,#184676b7 0%,#1e4c807e 35%,#518ac116 67%,transparent 80%),url('./assets/ayer_home_harpist.webp');
+  background-size:100% 100%,contain;
+ }
+ .ayer-original-art-ready::before{inset:5px;border-color:#fff0c69e}
+}
+@media(max-width:355px){
+ .ayer-original-art-ready .ayer-hero-message{width:67%;padding-left:9px}
+ .ayer-original-art-ready .ayer-hero-message h1{font-size:14px;margin-bottom:5px}
+ .ayer-original-art-ready .ayer-hero-primary,.ayer-original-art-ready .ayer-hero-secondary{font-size:9px!important;padding-inline:6px}
+}
