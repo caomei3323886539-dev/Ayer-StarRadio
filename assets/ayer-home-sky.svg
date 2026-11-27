@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="天空音乐厅与浮空城剪影">
+<defs>
+<linearGradient id="sky" x2="0" y2="1"><stop stop-color="#90c9f0"/><stop offset=".45" stop-color="#bfdef9"/><stop offset="1" stop-color="#ecf7ff"/></linearGradient>
+<linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff8d5"/><stop offset=".5" stop-color="#e8c98b"/><stop offset="1" stop-color="#a78357"/></linearGradient>
+<linearGradient id="stone" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#bbd6ee"/></linearGradient>
+<radialGradient id="light"><stop stop-color="#fffef4" stop-opacity=".9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="4"/></filter>
+</defs>
+<rect width="1000" height="420" fill="url(#sky)"/>
+<circle cx="718" cy="72" r="170" fill="url(#light)"/>
+<g opacity=".7" fill="#fff"><path d="M0 290Q80 230 180 280Q300 207 401 288Q500 230 590 290T800 280Q900 250 1000 283V420H0Z"/><path d="M0 356Q190 309 325 352T680 338Q890 318 1000 343V420H0Z"/></g>
+<g opacity=".47" stroke="#f7faff" stroke-width="4" fill="none"><path d="M30 235Q375 65 785 144"/><path d="M120 260Q410 92 840 178"/></g>
+<g transform="translate(420 109)" opacity=".62">
+<path d="M0 98Q120 64 267 99L244 120H26Z" fill="#8caec9"/>
+<path d="M32 20H222V96H32Z" fill="url(#stone)"/><path d="M64 15L84-30L104 15M135 10L154-61L173 10M193 21L209-24L225 21" stroke="#fff" stroke-width="5" fill="#e8eefc"/>
+<path d="M41 41H218M41 59H218M41 79H218" stroke="#94bce0" stroke-width="2"/>
+<path d="M0 112Q113 141 265 112" fill="#84a9cb"/>
+</g>
+<g transform="translate(683 58)">
+<path d="M55 305V42M203 314V38" stroke="#a8c8e4" stroke-width="24"/>
+<path d="M55 44Q130-35 203 40" stroke="#f6fbff" stroke-width="18" fill="none"/>
+<path d="M55 53Q129-18 203 53" stroke="#d7e8f9" stroke-width="5" fill="none"/>
+<path d="M35 320H235M30 309H240M41 291H226" stroke="#f5faff" stroke-width="14"/>
+<path d="M64 156H194M64 191H194" stroke="#d1e2f6" stroke-width="4"/>
+<path d="M83 75V273M175 75V273" stroke="#f2f8fe" stroke-width="8"/>
+<path d="M104 132Q129 83 154 132V260H104Z" fill="#d4e8f7" opacity=".65" stroke="#f5f9ff" stroke-width="3"/>
+</g>
+<g transform="translate(814 133)" fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round">
+<path d="M55 30Q19 72 47 135Q76 190 87 249"/><path d="M55 30Q114 58 110 130Q109 191 87 249"/><path d="M55 30L88 249"/><path d="M48 54L60 204M61 52L70 204M74 53L80 204M88 57L88 204M100 74L98 200"/>
+<path d="M33 133Q69 149 116 133"/>
+</g>
+<g fill="#fff7d6" stroke="#e6c995" stroke-width="2"><path d="M705 44l5 14 14 5-14 5-5 14-5-14-14-5 14-5Z"/><path d="M468 54l4 10 10 4-10 4-4 10-4-10-10-4 10-4Z"/><path d="M950 179l6 14 14 6-14 6-6 14-6-14-14-6 14-6Z"/></g>
+<path d="M0 390Q170 345 340 392T730 385T1000 380V420H0Z" fill="#fff" opacity=".8"/>
+</svg>
