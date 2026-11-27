@@ -24,7 +24,7 @@ self.addEventListener('fetch',e=>{
   })));
   return;
  }
- const isShell=/\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname);
+ const isShell=/\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname)||url.pathname.endsWith('/assets/ayer-bottom-nav.webp');
  if(isShell)e.respondWith(fetch(req).then(response=>{
   if(response.ok){const copy=response.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(req,copy)))}
   return response;
