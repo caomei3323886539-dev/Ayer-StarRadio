@@ -208,13 +208,25 @@ function renderHome(root){
  const localSongs=availableLocal();
  const page=el('div','ayer-home');
  const top=el('div','ayer-home-top');
- top.append(el('div','ayer-home-kicker','AYER STAR MUSIC · 艾耶尔大陆'),el('h1','','让每一段旅程，都有自己的旋律'));
+ const hero=el('section','ayer-illustrated-hero');
+ const heroSky=el('div','ayer-hero-sky');
+ heroSky.setAttribute('aria-hidden','true');
+ const heroContent=el('div','ayer-hero-message');
+ heroContent.append(el('span','ayer-hero-kicker','✦ AYER STAR MUSIC · 艾耶尔大陆'),
+  el('h1','','让每一段旅程，都有自己的旋律'),
+  el('p','','听见神之谷的风、沙海尽头的祈愿，还有旅途中每一份温柔的约定。'));
+ const heroActions=el('div','ayer-hero-buttons');
+ heroActions.append(button('♫ 探索音乐馆','ayer-hero-primary',()=>goto('discover')),
+  button('✧ 本机音乐','ayer-hero-secondary',()=>goto('local')));
+ heroContent.append(heroActions);
+ hero.append(heroSky,heroContent);
+ top.append(hero);
  const tabs=el('nav','ayer-home-tabs');tabs.setAttribute('aria-label','主页音乐分类');
  const categories=[['home','推荐'],['discover','音乐'],['albums','专辑'],['artists','创作者'],['favorites','心动']];
  for(const [view,label] of categories){const tab=button(label,view==='home'?'is-current':'',()=>goto(view));if(view==='home')tab.setAttribute('aria-current','page');tabs.append(tab)}
  top.append(tabs);page.append(top);
  const carousel=el('section','ayer-featured');
- carousel.append(heading('探索今日星音','听见大陆各处的故事'));
+ carousel.append(heading('探索今日星音','EXPLORE TODAY\'S STAR MUSIC'));
  const rail=el('div','ayer-featured-rail');
  const cards=[
   {title:'最新星音',subtitle:'刚刚来到音乐馆的旋律',track:songs[0],view:'discover',kind:'latest'},
@@ -227,12 +239,13 @@ function renderHome(root){
   const artworkBox=el('div','ayer-feature-art','✦');
   if(card.track)setArt(card.track,artworkBox);
   const overlay=el('div','ayer-feature-copy');
+  overlay.append(el('span','ayer-feature-medallion','✦'));
   overlay.append(el('small','',card.subtitle),el('strong','',card.title),el('span','',card.track?card.track.title:'等待新的正式发布歌曲'));
   item.append(artworkBox,overlay);rail.append(item);
  }
  carousel.append(rail);page.append(carousel);
  const rec=el('section','ayer-recommend section');
- rec.append(heading('根据你的喜爱探索星音',state.user?'你收藏的音乐与最新公开歌曲':'精选已公开的原创音乐','查看全部',()=>goto('discover')));
+ rec.append(heading('根据你的喜爱探索星音','FOR YOU IN AYER CONTINENT','查看全部',()=>goto('discover')));
  const liked=state.user?songs.filter(t=>state.favorites.has(t.id)):[];
  const recTracks=[...liked,...songs.filter(t=>!liked.some(x=>key(x)===key(t)))].slice(0,6);
  rec.append(recTracks.length?rowList(recTracks):empty('期待第一首公开旋律','管理员正式发布歌曲后，音乐会出现在这里。'));page.append(rec);
