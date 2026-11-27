@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=099"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=099"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0991"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0991"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=099'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=099'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0991'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0991'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=099/);
+ assert.match(serviceWorker,/local-library\.js\?v=0991/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -182,4 +182,17 @@ test('v0.9.9 offline playback does not expose local tracks through cloud APIs',(
  assert.match(script,/next\.kind==='local'\|\|/);
  assert.match(script,/if\(t\.kind!=='local'&&state\.localAudioUrl\)/);
  assert.match(script,/if\(sb\)sb\.auth\.onAuthStateChange/);
+});
+
+test('v0.9.9.1 Ayer fantasy homepage keeps live controls and new decorative assets',()=>{
+ assert.match(script,/ayer-illustrated-hero/);
+ assert.match(script,/ayer-hero-message/);
+ assert.match(script,/ayer-hero-buttons/);
+ assert.match(script,/goto\('discover'\)/);
+ assert.match(script,/goto\('local'\)/);
+ assert.match(css,/url\('\.\/assets\/ayer-home-sky\.svg'\)/);
+ assert.match(css,/\.ayer-hero-primary/);
+ assert.match(css,/\.ayer-feature-medallion/);
+ assert.match(serviceWorker,/assets\/ayer-home-sky\.svg/);
+ assert.match(script,/sortPublicTracks\(availablePublic\(\),'newest'\)/);
 });
