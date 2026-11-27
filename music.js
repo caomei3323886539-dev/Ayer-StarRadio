@@ -211,6 +211,16 @@ function renderHome(root){
  const hero=el('section','ayer-illustrated-hero');
  const heroSky=el('div','ayer-hero-sky');
  heroSky.setAttribute('aria-hidden','true');
+ const heroine=el('div','ayer-hero-musician');
+ heroine.setAttribute('aria-hidden','true');
+ const heroineArtwork=el('img');
+ heroineArtwork.alt='';
+ heroineArtwork.decoding='async';
+ heroineArtwork.src='./assets/ayer-harpist.svg';
+ heroine.append(heroineArtwork);
+ const ornamental=el('div','ayer-hero-ornaments');
+ ornamental.setAttribute('aria-hidden','true');
+ ornamental.append(el('span','','✦'),el('span','','✧'),el('span','','✦'));
  const heroContent=el('div','ayer-hero-message');
  heroContent.append(el('span','ayer-hero-kicker','✦ AYER STAR MUSIC · 艾耶尔大陆'),
   el('h1','','让每一段旅程，都有自己的旋律'),
@@ -219,7 +229,10 @@ function renderHome(root){
  heroActions.append(button('♫ 探索音乐馆','ayer-hero-primary',()=>goto('discover')),
   button('✧ 本机音乐','ayer-hero-secondary',()=>goto('local')));
  heroContent.append(heroActions);
- hero.append(heroSky,heroContent);
+ const heroFoot=el('div','ayer-hero-foot');
+ heroFoot.append(el('span','','✧ SKY HALL · MUSIC JOURNEY'),el('span','','✦ ✦ ✦'));
+ heroContent.append(heroFoot);
+ hero.append(heroSky,ornamental,heroine,heroContent);
  top.append(hero);
  const tabs=el('nav','ayer-home-tabs');tabs.setAttribute('aria-label','主页音乐分类');
  const categories=[['home','推荐'],['discover','音乐'],['albums','专辑'],['artists','创作者'],['favorites','心动']];
@@ -239,6 +252,9 @@ function renderHome(root){
   const artworkBox=el('div','ayer-feature-art','✦');
   if(card.track)setArt(card.track,artworkBox);
   const overlay=el('div','ayer-feature-copy');
+  const emblem=el('span','ayer-feature-emblem','✧');
+  emblem.setAttribute('aria-hidden','true');
+  item.append(emblem);
   overlay.append(el('span','ayer-feature-medallion','✦'));
   overlay.append(el('small','',card.subtitle),el('strong','',card.title),el('span','',card.track?card.track.title:'等待新的正式发布歌曲'));
   item.append(artworkBox,overlay);rail.append(item);
