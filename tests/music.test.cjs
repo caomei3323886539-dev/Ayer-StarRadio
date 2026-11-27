@@ -223,3 +223,13 @@ test('v0.9.9.3 original harpist artwork replaces vector only after successful lo
  assert.match(css,/url\('\.\/assets\/ayer_home_harpist\.webp'\)/);
  assert.match(script,/heroineArtwork\.src='\.\/assets\/ayer-harpist\.svg'/);
 });
+
+test('production harpist illustration exists, is a valid WebP and is cached offline',()=>{
+ const art=fs.readFileSync('assets/ayer_home_harpist.webp');
+ assert.ok(art.length>100000&&art.length<600000,'Expected optimized original painting');
+ assert.equal(art.toString('ascii',0,4),'RIFF');
+ assert.equal(art.toString('ascii',8,12),'WEBP');
+ assert.match(script,/officialBanner\.src='\.\/assets\/ayer_home_harpist\.webp'/);
+ assert.match(css,/\.ayer-illustrated-hero\.ayer-original-art-ready/);
+ assert.match(serviceWorker,/'\.\/assets\/ayer_home_harpist\.webp'/);
+});
