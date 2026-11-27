@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0996"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0996"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0997"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0997"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0996'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0996'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0997'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0997'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=0996/);
+ assert.match(serviceWorker,/local-library\.js\?v=0997/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -253,8 +253,8 @@ test('v0.9.9.5 overlays the title onto the original art without a separate pale 
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message\{[\s\S]*?background:transparent;color:#fff/);
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message p\{display:none\}/);
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-buttons\{gap:7px;flex-wrap:nowrap\}/);
- assert.match(html,/music\.css\?v=0996/);
- assert.match(serviceWorker,/ayer-star-radio-v0996-nav-20261127/);
+ assert.match(html,/music\.css\?v=0997/);
+ assert.match(serviceWorker,/ayer-star-radio-v0997-glow-20261127/);
 });
 
 test('v0.9.9.6 official five-tab image-backed navigation routes and accessibility',()=>{
@@ -269,5 +269,7 @@ test('v0.9.9.6 official five-tab image-backed navigation routes and accessibilit
  assert.match(css,/--nav-height:calc\(82px \+ env\(safe-area-inset-bottom,0px\)\)/);
  assert.match(css,/\.mobile-nav\.ayer-celestial-nav button\.active/);
  assert.match(serviceWorker,/assets\/ayer-bottom-nav\.webp/);
- assert.match(html,/music\.css\?v=0996/);
+ assert.match(html,/music\.css\?v=0997/);
 });
+
+test('v0.9.9.7 removes rectangular tap feedback',()=>{assert.ok(css.includes('-webkit-tap-highlight-color:transparent'));assert.ok(css.includes('radial-gradient(ellipse at 50% 42%'));assert.ok(css.includes('button:active{transform:none;background:transparent!important}'))});
