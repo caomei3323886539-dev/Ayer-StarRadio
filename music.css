@@ -873,3 +873,81 @@ body.detail-open{overflow:hidden}
  .ayer-original-art-ready .ayer-hero-message h1{font-size:14px;margin-bottom:5px}
  .ayer-original-art-ready .ayer-hero-primary,.ayer-original-art-ready .ayer-hero-secondary{font-size:9px!important;padding-inline:6px}
 }
+
+/* v0.9.9.6: approved five-section celestial navigation artwork.
+   Original painting is a decorative layer; functional buttons and selection remain independent. */
+@media(max-width:900px){
+ :root{--nav-height:calc(82px + env(safe-area-inset-bottom,0px))}
+ .mobile-nav.ayer-celestial-nav{
+  position:fixed!important;display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  align-items:stretch;justify-content:stretch;
+  box-sizing:border-box;isolation:isolate;
+  height:var(--nav-height)!important;
+  padding:7px 8px calc(7px + env(safe-area-inset-bottom,0px))!important;
+  gap:2px;overflow:hidden;
+  background:linear-gradient(105deg,#ebf5ffeb,#fffefaed 50%,#e8f3ffec)!important;
+  border:1px solid #e8d5a5!important;border-bottom:0!important;
+  border-radius:20px 20px 0 0;
+  box-shadow:0 -6px 24px #507caa2e,inset 0 2px #fff8e0;
+ }
+ .mobile-nav.ayer-celestial-nav::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:url('./assets/ayer-bottom-nav.webp') center center/100% 100% no-repeat;
+  opacity:.32;
+ }
+ .mobile-nav.ayer-celestial-nav::after{
+  content:"✧";position:absolute;top:-5px;left:50%;transform:translateX(-50%);
+  z-index:0;pointer-events:none;font-size:18px;color:#cfa967;text-shadow:0 0 6px #fff;
+ }
+ .mobile-nav.ayer-celestial-nav button{
+  position:relative;z-index:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  width:100%;height:100%;min-width:0;min-height:44px;
+  padding:3px 1px;
+  background:#f7fbff80;border:1px solid transparent;border-radius:14px;
+  color:#446b9d;font-family:Georgia,'Noto Serif SC','Songti SC',serif;
+  font-weight:700;line-height:1.2;
+  font-size:12px;touch-action:manipulation;
+  transition:background .16s ease,transform .16s ease;
+ }
+ .mobile-nav.ayer-celestial-nav button span:first-child{
+  display:block;font-family:Arial,system-ui,sans-serif;
+  font-size:23px!important;line-height:1;color:#4e76aa;
+  text-shadow:0 0 8px #f8fdff;
+ }
+ .mobile-nav.ayer-celestial-nav button .ayer-nav-label{
+  display:block;font-size:12px!important;color:inherit;line-height:1.15;
+  letter-spacing:0;white-space:nowrap;
+ }
+ .mobile-nav.ayer-celestial-nav button.active{
+  background:linear-gradient(150deg,#699fe0,#2962b0)!important;
+  border-color:#e8c78d!important;
+  border-radius:17px;
+  color:#fff!important;
+  box-shadow:0 0 0 2px #fff6d9aa,0 3px 13px #477bb36b,inset 0 1px #ffffff9c;
+ }
+ .mobile-nav.ayer-celestial-nav button.active span:first-child{
+  color:#fff7df;text-shadow:0 0 8px #fff7c0;
+ }
+ .mobile-nav.ayer-celestial-nav button.active .ayer-nav-label{
+  color:#fff!important;text-shadow:0 1px 3px #284e80;
+ }
+ .mobile-nav.ayer-celestial-nav button.active:after{
+  content:"";position:absolute;bottom:2px;left:32%;right:32%;
+  height:2px;border-radius:100px;background:#fff2bc;
+ }
+ .mobile-nav.ayer-celestial-nav button:focus-visible{
+  outline:3px solid #ffdd8e;outline-offset:-2px;
+ }
+ .mobile-nav.ayer-celestial-nav button:active{transform:scale(.97)}
+ .player{bottom:calc(var(--visual-bottom,0px) + var(--nav-height) + 9px)!important}
+ .drawer{bottom:calc(var(--visual-bottom,0px) + var(--nav-height) + 90px)!important}
+ .workspace{padding-bottom:calc(var(--nav-height) + 112px)}
+}
+@media(max-width:360px){
+ .mobile-nav.ayer-celestial-nav{padding-left:4px!important;padding-right:4px!important;gap:1px}
+ .mobile-nav.ayer-celestial-nav button .ayer-nav-label{font-size:11px!important}
+ .mobile-nav.ayer-celestial-nav button span:first-child{font-size:20px!important}
+}
+@media(prefers-reduced-motion:reduce){.mobile-nav.ayer-celestial-nav button{transition:none!important}}
