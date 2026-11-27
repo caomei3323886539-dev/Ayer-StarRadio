@@ -1,0 +1,9 @@
+/* Common component skin; not a replacement for page-specific layout. */
+.ayer-alpha2 .simple-dialog,.ayer-alpha2 .drawer{background:var(--a2-surface);border:1px solid var(--a2-gold);border-radius:var(--a2-radius);box-shadow:0 16px 48px #254b8040}
+.ayer-alpha2 .simple-dialog input{border-color:#b8cde5;color:var(--a2-ink)}
+.ayer-alpha2 .soft-btn,.ayer-alpha2 .simple-dialog button:not(.icon-btn){border-color:#c0d4ec;background:var(--a2-surface);color:var(--a2-ink)}
+.ayer-alpha2 .accent,.ayer-alpha2 .play-main{background:linear-gradient(140deg,#6594d1,#365f9e)!important;color:white!important;border:1px solid var(--a2-gold)!important}
+.ayer-alpha2 .music-tile,.ayer-alpha2 .profile-v2-action{border-color:#d7e3f2;box-shadow:var(--a2-shadow)}
+.ayer-alpha2 input[type=range]{accent-color:var(--a2-blue)}
+.ayer-alpha2 button:focus-visible,.ayer-alpha2 a:focus-visible,.ayer-alpha2 input:focus-visible{outline:2px solid var(--a2-focus);outline-offset:2px}
+.ayer-alpha2 .player{border-color:var(--a2-gold)!important;background:var(--a2-surface)!important}

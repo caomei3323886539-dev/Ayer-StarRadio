@@ -4,6 +4,8 @@ on:
     paths:
       - 'music.html'
       - 'music.css'
+      - 'ui/**'
+      - 'assets/navigation/**'
       - 'music.js'
       - 'local-library.js'
       - 'assets/ayer_home_harpist.webp'
@@ -16,6 +18,8 @@ on:
     paths:
       - 'music.html'
       - 'music.css'
+      - 'ui/**'
+      - 'assets/navigation/**'
       - 'music.js'
       - 'sw.js'
       - 'manifest.webmanifest'

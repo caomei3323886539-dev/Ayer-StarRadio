@@ -1,0 +1,14 @@
+/* Shared shell only; all business routes and DOM IDs remain unchanged. */
+body.ayer-alpha2{color:var(--a2-ink);background:radial-gradient(ellipse at 95% 0%,#dbeaff 0,transparent 40%),radial-gradient(ellipse at 0% 35%,#fff9ed 0,transparent 35%),var(--a2-white)}
+.ayer-alpha2 .sidebar{background:linear-gradient(155deg,#fff,#e7f2ff);border-color:#d7e3f4}
+.ayer-alpha2 .topbar{background:linear-gradient(105deg,#fdfefe,#e4f0ff 65%,#fdf9ed);border-bottom:1px solid var(--a2-gold);box-shadow:var(--a2-shadow)}
+.ayer-alpha2 .brand-icon{background:transparent;box-shadow:none}
+.ayer-alpha2 .brand-icon img{width:40px;height:40px}
+.ayer-alpha2 .mobile-brand{align-items:center;gap:5px;color:var(--a2-ink)}
+.ayer-alpha2 .mobile-brand img{width:30px;height:30px;flex:none}
+.ayer-alpha2 .mobile-brand span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ayer-alpha2 .topbar .pill.accent{border:1px solid var(--a2-gold)!important}
+.ayer-alpha2 .search-wrap{border-color:#bfd3ea;box-shadow:none}
+.ayer-alpha2 .topbar .icon-btn{color:var(--a2-blue);-webkit-tap-highlight-color:transparent}
+@media(max-width:900px){.ayer-alpha2 .topbar{gap:5px;padding-inline:8px}.ayer-alpha2 .mobile-brand{font-size:14px}.ayer-alpha2 .topbar .account-actions{max-width:35vw}}
+@media(max-width:360px){.ayer-alpha2 .mobile-brand img{width:23px;height:23px}.ayer-alpha2 .mobile-brand{font-size:12px}}
