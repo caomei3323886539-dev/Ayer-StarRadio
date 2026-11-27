@@ -893,8 +893,8 @@ body.detail-open{overflow:hidden}
  }
  .mobile-nav.ayer-celestial-nav::before{
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:url('./assets/ayer-bottom-nav.webp') center center/100% 100% no-repeat;
-  opacity:.32;
+  background:radial-gradient(ellipse at 0% 100%,#b9d8f5 0%,transparent 35%),radial-gradient(ellipse at 100% 100%,#c5dcf5 0%,transparent 35%),linear-gradient(180deg,#f9fcff,#e9f3ff);
+  opacity:1;
  }
  .mobile-nav.ayer-celestial-nav::after{
   content:"✧";position:absolute;top:-5px;left:50%;transform:translateX(-50%);
@@ -978,3 +978,6 @@ body.detail-open{overflow:hidden}
  .mobile-nav.ayer-celestial-nav button span:first-child{transition:transform .16s ease,filter .16s ease}
 }
 @media(prefers-reduced-motion:reduce){.mobile-nav.ayer-celestial-nav button span:first-child{transition:none!important;transform:none!important}}
+
+/* v0.9.9.8: decorative background contains no baked-in labels or icons */
+@media(max-width:900px){.mobile-nav.ayer-celestial-nav{background:#f4f9ff!important;backdrop-filter:none}.mobile-nav.ayer-celestial-nav::before{background-image:radial-gradient(ellipse at 0% 100%,#b9d8f5,transparent 35%),radial-gradient(ellipse at 100% 100%,#c5dcf5,transparent 35%),linear-gradient(180deg,#f9fcff,#e9f3ff);opacity:1}}
