@@ -15,6 +15,15 @@ self.addEventListener('fetch',e=>{
   }).catch(()=>caches.match(path).then(r=>r||new Response('该页面尚未缓存。请联网后再次打开。',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}}))));
   return;
  }
+ // Optional high-resolution artwork is cached only after a successful network
+ // response. A missing binary must never block installation of the music PWA.
+ if(url.pathname.endsWith('/assets/ayer_home_harpist.webp')){
+  e.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(response=>{
+   if(response.ok){const copy=response.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(req,copy)))}
+   return response;
+  })));
+  return;
+ }
  const isShell=/\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname);
  if(isShell)e.respondWith(fetch(req).then(response=>{
   if(response.ok){const copy=response.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(req,copy)))}
