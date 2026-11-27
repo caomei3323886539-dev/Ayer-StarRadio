@@ -12,12 +12,12 @@ const serviceWorker = read('sw.js');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 
 test('new platform shell is installed and linked', () => {
-  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0994"><\/script>/);
-  assert.match(html, /href="\.\/music\.css\?v=0994"/);
+  assert.match(html, /<script type="module" src="\.\/music\.js\?v=0995"><\/script>/);
+  assert.match(html, /href="\.\/music\.css\?v=0995"/);
   assert.equal(manifest.start_url,'./music.html');
   assert.match(serviceWorker, /'\.\/music\.html'/);
-  assert.match(serviceWorker, /'\.\/music\.css\?v=0994'/);
-  assert.match(serviceWorker, /'\.\/music\.js\?v=0994'/);
+  assert.match(serviceWorker, /'\.\/music\.css\?v=0995'/);
+  assert.match(serviceWorker, /'\.\/music\.js\?v=0995'/);
 });
 
 test('every UI element referenced by music.js exists', () => {
@@ -169,7 +169,7 @@ test('v0.9.9 serves local library through both desktop and Android views',()=>{
  assert.match(script,/function createLocalPlaylist\(\)/);
  assert.match(css,/\.unified-local/);
  assert.match(css,/\.local-playlist-grid/);
- assert.match(serviceWorker,/local-library\.js\?v=0994/);
+ assert.match(serviceWorker,/local-library\.js\?v=0995/);
 });
 test('v0.9.9 offline playback does not expose local tracks through cloud APIs',()=>{
  assert.match(script,/await import\('https:\/\/esm\.sh\/@supabase\/supabase-js@2\.49\.4'\)/);
@@ -243,4 +243,16 @@ test('v0.9.9.4 preserves the full banner and caches only versioned public covers
  assert.match(script,/img\.loading='eager'/);
  assert.match(script,/if\(epoch!==coverEpoch\)return null/);
  assert.match(html,/rel="preload" as="image" href="\.\/assets\/ayer_home_harpist\.webp"/);
+});
+
+test('v0.9.9.5 overlays the title onto the original art without a separate pale panel',()=>{
+ assert.match(css,/v0\.9\.9\.5 — unified painted hero/);
+ assert.match(css,/\.ayer-illustrated-hero\.ayer-original-art-ready\{\s*position:relative;isolation:isolate;display:flex/);
+ assert.match(css,/\.ayer-original-art-ready \.ayer-hero-sky\{\s*position:absolute;inset:0/);
+ assert.match(css,/background-size:100% 100%,contain/);
+ assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message\{[\s\S]*?background:transparent;color:#fff/);
+ assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message p\{display:none\}/);
+ assert.match(css,/\.ayer-original-art-ready \.ayer-hero-buttons\{gap:7px;flex-wrap:nowrap\}/);
+ assert.match(html,/music\.css\?v=0995/);
+ assert.match(serviceWorker,/ayer-star-radio-v0995-overlay-20261127/);
 });
