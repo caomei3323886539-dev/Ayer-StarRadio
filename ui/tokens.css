@@ -1,2 +1,15 @@
 /* Star Chapter Alpha 2: shared visual tokens */
 :root{--a2-white:#f5f9ff;--a2-ice:#dcebfc;--a2-sky:#86b7ea;--a2-ink:#274d83;--a2-blue:#365f9e;--a2-gold:#d8bb83;--a2-violet:#c1b7e9;--a2-radius:18px;--a2-shadow:0 7px 23px #426eaa19;--a2-surface:linear-gradient(150deg,#fff,#edf5ff);--a2-focus:#245eaa;--a2-motion:160ms ease}
+
+/* B2: derived from existing palette; retain B1 navigation tokens. */
+.ayer-alpha2{
+ --a2-line:#c8d9f1;--a2-gold-line:#d8bb83;--a2-muted:#526d91;
+ --a2-panel:linear-gradient(155deg,#ffffff,#edf3ff);
+ --a2-header:linear-gradient(115deg,#f9fbff 0%,#e0eaff 55%,#f7f5ff 100%);
+ --a2-border-glow:inset 0 0 0 2px #ffffffa6,0 5px 16px #426eaa14;
+ --a2-title-font:Georgia,'Noto Serif SC','Songti SC',serif;
+ --a2-body-font:system-ui,'Noto Sans SC',sans-serif;
+ --a2-lily:url('../assets/ornaments/lily.png');
+ --a2-divider:url('../assets/ornaments/gold-divider.png');
+ --a2-star:url('../assets/ornaments/star.png');
+}
