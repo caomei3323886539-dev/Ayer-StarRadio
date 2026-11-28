@@ -53,7 +53,7 @@ async function main(){
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+3),'Preview horizontal overflow at '+width);
    await page.screenshot({path:'alpha2-browser-results/preview-'+width+'.png',fullPage:true});
    await page.locator('.launch').click();
-   await page.waitForURL('**/music.html?v=100a2');
+   await page.waitForURL('**/music.html?v=100a2c11');
    await page.waitForFunction(()=>document.querySelector('#notice')?.textContent.includes('离线模式'),null,{timeout:20000});
    await page.waitForFunction(()=>document.querySelector('#viewRoot')?.children.length>0);
    if(mobile){
