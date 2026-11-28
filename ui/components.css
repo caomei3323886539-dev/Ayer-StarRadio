@@ -31,3 +31,26 @@
 @media(prefers-reduced-motion:reduce){
  .ayer-alpha2 :is(.soft-btn,.primary-btn,.pill,.play-main,.icon-btn,.mini-action,.profile-v2-action){transition:none}
 }
+
+/* B2 shared content surfaces. No changes to navigation, audio controls or data. */
+.ayer-alpha2 :is(.music-tile,.list,.playlist-panel,.playlist-edit-list,.profile-v2-action){
+ background:var(--a2-panel);border:1px solid var(--a2-line);border-radius:var(--a2-radius);box-shadow:var(--a2-border-glow);
+}
+.ayer-alpha2 .music-tile{padding:10px;border-color:var(--a2-gold-line)}
+.ayer-alpha2 .tile-cover{border:1px solid #dfc994;border-radius:12px}
+.ayer-alpha2 .track-cover{border:1px solid var(--a2-line)}
+.ayer-alpha2 .track-row{border-color:#dce6f5}
+.ayer-alpha2 .track-row.playing-row{background:linear-gradient(90deg,#e2ecff,#f7faff);border-radius:10px}
+.ayer-alpha2 :is(.tile-title,.track-desc strong){color:var(--a2-ink)}
+.ayer-alpha2 :is(.tile-sub,.track-desc small,.music-filter-summary){color:var(--a2-muted)}
+.ayer-alpha2 .section-heading h2{font-family:var(--a2-title-font);color:var(--a2-ink)}
+.ayer-alpha2 .section-heading{border-bottom:1px solid #dfc99466;padding-bottom:8px}
+.ayer-alpha2 .music-filter-tools{background:var(--a2-panel);border:1px solid var(--a2-line);border-radius:16px;padding:6px 10px}
+.ayer-alpha2 .music-filter-tabs button{min-height:44px;background:#f9fbff;color:var(--a2-ink);border-color:var(--a2-line);touch-action:manipulation}
+.ayer-alpha2 .music-filter-tabs button.active{background:linear-gradient(145deg,#507cbe,#355b9d);border-color:var(--a2-gold-line);color:#fff;box-shadow:inset 0 0 0 1px #ffffff70}
+.ayer-alpha2 .music-filter-tabs button:active{filter:brightness(.94)}
+.ayer-alpha2 .music-sort{min-height:44px;background:var(--a2-panel);border-color:var(--a2-line);color:var(--a2-ink)}
+.ayer-alpha2 .ayer-illustrated-hero{border-color:var(--a2-gold-line);box-shadow:var(--a2-border-glow)}
+.ayer-alpha2 .ayer-home-tabs{background:var(--a2-panel);border:1px solid var(--a2-line);border-radius:16px}
+.ayer-alpha2 .ayer-feature-card{border-color:var(--a2-gold-line)}
+@media(max-width:540px){.ayer-alpha2 .music-tile{padding:7px}.ayer-alpha2 .music-filter-tools{padding:5px 7px}.ayer-alpha2 .music-filter-tabs button{padding-inline:12px}}
