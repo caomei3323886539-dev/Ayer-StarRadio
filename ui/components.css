@@ -17,3 +17,17 @@
 /* Original flower ornament in dialog corner, separate from controls. */
 .ayer-alpha2 .simple-dialog::after{content:"";position:absolute;right:3px;bottom:3px;width:40px;height:40px;background:url('../assets/ornaments/lily.png') center/contain no-repeat;pointer-events:none;opacity:.55}
 .ayer-alpha2 .simple-dialog button:not(.icon-btn){min-height:44px}
+
+/* Alpha 2 shared interaction feedback; leave playback and event handlers untouched. */
+.ayer-alpha2 :is(.soft-btn,.primary-btn,.pill,.play-main,.icon-btn,.mini-action,.profile-v2-action){touch-action:manipulation;transition:filter var(--a2-motion),box-shadow var(--a2-motion)}
+.ayer-alpha2 :is(.soft-btn,.primary-btn,.pill,.play-main,.icon-btn,.mini-action,.profile-v2-action):active:not(:disabled){filter:brightness(.92)}
+.ayer-alpha2 :is(button,input):disabled{opacity:.55;cursor:not-allowed}
+.ayer-alpha2 :is(.soft-btn,.primary-btn,.pill,.icon-btn,.mini-action):focus-visible{outline:2px solid var(--a2-focus);outline-offset:2px}
+.ayer-alpha2 .search-wrap:focus-within{outline:2px solid var(--a2-focus);outline-offset:2px}
+@media(max-width:900px){
+ .ayer-alpha2 .topbar .pill.accent{min-height:44px}
+ .ayer-alpha2 .simple-dialog :is(button,input){min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ayer-alpha2 :is(.soft-btn,.primary-btn,.pill,.play-main,.icon-btn,.mini-action,.profile-v2-action){transition:none}
+}
