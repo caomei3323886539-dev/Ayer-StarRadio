@@ -12,3 +12,12 @@ body.ayer-alpha2{color:var(--a2-ink);background:radial-gradient(ellipse at 95% 0
 .ayer-alpha2 .topbar .icon-btn{color:var(--a2-blue);-webkit-tap-highlight-color:transparent}
 @media(max-width:900px){.ayer-alpha2 .topbar{gap:5px;padding-inline:8px}.ayer-alpha2 .mobile-brand{font-size:14px}.ayer-alpha2 .topbar .account-actions{max-width:35vw}}
 @media(max-width:360px){.ayer-alpha2 .mobile-brand img{width:23px;height:23px}.ayer-alpha2 .mobile-brand{font-size:12px}}
+
+/* Approved raster star brand, separate search/menu controls and live text. */
+.ayer-alpha2 .topbar .icon-btn img{display:block;width:25px;height:25px;object-fit:contain;pointer-events:none}
+.ayer-alpha2 .topbar .icon-btn:active img{transform:scale(.94)}
+.ayer-alpha2 .a2-brand-copy{display:flex;flex-direction:column;gap:2px;font-family:Georgia,'Songti SC',serif;line-height:1.1;font-weight:700}
+.ayer-alpha2 .a2-brand-copy small{font-family:system-ui,sans-serif;font-size:7px;letter-spacing:1px;color:#496d9e;font-weight:650}
+.ayer-alpha2 .topbar .pill.accent{position:relative;overflow:hidden;text-overflow:ellipsis;background:linear-gradient(145deg,#497dc1,#284f8a)!important;box-shadow:inset 0 0 0 2px #f5e5b47a,0 3px 10px #4975a92c!important}
+@media(max-width:360px){.ayer-alpha2 .a2-brand-copy small{font-size:6px;letter-spacing:.4px}}
+@media(prefers-reduced-motion:reduce){.ayer-alpha2 .topbar .icon-btn:active img{transform:none}}

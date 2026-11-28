@@ -6,6 +6,7 @@ on:
       - 'music.css'
       - 'ui/**'
       - 'assets/navigation/**'
+      - 'assets/ornaments/**'
       - 'music.js'
       - 'local-library.js'
       - 'assets/ayer_home_harpist.webp'
@@ -20,6 +21,7 @@ on:
       - 'music.css'
       - 'ui/**'
       - 'assets/navigation/**'
+      - 'assets/ornaments/**'
       - 'music.js'
       - 'sw.js'
       - 'manifest.webmanifest'
@@ -36,3 +38,11 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/music.test.cjs tests/local-library.test.cjs
+      - name: Package full Alpha 2 test site
+        if: github.ref == 'refs/heads/ui/v1.0.0-alpha2'
+        run: git archive --format=zip --output=Ayer_Alpha2_Test_Site.zip HEAD
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/ui/v1.0.0-alpha2'
+        with:
+          name: Ayer_Alpha2_Test_Site
+          path: Ayer_Alpha2_Test_Site.zip

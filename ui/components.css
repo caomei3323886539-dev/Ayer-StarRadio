@@ -7,3 +7,9 @@
 .ayer-alpha2 input[type=range]{accent-color:var(--a2-blue)}
 .ayer-alpha2 button:focus-visible,.ayer-alpha2 a:focus-visible,.ayer-alpha2 input:focus-visible{outline:2px solid var(--a2-focus);outline-offset:2px}
 .ayer-alpha2 .player{border-color:var(--a2-gold)!important;background:var(--a2-surface)!important}
+
+/* Ornamental artwork is decorative only and cannot intercept clicks. */
+.ayer-alpha2 .simple-dialog{position:fixed;padding-top:32px}.ayer-alpha2 .simple-dialog::before{content:"";position:absolute;top:8px;left:14%;right:14%;height:13px;background:url('../assets/ornaments/gold-divider.png') center/100% 100% no-repeat;pointer-events:none}
+.ayer-alpha2 .simple-dialog .accent{color:#fff!important;background:linear-gradient(145deg,#4d81c1,#365f9e)!important}
+.ayer-alpha2 .player{box-shadow:0 7px 24px #396da225!important}
+.ayer-alpha2 .player .play-main{box-shadow:inset 0 0 0 2px #fff2ce77,0 3px 12px #355d9f33}
