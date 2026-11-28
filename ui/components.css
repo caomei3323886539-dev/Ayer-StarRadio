@@ -54,3 +54,33 @@
 .ayer-alpha2 .ayer-home-tabs{background:var(--a2-panel);border:1px solid var(--a2-line);border-radius:16px}
 .ayer-alpha2 .ayer-feature-card{border-color:var(--a2-gold-line)}
 @media(max-width:540px){.ayer-alpha2 .music-tile{padding:7px}.ayer-alpha2 .music-filter-tools{padding:5px 7px}.ayer-alpha2 .music-filter-tabs button{padding-inline:12px}}
+
+/* C1: home and library only. B1 navigation and B2 shared shell remain intact. */
+.ayer-alpha2 .a2-library-hero{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:190px;aspect-ratio:3.5/1;max-height:320px;border:1px solid var(--a2-gold-line);border-radius:22px;background:#456bb0 url('../assets/ayer_library_palace.svg') center/cover no-repeat;box-shadow:var(--a2-border-glow)}
+.ayer-alpha2 .a2-library-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#172e64e8 0%,#234477ae 35%,transparent 76%);pointer-events:none}
+.ayer-alpha2 .a2-library-hero::after{content:"";position:absolute;inset:5px;border:1px solid #ffe9b899;border-radius:17px;pointer-events:none;background:var(--a2-lily) right -8px bottom -12px/90px auto no-repeat}
+.ayer-alpha2 .a2-library-copy{padding:24px clamp(16px,4vw,42px);max-width:65%;color:white;text-shadow:0 1px 3px #192d58}
+.ayer-alpha2 .a2-library-copy h1{font:700 clamp(23px,4vw,40px)/1.2 var(--a2-title-font);margin:8px 0;color:white}
+.ayer-alpha2 .a2-library-copy small{font-size:10px;letter-spacing:1px;color:#ffedbd}
+.ayer-alpha2 .a2-library-copy p{font-size:13px;margin:0;color:#f7fbff}
+.ayer-alpha2 .a2-library-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:7px;margin:12px 0;border:1px solid var(--a2-line);border-radius:18px;background:var(--a2-panel);box-shadow:var(--a2-border-glow)}
+.ayer-alpha2 .a2-library-shortcut{min-width:0;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;padding:3px 5px;border:1px solid transparent;background:transparent;border-radius:12px;color:var(--a2-ink);font-weight:650;touch-action:manipulation}
+.ayer-alpha2 .a2-library-shortcut img{width:36px;height:36px;object-fit:contain;pointer-events:none}
+.ayer-alpha2 .a2-library-shortcut.active{background:#e0eaff;border-color:var(--a2-gold-line)}
+.ayer-alpha2 .a2-library-shortcut:active{filter:brightness(.92)}
+.ayer-alpha2 .ayer-home .ayer-home-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:5px}
+.ayer-alpha2 .ayer-home .ayer-home-tabs button{min-width:0;min-height:44px;padding:5px 2px;white-space:nowrap}
+.ayer-alpha2 .ayer-home .ayer-featured-rail{scroll-snap-type:x proximity}
+.ayer-alpha2 .ayer-home .ayer-feature-card{scroll-snap-align:start}
+.ayer-alpha2 .ayer-home .ayer-feature-card:active{filter:brightness(.94)}
+@media(max-width:900px){
+ .ayer-alpha2 .a2-library-hero{min-height:128px;aspect-ratio:2.45/1}
+ .ayer-alpha2 .a2-library-copy{max-width:70%;padding:14px}
+ .ayer-alpha2 .a2-library-copy h1{font-size:clamp(19px,5vw,28px)}
+ .ayer-alpha2 .a2-library-copy small{font-size:8px;letter-spacing:.35px}
+ .ayer-alpha2 .a2-library-copy p{font-size:11px}
+ .ayer-alpha2 .a2-library-hero::after{background-size:58px auto}
+ .ayer-alpha2 .a2-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .ayer-alpha2 .ayer-home .ayer-feature-card{flex:0 0 calc((100% - 12px)/2);min-width:0;aspect-ratio:1.15/1}
+}
+@media(max-width:360px){.ayer-alpha2 .a2-library-shortcut{font-size:12px;gap:2px}.ayer-alpha2 .a2-library-shortcut img{width:30px;height:30px}.ayer-alpha2 .ayer-home .ayer-home-tabs button{font-size:11px}}
