@@ -84,3 +84,8 @@
  .ayer-alpha2 .ayer-home .ayer-feature-card{flex:0 0 calc((100% - 12px)/2);min-width:0;aspect-ratio:1.15/1}
 }
 @media(max-width:360px){.ayer-alpha2 .a2-library-shortcut{font-size:12px;gap:2px}.ayer-alpha2 .a2-library-shortcut img{width:30px;height:30px}.ayer-alpha2 .ayer-home .ayer-home-tabs button{font-size:11px}}
+
+/* C1.1 build identity and optional independent raster art. Keep vector until the approved file is present. */
+.ayer-alpha2 .a2-build-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 10px;padding:5px 10px;color:var(--a2-ink);background:var(--a2-panel);border:1px solid var(--a2-line);border-radius:10px;font:650 11px/1.4 var(--a2-body-font)}
+.ayer-alpha2 .a2-build-label span{color:#355b9d;border:1px solid var(--a2-gold-line);border-radius:999px;padding:2px 6px;white-space:nowrap}
+.ayer-alpha2 .a2-library-hero{background-image:url('../assets/ayer_library_palace.webp?v=100a2c11'),url('../assets/ayer_library_palace.svg');background-position:center,center;background-size:cover,cover;background-repeat:no-repeat,no-repeat}

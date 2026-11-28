@@ -1,4 +1,4 @@
-import {readLocalLibrary,saveLocalSong,saveLocalPlaylist,importLocalSongs} from './local-library.js?v=100a2';
+import {readLocalLibrary,saveLocalSong,saveLocalPlaylist,importLocalSongs} from './local-library.js?v=100a2c11';
 
 // The offline library must remain usable when the cloud SDK is unreachable.
 let createClient=null;
