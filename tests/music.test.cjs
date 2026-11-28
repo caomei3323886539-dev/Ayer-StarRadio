@@ -254,7 +254,7 @@ test('v0.9.9.5 overlays the title onto the original art without a separate pale 
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-message p\{display:none\}/);
  assert.match(css,/\.ayer-original-art-ready \.ayer-hero-buttons\{gap:7px;flex-wrap:nowrap\}/);
  assert.match(html,/music\.css\?v=100a2/);
- assert.match(serviceWorker,/ayer-star-radio-v100a2-art-20261128/);
+ assert.match(serviceWorker,/const CACHE='ayer-star-radio-v100a2-preview-20261128';/);
 });
 
 test('v0.9.9.6 official five-tab image-backed navigation routes and accessibility',()=>{

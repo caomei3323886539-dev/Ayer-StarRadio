@@ -29,3 +29,7 @@ body.ayer-alpha2{color:var(--a2-ink);background:radial-gradient(ellipse at 95% 0
 .ayer-alpha2 .topbar .account-actions{min-width:0}
 .ayer-alpha2 .topbar .pill.accent{min-height:40px;max-width:100%;white-space:nowrap}
 @media(max-width:360px){.ayer-alpha2 .topbar{gap:3px;padding-inline:5px}.ayer-alpha2 .topbar .account-actions{max-width:31vw}.ayer-alpha2 .topbar .icon-btn{min-width:44px}}
+
+/* Desktop and mobile share the same independent celestial search artwork. */
+.ayer-alpha2 .search-wrap>span{display:grid;place-items:center;flex:0 0 23px}
+.ayer-alpha2 .search-wrap>span img{display:block;width:23px;height:23px;object-fit:contain}

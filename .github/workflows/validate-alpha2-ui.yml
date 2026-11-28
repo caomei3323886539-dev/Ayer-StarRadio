@@ -1,0 +1,43 @@
+name: Validate Alpha 2 UI
+on:
+  push:
+    branches:
+      - 'ui/v1.0.0-alpha2'
+    paths:
+      - 'music.html'
+      - 'music.css'
+      - 'music.js'
+      - 'alpha2-preview.html'
+      - 'ui/**'
+      - 'assets/navigation/**'
+      - 'assets/ornaments/**'
+      - 'tests/alpha2-browser.cjs'
+      - '.github/workflows/validate-alpha2-ui.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  responsive-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser test dependencies
+        run: |
+          npm install --no-save playwright@1.57.0
+          if ! command -v google-chrome >/dev/null && ! command -v google-chrome-stable >/dev/null; then
+            npx playwright install --with-deps chromium
+          fi
+      - name: Serve isolated test site
+        run: python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/alpha2-server.log 2>&1 &
+      - name: Responsive touch and navigation checks
+        run: node tests/alpha2-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Ayer_Alpha2_Browser_Results
+          path: alpha2-browser-results/
+          if-no-files-found: ignore

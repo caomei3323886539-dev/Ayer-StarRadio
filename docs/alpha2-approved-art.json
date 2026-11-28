@@ -1,0 +1,21 @@
+{
+  "source": "Ayer_Alpha2_Art.zip / Ayer_Alpha2_Standalone_Preview.html",
+  "description": "Approved Android preview raster assets. Hashes use the Git blob SHA-1 format.",
+  "assets": {
+    "assets/ornaments/crystal-heart.png": "8b3e2d007ae740d59e2ef5bf5f357aa67a75db28",
+    "assets/ornaments/gold-divider.png": "394b5efddb063bcfb95d4def00264ad495a1d9d5",
+    "assets/ornaments/lily.png": "0cdd8cc79add4860588946e9cd70f48a7bbbf1ef",
+    "assets/ornaments/star.png": "06dc5c901ea206151f70d91608c3425219e495e1",
+    "assets/navigation/discover.png": "58becafbc192ba9633d4f384f07a525fdb04a3f6",
+    "assets/navigation/home-active.png": "96354e26f32fdd405172b287c86ef6c5e42e7fb2",
+    "assets/navigation/discover-active.png": "2b99efc23f88ad57895bf369179b211192cf590d",
+    "assets/navigation/favorites-active.png": "a4b1f2c597172d6cc695abaffba77e08dcf0ce2a",
+    "assets/navigation/playlists-active.png": "a713444e84616000223b3a77d271240f8701f907",
+    "assets/navigation/profile.png": "11dfac2d57b024b333413f6e2f656ecc875e3eaf",
+    "assets/navigation/frame.webp": "a41781bb1a6562d735bbe81dd3f1fc696afacee6",
+    "assets/navigation/favorites.png": "bef0975f90d827c063cedd5044c559feb92c328a",
+    "assets/navigation/home.png": "1c09ec4913b0a020d2d83a0aca22c4119e9d1999",
+    "assets/navigation/playlists.png": "8bed31a64d10695529edeffa30f54e6dd7a0206d",
+    "assets/navigation/profile-active.png": "94000b51feaadd43a72a14fbcbf9e99c6e6023ac"
+  }
+}

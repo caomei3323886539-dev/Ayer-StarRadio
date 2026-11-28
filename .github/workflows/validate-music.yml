@@ -5,6 +5,8 @@ on:
       - 'music.html'
       - 'alpha2-preview.html'
       - 'tests/alpha2-preview.test.cjs'
+      - 'tests/alpha2-artwork.test.cjs'
+      - 'docs/alpha2-approved-art.json'
       - 'music.css'
       - 'ui/**'
       - 'assets/navigation/**'
@@ -22,6 +24,8 @@ on:
       - 'music.html'
       - 'alpha2-preview.html'
       - 'tests/alpha2-preview.test.cjs'
+      - 'tests/alpha2-artwork.test.cjs'
+      - 'docs/alpha2-approved-art.json'
       - 'music.css'
       - 'ui/**'
       - 'assets/navigation/**'
@@ -41,7 +45,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/music.test.cjs tests/local-library.test.cjs tests/alpha2-preview.test.cjs
+      - run: node --test tests/music.test.cjs tests/local-library.test.cjs tests/alpha2-preview.test.cjs tests/alpha2-artwork.test.cjs
       - name: Package full Alpha 2 test site
         if: github.ref == 'refs/heads/ui/v1.0.0-alpha2'
         run: git archive --format=zip --output=Ayer_Alpha2_Test_Site.zip HEAD
