@@ -7,3 +7,6 @@
 15 项资源直接从已通过 Android 图片显示验收的 Ayer_Alpha2_Standalone_Preview.html 提取，保持字节内容不变。十款 PNG 和 WebP 背景替换导航显示；星晶用于品牌，金色分隔线用于弹窗。顶部菜单、搜索为新绘制矢量资源。正式音乐页面仍待实际设备验证。
 
 测试：在独立分支 checkout 后，使用 python -m http.server 8080 启动，在浏览器打开 http://localhost:8080/music.html。该完整页面使用现有云端服务，测试写入会作用于真实账户，请先使用游客模式或测试账号。不得在生产主分支部署测试版。
+
+## 测试中心
+通过分支 Actions 下载 Ayer_Alpha2_Test_Site，解压，在根目录运行 python -m http.server 8080。打开 http://localhost:8080/alpha2-preview.html 先检查纯 UI；通过页面入口进入完整音乐界面。手机可使用电脑同一局域网 IP:8080（HTTP 环境不能验证 PWA 安装）。真实云账户写入需谨慎。主站未部署。原画 15 项已按 Git blob SHA 与验收 ZIP 核对，完全一致。
