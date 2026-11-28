@@ -361,7 +361,17 @@ function sortPublicTracks(songs,sort){
 }
 function renderDiscover(root){
  const songs=availablePublic(),albums=groupBy(songs,albumName),artists=groupBy(songs,displayName);
- pageHead(root,'发现音乐','公开音乐馆 · '+songs.length+' 首已发布曲目');
+ const banner=el('section','a2-library-hero');
+ const copy=el('div','a2-library-copy');
+ copy.append(el('small','','AYER STAR MUSIC · CELESTIAL HALL'),el('h1','','星音音乐馆'),el('p','','公开音乐馆 · '+songs.length+' 首已发布曲目'));
+ banner.append(copy);root.append(banner);
+ const shortcuts=el('nav','a2-library-shortcuts');shortcuts.setAttribute('aria-label','音乐馆分类');
+ for(const [view,label,icon] of [['discover','音乐','discover'],['albums','专辑','playlists'],['artists','创作者','profile']]){
+  const control=button('','a2-library-shortcut'+(view==='discover'?' active':''),()=>goto(view));
+  const art=el('img');art.src='./assets/navigation/'+icon+(view==='discover'?'-active':'')+'.png';art.alt='';art.width=40;art.height=40;
+  control.append(art,el('span','',label));if(view==='discover')control.setAttribute('aria-current','page');shortcuts.append(control);
+ }
+ root.append(shortcuts);
  if(!songs.length){root.append(empty('尚无已发布歌曲','只有管理员在云端管理中明确发布的音乐，才会向所有用户开放。'));return}
  const tools=el('div','music-filter-tools');
  const tabs=el('div','music-filter-tabs');
@@ -383,6 +393,13 @@ function renderDiscover(root){
  if(!filtered.length){state.discoverFilter='all';renderDiscover(root);return}
  const summary=el('p','music-filter-summary','当前展示 '+filtered.length+' 首歌曲 · '+albums.size+' 张专辑 · '+artists.size+' 位创作者');
  root.append(summary,rowList(sortPublicTracks(filtered,state.discoverSort)));
+ if(albums.size){
+  const section=el('section','section a2-library-albums');
+  section.append(heading('星辉专辑','探索公开音乐作品集','全部专辑',()=>goto('albums')));
+  const grid=el('div','tiles a2-library-grid');
+  for(const [name,tracks] of [...albums].slice(0,6))grid.append(collectionTile(name,tracks.length+' 首歌曲',tracks[0],()=>{goto('albums');state.album=name;render()},'专辑'));
+  section.append(grid);root.append(section);
+ }
 }
 function renderAlbums(root){
  const songs=availablePublic(),albums=groupBy(songs,albumName);
