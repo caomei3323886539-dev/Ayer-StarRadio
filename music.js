@@ -390,7 +390,7 @@ function renderDiscover(root){
  sorter.value=state.discoverSort;sorter.onchange=()=>{state.discoverSort=sorter.value;render()};
  tools.append(tabs,sorter);root.append(tools);
  const filtered=state.discoverFilter.startsWith('album:')?songs.filter(t=>albumName(t)===state.discoverFilter.slice(6)):songs;
- if(!filtered.length){state.discoverFilter='all';renderDiscover(root);return}
+ if(!filtered.length){state.discoverFilter='all';root.replaceChildren();renderDiscover(root);return}
  const summary=el('p','music-filter-summary','当前展示 '+filtered.length+' 首歌曲 · '+albums.size+' 张专辑 · '+artists.size+' 位创作者');
  root.append(summary,rowList(sortPublicTracks(filtered,state.discoverSort)));
  if(albums.size){
